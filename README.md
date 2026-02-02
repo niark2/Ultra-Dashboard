@@ -1,50 +1,56 @@
-# Niark Dashboard 🚀
+# Ultra Dashboard 🚀
 
-A powerful, all-in-one local dashboard for media management, creation, and system utilities. Built with Node.js, Express, and modern web technologies.
+A comprehensive, modular dashboard for media management, AI processing, and local networking. Built with Node.js and Python microservices.
 
 ## ✨ Features
 
-### 🎬 Media Studio
-- **Multi-track Timeline**: Advanced video and audio editing capabilities.
-- **YouTube Integration**: Compact downloader and upload interface.
-- **Media Converter**: FFmpeg-powered format conversion.
+### 🤖 AI Suite (Python Integration)
+- **RemoveBG**: Instant background removal for images using AI.
+- **Whisper STT**: High-accuracy local speech-to-text transcription.
+- **AI Upscaler**: Enhance image resolution using deep learning.
+- **AI Chat**: Integrated LLM chat interface.
 
-### 🛠️ Toolbox & Utilities
-- **Metadata Editor**: Edit file tags and information using FFmetadata.
-- **LocalDrop**: Seamless P2P file sharing on your local network (WebRTC).
-- **Webcam Mirror**: Quick camera check and capture tool.
-- **Widgets**: Customizable home screen with persistent widgets (Weather, Time, etc.).
+### 🎬 Media Tools
+- **YouTube Hub**: Compact interface for downloading/converting videos & audio (yt-dlp).
+- **Format Converter**: Advanced FFmpeg frontend for all your conversion needs.
+- **Metadata Editor**: Edit ID3 tags and metadata for audio/video files.
 
-### ⬇️ Download Manager
-- **Torrent Client**: Integrated qBittorrent management.
-- **YouTube Downloader**: High-quality video/audio extraction.
-
-## 🚀 File Structure
-- `server/`: Express backend logic and API routes.
-- `public/`: Static assets, CSS, and client-side JavaScript.
-- `views/`: EJS templates for dynamic rendering.
-- `uploads/`: Temporary storage for processed files.
+### ⚡ Network & Utils
+- **LocalDrop**: Seamless p2p file sharing (WebRTC) - AirDrop for your local network.
+- **Torrent Client**: Integrated qBittorrent management interface.
+- **Home Widgets**: Personal dashboard with weather, time, and system stats.
+- **Toolbox**: Collection of useful utilities (Webcam Mirror, etc.).
 
 ## 🛠️ Tech Stack
-- **Backend**: Node.js, Express, Socket.io
-- **Frontend**: Vanilla JS, EJS, CSS3 (Modern variables & layout)
-- **Processing**: FFmpeg, Sharp, Pandoc
-- **Data**: LocalStorage & JSON persistence
+- **Frontend**: EJS, CSS Variables, Lucide Icons
+- **Backend**: Node.js (Express), Socket.io
+- **AI Services**: Python (Rembg, OpenAI Whisper)
+- **Core Processing**: FFmpeg, yt-dlp, Sharp
 
 ## 📦 Installation
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/niark2/Niark-Dashboard.git
+   cd Niark-Dashboard
    ```
-2. Install dependencies:
+
+2. **Install Node.js dependencies**
    ```bash
    npm install
    ```
-3. Start the development server:
+
+3. **Install Python dependencies**
+   Ensure you have Python 3.x installed, then install required packages for AI features:
+   ```bash
+   pip install rembg openai-whisper torch
+   ```
+
+4. **Start the server**
    ```bash
    npm run dev
    ```
+   Access the dashboard at `http://localhost:3000`
 
 ## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
