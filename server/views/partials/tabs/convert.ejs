@@ -1,0 +1,89 @@
+<section class="tab-content" id="tab-convert">
+    <header class="content-header">
+        <h1>Convertisseur de fichiers</h1>
+        <p class="subtitle">Convertissez vos images, audio et vidéos en un clic</p>
+    </header>
+
+    <div class="converter-container">
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-content">
+                <div class="drop-icon"><i data-lucide="folder"></i></div>
+                <p class="drop-text">Glissez votre fichier ici</p>
+                <p class="drop-subtext">ou cliquez pour sélectionner</p>
+                <input type="file" id="fileInput" hidden>
+            </div>
+        </div>
+
+        <!-- File Info -->
+        <div class="file-info hidden" id="fileInfo">
+            <div class="file-preview">
+                <img id="imagePreview" class="hidden" alt="Aperçu">
+                <div class="file-icon-large" id="fileIconLarge"><i data-lucide="file-text"></i></div>
+            </div>
+            <div class="file-details">
+                <h3 id="fileName">filename.png</h3>
+                <p id="fileSize">0 KB</p>
+                <button class="btn-remove" id="removeFile"><i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                    Retirer</button>
+            </div>
+        </div>
+
+        <!-- Format Selection -->
+        <div class="format-section hidden" id="formatSection">
+            <h3>Convertir en :</h3>
+            <div class="format-grid" id="formatGrid">
+                <!-- Formats générés dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Options Section -->
+        <div class="convert-options hidden" id="convertOptions">
+            <div class="option-divider"></div>
+            <div class="compress-option">
+                <div class="option-info">
+                    <span class="option-icon"><i data-lucide="package"></i></span>
+                    <div class="option-text">
+                        <span class="option-title">Compresser le fichier</span>
+                        <span class="option-desc">Réduit la taille du fichier (qualité optimisée)</span>
+                    </div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="compressToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="compress-level hidden" id="compressLevelContainer">
+                <label class="compress-label">Niveau de compression</label>
+                <div class="compress-slider-container">
+                    <input type="range" id="compressLevel" min="1" max="100" value="75" class="compress-slider">
+                    <span id="compressLevelValue" class="compress-value">75%</span>
+                </div>
+                <div class="compress-hints">
+                    <span>Plus léger</span>
+                    <span>Meilleure qualité</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Convert Button -->
+        <button class="btn-convert hidden" id="convertBtn">
+            <span class="btn-text">Convertir</span>
+            <span class="btn-loader hidden"></span>
+        </button>
+
+        <!-- Progress -->
+        <div class="progress-container hidden" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">Conversion en cours...</p>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message hidden" id="successMessage">
+            <div class="success-icon"><i data-lucide="check-circle-2"></i></div>
+            <p>Conversion réussie !</p>
+        </div>
+    </div>
+</section>

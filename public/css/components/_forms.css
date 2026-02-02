@@ -1,0 +1,78 @@
+/* ============================================
+   FORMS & INPUTS
+   ============================================ */
+
+/* Labels (shared across modules) */
+.section-label,
+.format-section h3,
+.model-label,
+.result-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.format-section h3,
+.result-label {
+    margin-bottom: 16px;
+}
+
+/* Select Dropdown */
+.model-select {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+}
+
+.model-select:hover {
+    border-color: var(--text-secondary);
+}
+
+.model-select:focus {
+    outline: none;
+    border-color: var(--text-primary);
+}
+
+.model-select option {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 12px;
+}
+
+/* Textarea */
+.result-textarea {
+    width: 100%;
+    min-height: 200px;
+    max-height: 400px;
+    padding: 20px;
+    background: var(--bg-element);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 15px;
+    line-height: 1.7;
+    resize: vertical;
+    margin-bottom: 24px;
+}
+
+.result-textarea:focus {
+    outline: none;
+    border-color: var(--border-strong);
+}

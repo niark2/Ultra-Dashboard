@@ -1,0 +1,210 @@
+<section class="tab-content" id="tab-settings">
+    <header class="content-header">
+        <h1>Réglages</h1>
+        <p class="subtitle">Personnalisez votre expérience Ultra Dashboard</p>
+    </header>
+
+    <div class="settings-container">
+        <!-- Appearance Section -->
+        <div class="settings-group">
+            <div class="settings-group-title">Apparence</div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Thème Sombre</div>
+                    <div class="setting-description">Basculez entre le mode sombre et le mode clair</div>
+                </div>
+                <div class="setting-action">
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Couleur d'accentuation</div>
+                    <div class="setting-description">Choisissez la couleur principale de l'interface</div>
+                </div>
+                <div class="setting-action">
+                    <div class="accent-picker" id="accentPicker">
+                        <button class="accent-dot active" data-color="#ffffff"
+                            style="background: #ffffff; border: 1px solid var(--border-strong)"></button>
+                        <button class="accent-dot" data-color="#3b82f6" style="background: #3b82f6"></button>
+                        <button class="accent-dot" data-color="#ef4444" style="background: #ef4444"></button>
+                        <button class="accent-dot" data-color="#10b981" style="background: #10b981"></button>
+                        <button class="accent-dot" data-color="#f59e0b" style="background: #f59e0b"></button>
+                        <button class="accent-dot" data-color="#8b5cf6" style="background: #8b5cf6"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interface Section -->
+        <div class="settings-group">
+            <div class="settings-group-title">Interface</div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Animations réduites</div>
+                    <div class="setting-description">Désactive les animations pour plus de fluidité sur les
+                        vieux PC</div>
+                </div>
+                <div class="setting-action">
+                    <label class="switch">
+                        <input type="checkbox" id="reduceMotionToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Barre latérale réduite</div>
+                    <div class="setting-description">Affiche uniquement les icônes dans la barre latérale
+                    </div>
+                </div>
+                <div class="setting-action">
+                    <label class="switch">
+                        <input type="checkbox" id="compactSidebarToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Items Section -->
+        <div class="settings-group">
+            <div class="settings-group-title">Éléments de la barre latérale</div>
+            <div class="sidebar-items-description">
+                Choisissez les outils à afficher dans la barre latérale
+            </div>
+
+            <div class="sidebar-items-grid">
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="home" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="home"></i></span>
+                    <span class="item-label">Accueil</span>
+                </label>
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="convert" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="refresh-cw"></i></span>
+                    <span class="item-label">Convertisseur</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="youtube" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="youtube"></i></span>
+                    <span class="item-label">YouTube</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="removebg" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="scissors"></i></span>
+                    <span class="item-label">Remove BG</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="stt" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="mic"></i></span>
+                    <span class="item-label">Speech-to-Text</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="upscale" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="image"></i></span>
+                    <span class="item-label">AI Upscaler</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="chat" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="message-square"></i></span>
+                    <span class="item-label">AI Chat</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="metadata" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="tag"></i></span>
+                    <span class="item-label">Metadata Editor</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="torrent" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="zap"></i></span>
+                    <span class="item-label">Torrents</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="localdrop" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="share-2"></i></span>
+                    <span class="item-label">LocalDrop</span>
+                </label>
+
+                <label class="sidebar-item-checkbox">
+                    <input type="checkbox" data-sidebar-item="toolbox" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="item-icon"><i data-lucide="wrench"></i></span>
+                    <span class="item-label">Toolbox</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- System Section -->
+        <div class="settings-group">
+            <div class="settings-group-title">Système</div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Notification de fin</div>
+                    <div class="setting-description">Émettre un son quand une conversion est terminée</div>
+                </div>
+                <div class="setting-action">
+                    <label class="switch">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Cache local</div>
+                    <div class="setting-description">Vider le cache des fichiers temporaires</div>
+                </div>
+                <div class="setting-action">
+                    <button class="btn-secondary" id="clearCacheBtn">Vider le cache</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Info Card -->
+        <div class="settings-about">
+            <div class="about-card">
+                <div class="about-logo">
+                    <img src="favicon.png" alt="Ultra Logo"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+                </div>
+                <div class="about-content">
+                    <h3>Ultra Dashboard Pro v1.0.0</h3>
+                    <p>Un outil tout-en-un conçu pour la performance et le style.</p>
+                    <div class="about-links">
+                        <a href="#">Documentation</a>
+                        <a href="#">Support</a>
+                        <a href="#">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,23 @@
+/* ============================================
+   REMOVE BG MODULE
+   ============================================ */
+.rembg-preview {
+    width: 120px;
+    height: 120px;
+    background: repeating-conic-gradient(#2d2d35 0% 25%, var(--bg-element) 0% 50%) 50% / 20px 20px;
+}
+
+.rembg-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.rembg-result {
+    margin-top: 32px;
+    padding: 32px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}

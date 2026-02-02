@@ -1,0 +1,47 @@
+/* ============================================
+   ULTRA DASHBOARD - Main Stylesheet
+   ============================================
+   
+   This file imports all modular CSS files.
+   Edit individual files for specific changes.
+   
+   Structure:
+   ├── base/         → Variables, reset
+   ├── layout/       → Sidebar, main content
+   ├── components/   → Buttons, badges, forms, cards
+   ├── modules/      → Converter, RemBG, Upscale, STT
+   └── utils/        → States, utilities, animations, responsive
+   ============================================ */
+
+/* Base */
+@import url('./base/_variables.css');
+@import url('./base/_reset.css');
+
+/* Layout */
+@import url('./layout/_sidebar.css');
+@import 'youtube.css';
+@import 'modules/_chat.css';
+@import url('./layout/_main-content.css');
+
+/* Components */
+@import url('./components/_buttons.css');
+@import url('./components/_badges.css');
+@import url('./components/_forms.css');
+@import url('./components/_cards.css');
+
+/* Modules */
+@import url('./modules/_home.css');
+@import url('./modules/_converter.css');
+@import url('./modules/_rembg.css');
+@import url('./modules/_upscale.css');
+@import url('./modules/_stt.css');
+@import url('./modules/_toolbox.css');
+@import url('./modules/_metadata.css');
+@import url('./modules/_localdrop.css');
+@import url('./modules/_settings.css');
+
+/* Utils */
+@import url('./utils/_states.css');
+@import url('./utils/_utilities.css');
+@import url('./utils/_animations.css');
+@import url('./utils/_responsive.css');

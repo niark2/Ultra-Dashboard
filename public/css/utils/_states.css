@@ -1,0 +1,152 @@
+/* ============================================
+   STATES (Loading, Success, Error)
+   ============================================ */
+
+/* Progress */
+.progress-container {
+    margin-top: 32px;
+}
+
+.progress-bar {
+    height: 2px;
+    background: var(--bg-element);
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--text-primary);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: left;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Success Message */
+.success-message {
+    margin-top: 32px;
+    padding: 32px;
+    background: transparent;
+    border: 1px solid var(--success);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: 0 auto 12px auto;
+    color: var(--success);
+}
+
+.success-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.success-message p {
+    color: var(--success);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Server Error */
+.server-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px;
+    background: var(--bg-surface);
+    border: 1px solid var(--error);
+    border-radius: var(--radius-lg);
+    margin-bottom: 32px;
+}
+
+.server-error .error-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    color: var(--error);
+}
+
+.server-error .error-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.server-error .error-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.server-error .error-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.server-error code {
+    display: block;
+    padding: 12px 16px;
+    background: var(--bg-element);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+
+/* Coming Soon */
+.coming-soon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background: var(--bg-surface);
+}
+
+.coming-soon-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 24px;
+    opacity: 0.5;
+    color: var(--text-primary);
+}
+
+.coming-soon-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.coming-soon p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}

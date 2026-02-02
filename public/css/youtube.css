@@ -1,0 +1,366 @@
+/* ===================================
+   YOUTUBE DOWNLOADER - Studio Minimalist
+   =================================== */
+
+.input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    max-width: 100%;
+}
+
+.url-input {
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 14px;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.url-input:focus {
+    border-color: var(--text-secondary);
+}
+
+.btn-search {
+    width: 56px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    display: flex;
+    /* Centering icon */
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-search:hover {
+    background: var(--bg-element);
+    color: var(--text-primary);
+}
+
+/* YouTube Preview */
+.yt-preview {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    /* Fixed width for thumbnail */
+    gap: 0;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Removed min-height: 500px */
+    width: 100%;
+}
+
+.yt-thumbnail-container {
+    position: relative;
+    width: 100%;
+    /* Let height be determined by grid or content, 
+       but we want it to cover the left side. 
+       Since grid rows are likely auto, let's make sure it fills. */
+    height: 100%;
+    background: var(--bg-depth);
+    min-height: 220px;
+    /* Ensure at least some height */
+}
+
+.yt-thumbnail-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+}
+
+.yt-duration {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+/* Info Section */
+.yt-info {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+}
+
+.yt-info h3 {
+    font-size: 20px;
+    /* Reduced from 24px */
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.yt-channel {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    /* Reduced from 40px */
+}
+
+/* Options Grid */
+.yt-options-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    /* 3 columns layout */
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.option-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* Toggles & Selects */
+.toggle-group {
+    display: flex;
+    background: var(--bg-primary);
+    padding: 2px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    height: 38px;
+    /* Fixed height for consistency */
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 0 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: calc(var(--radius-sm) - 2px);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.toggle-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+.toggle-btn.active {
+    background: var(--bg-element);
+    color: var(--text-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.yt-select {
+    width: 100%;
+    height: 38px;
+    /* Match toggle height */
+    padding: 0 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    /* Custom arrow ideally, but simple for now */
+}
+
+.btn-convert {
+    width: 100%;
+    padding: 14px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    /* Push to bottom if flex column */
+}
+
+.btn-convert:hover {
+    opacity: 0.9;
+}
+
+/* Advanced Panel */
+.yt-advanced-panel {
+    background: var(--bg-primary);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    margin-top: 16px;
+    border: 1px solid var(--border-strong);
+    margin-bottom: 16px;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Horizontal checkboxes */
+    gap: 12px;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.checkmark {
+    height: 14px;
+    width: 14px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.custom-checkbox input:checked~.checkmark {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+}
+
+.custom-checkbox input:checked~.checkmark::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--bg-primary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.time-input {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-strong) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 12px !important;
+}
+
+/* Loading & Progress */
+.yt-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    gap: 16px;
+}
+
+.loader-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--bg-element);
+    border-top: 2px solid var(--text-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.yt-progress-container {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+}
+
+.yt-progress-bar {
+    height: 4px;
+    background: var(--bg-element);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.yt-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--text-primary);
+    transition: width 0.3s ease;
+}
+
+.yt-progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .yt-preview {
+        grid-template-columns: 1fr;
+    }
+
+    .yt-thumbnail-container {
+        height: 250px;
+        min-height: auto;
+    }
+
+    .yt-info {
+        border-left: none;
+        border-top: 1px solid var(--border-strong);
+        padding: 20px;
+    }
+
+    .yt-options-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+}

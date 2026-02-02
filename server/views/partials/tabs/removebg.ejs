@@ -1,0 +1,76 @@
+<section class="tab-content" id="tab-removebg">
+    <header class="content-header">
+        <div class="header-with-status">
+            <h1>Remove Background</h1>
+            <span class="status-badge disconnected" id="rembgStatusBadge"><i data-lucide="power"
+                    class="status-icon"></i> Vérification...</span>
+        </div>
+        <p class="subtitle">Supprimez l'arrière-plan de vos images avec l'IA</p>
+    </header>
+
+    <div class="converter-container">
+        <!-- Server Error Message -->
+        <div class="server-error hidden" id="rembgServerError">
+            <div class="error-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="error-content">
+                <h3>Serveur REMBG non connecté</h3>
+                <p>Le serveur Python doit être démarré pour utiliser cette fonctionnalité.</p>
+                <code>python server/python/rembg_server.py</code>
+                <button id="rembgRetryBtn" class="btn-retry">Réessayer</button>
+            </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="rembgDropZone">
+            <div class="drop-zone-content">
+                <div class="drop-icon"><i data-lucide="image"></i></div>
+                <p class="drop-text">Glissez votre image ici</p>
+                <p class="drop-subtext">PNG, JPG, WEBP, GIF • Max 10MB</p>
+                <input type="file" id="rembgFileInput"
+                    accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/bmp" hidden>
+            </div>
+        </div>
+
+        <!-- File Info -->
+        <div class="file-info hidden" id="rembgFileInfo">
+            <div class="file-preview rembg-preview">
+                <img id="rembgPreview" src="" alt="Aperçu">
+            </div>
+            <div class="file-details">
+                <h3 id="rembgFileName">image.png</h3>
+                <p id="rembgFileSize">0 KB</p>
+                <button class="btn-remove" id="rembgRemoveFile"><i data-lucide="x"
+                        style="width: 14px; height: 14px;"></i> Retirer</button>
+            </div>
+        </div>
+
+        <!-- Process Button -->
+        <button class="btn-convert hidden" id="rembgProcessBtn" style="margin-top: 32px;">
+            <span class="btn-text"><i data-lucide="sparkles" class="inline-icon"></i> Supprimer
+                l'arrière-plan</span>
+            <span class="btn-loader hidden"></span>
+        </button>
+
+        <!-- Progress -->
+        <div class="progress-container hidden" id="rembgProgressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="rembgProgressFill"></div>
+            </div>
+            <p class="progress-text" id="rembgProgressText">Traitement en cours...</p>
+        </div>
+
+        <!-- Result -->
+        <div class="rembg-result hidden" id="rembgResultContainer">
+            <div class="result-preview">
+                <img id="rembgResultImage" src="" alt="Résultat">
+            </div>
+            <div class="result-actions">
+                <button class="btn-convert" id="rembgDownloadBtn">
+                    <span class="btn-text"><i data-lucide="download" class="inline-icon"></i> Télécharger
+                        PNG</span>
+                </button>
+                <button class="btn-secondary" id="rembgNewBtn">Nouvelle image</button>
+            </div>
+        </div>
+    </div>
+</section>

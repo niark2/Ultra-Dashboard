@@ -1,0 +1,86 @@
+<section class="tab-content" id="tab-stt">
+    <header class="content-header">
+        <div class="header-with-status">
+            <h1>Speech-to-Text</h1>
+            <span class="status-badge disconnected" id="sttStatusBadge"><i data-lucide="power" class="status-icon"></i>
+                Vérification...</span>
+        </div>
+        <p class="subtitle">Transcrivez vos fichiers audio et vidéo en texte avec Whisper IA</p>
+    </header>
+
+    <div class="converter-container">
+        <!-- Server Error Message -->
+        <div class="server-error hidden" id="sttServerError">
+            <div class="error-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="error-content">
+                <h3>Serveur Whisper non connecté</h3>
+                <p>Le serveur Python doit être démarré pour utiliser cette fonctionnalité.</p>
+                <code>python server/python/whisper_server.py</code>
+                <button id="sttRetryBtn" class="btn-retry">Réessayer</button>
+            </div>
+        </div>
+
+        <!-- Model Selection -->
+        <div class="model-selection">
+            <label class="model-label" for="sttModelSelect">Modèle AI Whisper</label>
+            <select id="sttModelSelect" class="model-select">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="sttDropZone">
+            <div class="drop-zone-content">
+                <div class="drop-icon"><i data-lucide="mic"></i></div>
+                <p class="drop-text">Glissez votre fichier ici</p>
+                <p class="drop-subtext">MP3, WAV, M4A, OGG, WebM • Max 500MB</p>
+                <input type="file" id="sttFileInput" hidden>
+            </div>
+        </div>
+
+        <!-- File Info -->
+        <div class="file-info hidden" id="sttFileInfo">
+            <div class="file-preview stt-preview">
+                <div class="file-icon-large"><i data-lucide="music"></i></div>
+            </div>
+            <div class="file-details">
+                <h3 id="sttFileName">audio.mp3</h3>
+                <p><span id="sttFileSize">0 KB</span> • <span id="sttFileDuration">--:--</span></p>
+                <button class="btn-remove" id="sttRemoveFile"><i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                    Retirer</button>
+            </div>
+        </div>
+
+        <!-- Process Button -->
+        <button class="btn-convert hidden" id="sttTranscribeBtn" style="margin-top: 32px;">
+            <span class="btn-text"><i data-lucide="mic" class="inline-icon"></i> Lancer la
+                transcription</span>
+            <span class="btn-loader hidden"></span>
+        </button>
+
+        <!-- Progress -->
+        <div class="progress-container hidden" id="sttProgressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="sttProgressFill"></div>
+            </div>
+            <p class="progress-text" id="sttProgressText">Transcription en cours...</p>
+        </div>
+
+        <!-- Result -->
+        <div class="stt-result hidden" id="sttResultContainer">
+            <label class="result-label">Résultat de la transcription</label>
+            <textarea id="sttResultText" class="result-textarea" readonly></textarea>
+            <div class="result-actions">
+                <button class="btn-convert" id="sttCopyBtn">
+                    <span class="btn-text"><i data-lucide="clipboard" class="inline-icon"></i> Copier le
+                        texte</span>
+                </button>
+                <button class="btn-convert" id="sttDownloadBtn">
+                    <span class="btn-text"><i data-lucide="download" class="inline-icon"></i> Télécharger
+                        .txt</span>
+                </button>
+                <button class="btn-secondary" id="sttNewBtn">Nouveau fichier</button>
+            </div>
+        </div>
+    </div>
+</section>

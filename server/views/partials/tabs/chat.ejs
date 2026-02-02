@@ -1,0 +1,61 @@
+<section class="tab-content" id="tab-chat">
+    <header class="content-header">
+        <h1>AI Chat / PDF Expert</h1>
+        <p class="subtitle">Discutez avec l'IA ou posez des questions sur vos documents</p>
+    </header>
+
+    <div class="chat-layout">
+        <!-- PDF Sidebar within Chat -->
+        <aside class="chat-sidebar" id="chatSidebar">
+            <div class="sidebar-section">
+                <h3 class="section-title">Document Context</h3>
+                <div class="pdf-upload-container">
+                    <label for="pdfInput" class="pdf-upload-label">
+                        <span class="icon"><i data-lucide="file-text"></i></span>
+                        <span class="text" id="pdfStatusText">Ajouter un PDF</span>
+                        <input type="file" id="pdfInput" accept="application/pdf" hidden>
+                    </label>
+                </div>
+                <div id="pdfInfo" class="pdf-info-card hidden">
+                    <div class="pdf-details">
+                        <span class="pdf-name" id="currentPdfName">doc.pdf</span>
+                        <span class="pdf-pages" id="currentPdfPages">-- pages</span>
+                    </div>
+                    <button class="btn-icon-small" id="removePdf" title="Retirer le document"><i data-lucide="x"
+                            style="width: 14px; height: 14px;"></i></button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Modèle</h3>
+                <div class="model-badge">Gemini 2.0 Pro</div>
+            </div>
+
+            <button class="btn-clear-chat" id="chatClearBtn"
+                style="display: flex; align-items: center; justify-content: center;gap:8px">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i> Effacer l'historique
+            </button>
+        </aside>
+
+        <!-- Chat Main Area -->
+        <div class="chat-main">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                    <div class="message-content">
+                        Bonjour ! Je suis Ultra AI. Comment puis-je vous aider aujourd'hui ?
+                        Vous pouvez m'envoyer un PDF via la barre latérale pour que j'y réponde précisément.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chatForm">
+                    <textarea id="chatInput" placeholder="Posez votre question ici..." rows="1"></textarea>
+                    <button type="submit" class="btn-send" id="sendBtn">
+                        <span class="send-icon"><i data-lucide="send"></i></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,307 @@
+/* Torrent Tab Styles */
+.torrent-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+/* Toolbar */
+.torrent-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-surface);
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.torrent-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Data-specific overrides for Toolbar Buttons */
+.torrent-toolbar .btn-convert,
+.torrent-toolbar .btn-secondary {
+    margin: 0;
+    /* Reset global margin */
+    padding: 10px 24px;
+    height: 42px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.torrent-stats {
+    display: flex;
+    gap: 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-value {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Torrent List */
+.torrent-list {
+    flex: 1;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.torrent-header-row {
+    display: grid;
+    grid-template-columns: 50px 3fr 1fr 1fr 1fr 100px;
+    padding: 12px 16px;
+    background: var(--bg-element);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.torrent-items {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.torrent-item {
+    display: grid;
+    grid-template-columns: 50px 3fr 1fr 1fr 1fr 100px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 14px;
+    transition: background var(--transition-fast);
+}
+
+.torrent-item:hover {
+    background: var(--bg-element);
+}
+
+.torrent-icon {
+    font-size: 20px;
+}
+
+.torrent-name-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.torrent-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+}
+
+.torrent-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 8px;
+}
+
+.progress-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding-right: 16px;
+}
+
+.progress-track {
+    height: 6px;
+    background: var(--bg-element);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--text-primary);
+    /* Default accent is text-primary in this theme usually? No, check accent */
+    background: var(--accent);
+    /* Wait, accent is usually black/white. Let's use specific colors for progress */
+    background: var(--text-primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.speed-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.speed-down {
+    color: var(--success);
+    /* Green */
+}
+
+.speed-up {
+    color: #3b82f6;
+    /* Blue */
+}
+
+.status-col {
+    display: flex;
+    align-items: center;
+}
+
+/* .status-badge styles removed to use global _badges.css */
+
+.status-downloading {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-seeding {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-paused {
+    background: var(--bg-element);
+    color: var(--text-muted);
+}
+
+.status-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+/* Actions Col */
+.actions-col {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-icon-s {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon-s:hover {
+    background: var(--bg-element);
+    color: var(--text-primary);
+}
+
+.btn-icon-s.delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+/* Add Modal */
+.add-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-surface);
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    width: 500px;
+    display: none;
+}
+
+.add-modal.visible {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    display: none;
+    backdrop-filter: blur(4px);
+}
+
+.overlay.visible {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.login-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-surface);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-radius: var(--radius-lg);
+}

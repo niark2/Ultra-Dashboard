@@ -1,0 +1,30 @@
+/* ============================================
+   AI UPSCALE MODULE
+   ============================================ */
+.upscale-options {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.upscale-preview {
+    width: 200px;
+    height: 200px;
+    background: var(--bg-element);
+}
+
+.upscale-result-preview {
+    max-width: 600px;
+    background: var(--bg-element);
+    aspect-ratio: auto;
+    min-height: 300px;
+}

@@ -1,0 +1,58 @@
+<section class="tab-content" id="tab-localdrop">
+    <header class="content-header">
+        <h1>LocalDrop</h1>
+        <p class="subtitle">Partagez des fichiers en P2P avec les appareils sur votre réseau</p>
+    </header>
+
+    <div class="localdrop-container">
+        <div class="localdrop-status" id="localdropStatus">
+            <div class="my-device">
+                <div class="device-avatar" id="myAvatar">?</div>
+                <div class="device-info">
+                    <span class="device-label">Mon appareil</span>
+                    <span class="device-name" id="myName">Chargement...</span>
+                </div>
+            </div>
+            <div class="share-info">
+                <div class="share-info">
+                    <div class="share-url-container">
+                        <span class="share-label">Scanner pour partager</span>
+                        <div id="qrcode" class="qrcode-container"></div>
+                        <div class="url-badge">
+                            <span id="localUrlDisplay">http://...</span>
+                            <button class="btn-icon-small" id="copyUrlBtn" title="Copier l'URL"><i
+                                    data-lucide="copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="devices-grid" id="devicesGrid">
+            <!-- Devices will be added here dynamically -->
+            <div class="no-devices">
+                <div class="no-devices-icon"><i data-lucide="radar"></i></div>
+                <p>Recherche d'autres appareils sur le réseau...</p>
+                <p class="subtext">Ouvrez Ultra Dashboard sur un autre appareil pour le voir ici.</p>
+            </div>
+        </div>
+
+        <!-- Hidden File Input -->
+        <input type="file" id="localdropFileInput" hidden>
+
+        <!-- Transfer Progress Modal (Generic) -->
+        <div id="transferModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Transfert en cours</h3>
+                <div class="transfer-info">
+                    <span id="transferFileName">fichier.ext</span>
+                    <span id="transferPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="transferProgressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <p id="transferStatus">Envoi vers...</p>
+            </div>
+        </div>
+    </div>
+</section>

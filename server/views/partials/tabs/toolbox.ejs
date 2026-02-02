@@ -1,0 +1,198 @@
+<section class="tab-content" id="tab-toolbox">
+    <header class="content-header">
+        <h1>Mega Toolbox</h1>
+        <p class="subtitle">Une collection d'outils essentiels regroupés dans une interface épurée</p>
+    </header>
+
+    <div class="toolbox-grid">
+        <!-- QR Code Generator -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="smartphone"></i></span>
+                <span class="tool-title">Générateur QR Code</span>
+            </div>
+            <div class="tool-content">
+                <input type="text" id="qr-input" class="tool-input" placeholder="Lien ou texte...">
+                <div id="qrcode-result"
+                    style="display: flex; justify-content: center; align-items: center; min-height: 150px; background: var(--surface-secondary); border-radius: 12px; margin: 12px 0;">
+                    <p style="color: var(--text-muted); font-size: 13px;">Votre QR code apparaîtra ici</p>
+                </div>
+                <button id="qr-download" class="tool-button hidden">Télécharger l'image</button>
+            </div>
+        </div>
+
+        <!-- Password Generator -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="key"></i></span>
+                <span class="tool-title">Mot de passe</span>
+            </div>
+            <div class="tool-content">
+                <div class="password-display"
+                    style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-secondary); padding: 12px; border-radius: 12px; margin-bottom: 16px; font-family: var(--font-mono); font-weight: 600; color: var(--accent-primary);">
+                    <span id="pass-result">********</span>
+                    <button id="pass-copy" class="btn-icon-small" title="Copier"
+                        style="background:none; border:none; cursor:pointer;"><i data-lucide="clipboard"
+                            style="width: 16px; height: 16px;"></i></button>
+                </div>
+                <div class="tool-range-group" style="margin-bottom: 16px;">
+                    <div class="stat-label-row"
+                        style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                        <span>Longueur</span>
+                        <span id="pass-length-val">16</span>
+                    </div>
+                    <input type="range" id="pass-length" class="tool-range" min="8" max="64" value="16"
+                        style="width: 100%;">
+                </div>
+                <div class="tool-checkbox-group"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                    <label class="tool-checkbox"
+                        style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input type="checkbox"
+                            id="pass-upper" checked> ABC</label>
+                    <label class="tool-checkbox"
+                        style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input type="checkbox"
+                            id="pass-lower" checked> abc</label>
+                    <label class="tool-checkbox"
+                        style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input type="checkbox"
+                            id="pass-num" checked> 123</label>
+                    <label class="tool-checkbox"
+                        style="display: flex; align-items: center; gap: 8px; font-size: 13px;"><input type="checkbox"
+                            id="pass-sym" checked> !@#</label>
+                </div>
+                <button id="pass-gen" class="tool-button"
+                    style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-tertiary); border: 1px solid var(--border-subtle); cursor: pointer; font-weight: 600;">Générer
+                    le mot de passe</button>
+            </div>
+        </div>
+
+        <!-- Text Utilities -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="type"></i></span>
+                <span class="tool-title">Outils Texte</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="text-input" class="tool-input"
+                    style="height: 100px; resize: none; width: 100%; margin-bottom: 12px;"
+                    placeholder="Collez votre texte ici..."></textarea>
+                <div class="text-tool-buttons"
+                    style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;">
+                    <button class="tool-button secondary" data-action="upper"
+                        style="padding: 6px; font-size: 11px;">ABC</button>
+                    <button class="tool-button secondary" data-action="lower"
+                        style="padding: 6px; font-size: 11px;">abc</button>
+                    <button class="tool-button secondary" data-action="title"
+                        style="padding: 6px; font-size: 11px;">Title</button>
+                    <button class="tool-button secondary" data-action="clean"
+                        style="padding: 6px; font-size: 11px;">Nettoyer</button>
+                </div>
+                <div class="text-stats"
+                    style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                    <span id="text-count-chars" class="stat-item">0 caractères</span>
+                    <span id="text-count-words" class="stat-item">0 mots</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit Converter -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="scale"></i></span>
+                <span class="tool-title">Convertisseur</span>
+            </div>
+            <div class="tool-content">
+                <div class="unit-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <input type="number" id="unit-from-val" class="tool-input" value="1" style="flex: 1;">
+                    <span class="unit-arrow">➜</span>
+                    <input type="number" id="unit-to-val" class="tool-input" readonly
+                        style="flex: 1; background: var(--surface-secondary);">
+                </div>
+                <div class="unit-controls" style="display: flex; gap: 8px;">
+                    <select id="unit-type" class="tool-input" style="flex: 1;">
+                        <option value="length">Mètres ⇄ Pieds</option>
+                        <option value="weight">Kg ⇄ Livres</option>
+                        <option value="temp">Celsius ⇄ Fahr</option>
+                    </select>
+                    <button id="unit-swap" class="tool-button secondary" style="padding: 8px;"><i
+                            data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currency Converter -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="banknote"></i></span>
+                <span class="tool-title">Devises (Live)</span>
+            </div>
+            <div class="tool-content">
+                <div class="unit-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <input type="number" id="cur-from-val" class="tool-input" value="1" style="flex: 1;">
+                    <span class="unit-arrow">➜</span>
+                    <input type="number" id="cur-to-val" class="tool-input" readonly
+                        style="flex: 1; background: var(--surface-secondary);">
+                </div>
+                <div class="unit-controls"
+                    style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;">
+                    <select id="cur-from-type" class="tool-input">
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="USD">USD (Dollar)</option>
+                        <option value="GBP">GBP (Livre)</option>
+                        <option value="JPY">JPY (Yen)</option>
+                        <option value="CHF">CHF (Franc)</option>
+                    </select>
+                    <button id="cur-swap" class="tool-button secondary" style="padding: 8px;"><i
+                            data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></button>
+                    <select id="cur-to-type" class="tool-input">
+                        <option value="USD">USD (Dollar)</option>
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="GBP">GBP (Livre)</option>
+                        <option value="JPY">JPY (Yen)</option>
+                        <option value="CAD">CAD (Dollar)</option>
+                    </select>
+                </div>
+                <p id="cur-rate-info"
+                    style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px;">Taux de
+                    change en
+                    direct</p>
+            </div>
+        </div>
+
+        <!-- Webcam Mirror -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <span class="tool-icon"><i data-lucide="camera"></i></span>
+                <span class="tool-title">Miroir Webcam</span>
+            </div>
+            <div class="tool-content">
+                <div class="mirror-container" id="mirrorContainer" style="position: relative;">
+                    <video id="mirrorVideo" autoplay playsinline muted
+                        style="width: 100%; border-radius: 12px; background: var(--surface-secondary); display: none;"></video>
+                    <canvas id="mirrorCanvas"
+                        style="width: 100%; border-radius: 12px; background: var(--surface-secondary); display: none;"></canvas>
+                    <div id="mirrorPlaceholder"
+                        style="width: 100%; aspect-ratio: 4/3; border-radius: 12px; background: var(--surface-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;">
+                        <div style="text-align: center;">
+                            <i data-lucide="video-off" style="width: 32px; height: 32px; margin-bottom: 8px;"></i>
+                            <p>Caméra désactivée</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mirror-controls" style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button id="mirrorToggle" class="tool-button" style="flex: 1;">
+                        <i data-lucide="video" style="width: 14px; height: 14px;"></i> Activer
+                    </button>
+                    <button id="mirrorCapture" class="tool-button secondary" style="flex: 1; display: none;">
+                        <i data-lucide="camera" style="width: 14px; height: 14px;"></i> Capturer
+                    </button>
+                    <button id="mirrorDownload" class="tool-button secondary" style="display: none;">
+                        <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </div>
+                <select id="mirrorDeviceSelect" class="tool-input" style="margin-top: 8px; display: none; width: 100%;">
+                    <option value="">Sélectionner une caméra...</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>

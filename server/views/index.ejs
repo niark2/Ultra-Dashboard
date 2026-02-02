@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include('partials/head') %>
+
+    <body>
+        <div class="app">
+            <%- include('partials/sidebar') %>
+
+                <main class="main-content">
+                    <%- include('partials/tabs/home') %>
+                        <%- include('partials/tabs/convert') %>
+                            <%- include('partials/tabs/youtube') %>
+                                <%- include('partials/tabs/removebg') %>
+                                    <%- include('partials/tabs/stt') %>
+                                        <%- include('partials/tabs/upscale') %>
+                                            <%- include('partials/tabs/chat') %>
+                                                <%- include('partials/tabs/metadata') %>
+                                                    <%- include('partials/tabs/torrent') %>
+                                                        <%- include('partials/tabs/localdrop') %>
+
+                                                            <%- include('partials/tabs/toolbox') %>
+                                                                <%- include('partials/tabs/settings') %>
+                </main>
+        </div>
+
+        <%- include('partials/scripts') %>
+    </body>
+
+</html>
