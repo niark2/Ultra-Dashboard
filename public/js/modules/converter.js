@@ -20,9 +20,7 @@ export class ConverterModule {
             fileSize: document.getElementById('fileSize'),
             convertOptions: document.getElementById('convertOptions'),
             compressToggle: document.getElementById('compressToggle'),
-            compressLevelContainer: document.getElementById('compressLevelContainer'),
-            compressLevel: document.getElementById('compressLevel'),
-            compressLevelValue: document.getElementById('compressLevelValue')
+            saveBtn: document.getElementById('convertSaveBtn')
         };
         this.init();
     }
@@ -46,17 +44,9 @@ export class ConverterModule {
             if (e.dataTransfer.files.length) this.handleFile(e.dataTransfer.files[0]);
         };
 
-        // Compress toggle
         this.elements.compressToggle.onchange = (e) => {
             this.compressEnabled = e.target.checked;
-            this.elements.compressLevelContainer.classList.toggle('hidden', !this.compressEnabled);
             this.updateButtonState();
-        };
-
-        // Compress level slider
-        this.elements.compressLevel.oninput = (e) => {
-            this.compressQuality = parseInt(e.target.value, 10);
-            this.elements.compressLevelValue.textContent = `${this.compressQuality}%`;
         };
     }
 
@@ -67,6 +57,7 @@ export class ConverterModule {
         this.elements.formatSection.classList.remove('hidden');
         this.elements.convertOptions.classList.remove('hidden');
         this.elements.successMessage.classList.add('hidden');
+        if (this.elements.saveBtn) this.elements.saveBtn.classList.add('hidden');
 
         this.elements.fileName.textContent = file.name;
         this.elements.fileSize.textContent = formatSize(file.size);
@@ -75,7 +66,7 @@ export class ConverterModule {
         // UI Preview
         const imgPre = document.getElementById('imagePreview');
         const icoPre = document.getElementById('fileIconLarge');
-        if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'tiff', 'bmp', 'ico'].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'tiff'].includes(ext)) {
             imgPre.src = URL.createObjectURL(file);
             imgPre.classList.remove('hidden');
             icoPre.classList.add('hidden');
@@ -189,18 +180,27 @@ export class ConverterModule {
                 throw new Error(errorData.error || 'Erreur lors du traitement');
             }
 
-            const blob = await res.blob();
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-
-            // Determine output filename
-            const ext = this.selectedFormat || this.selectedFile.name.split('.').pop().toLowerCase();
-            const baseName = this.selectedFile.name.replace(/\.[^/.]+$/, '');
-            const suffix = this.compressEnabled ? '-compressed' : '';
-            a.download = `${baseName}${suffix}.${ext}`;
-
-            a.click();
+            const data = await res.json();
             this.elements.successMessage.classList.remove('hidden');
+
+            document.dispatchEvent(new CustomEvent('app-notification', {
+                detail: {
+                    title: 'Conversion terminée',
+                    message: `Le fichier ${this.selectedFile.name} a été traité avec succès.`,
+                    type: 'success',
+                    icon: 'refresh-cw'
+                }
+            }));
+
+            // Show Save Button and Link to Databank
+            if (data.databankUrl && this.elements.saveBtn) {
+                this.elements.saveBtn.href = data.databankUrl;
+                this.elements.saveBtn.setAttribute('download', data.fileName || 'converted-file');
+                this.elements.saveBtn.classList.remove('hidden');
+
+                // Hide convert button to verify user flow
+                this.elements.convertBtn.classList.add('hidden');
+            }
         } catch (e) {
             alert('🚨 ' + e.message);
         } finally {
@@ -223,9 +223,6 @@ export class ConverterModule {
         this.elements.successMessage.classList.add('hidden');
         this.elements.fileInput.value = '';
         this.elements.compressToggle.checked = false;
-        this.elements.compressLevelContainer.classList.add('hidden');
-        this.elements.compressLevel.value = 75;
-        this.elements.compressLevelValue.textContent = '75%';
     }
 
 }

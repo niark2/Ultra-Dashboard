@@ -226,12 +226,19 @@ export class LocalDropModule {
                 if (receivedChunks.length * 16384 >= metadata.size) {
                     const blob = new Blob(receivedChunks);
                     const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = metadata.name;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    this.hideTransferModal();
+
+                    this.updateProgress(100);
+                    const statusEl = document.getElementById('transferStatus');
+                    statusEl.innerHTML = `Transfert terminé ! <br><a href="${url}" download="${metadata.name}" class="btn-primary btn-sm" style="display:inline-block; margin-top:10px; text-decoration:none; padding: 5px 10px; background: var(--primary); color: white; border-radius: 4px;">Télécharger ${metadata.name}</a>`;
+
+                    const btn = statusEl.querySelector('a');
+                    btn.onclick = () => {
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                            this.hideTransferModal();
+                            statusEl.textContent = 'Prêt';
+                        }, 1000);
+                    };
                 }
             }
         };

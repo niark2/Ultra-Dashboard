@@ -3,22 +3,22 @@
  */
 export class RemoveBGModule {
     constructor() {
-        this.selectedFile = null;
+        this.selectedFiles = [];
+        this.results = [];
+        this.selectedModel = 'u2net';
         this.isServerAvailable = false;
+        this.reconnectInterval = null;
+        this.isProcessing = false;
         this.elements = {
             dropZone: document.getElementById('rembgDropZone'),
             fileInput: document.getElementById('rembgFileInput'),
-            fileInfo: document.getElementById('rembgFileInfo'),
-            preview: document.getElementById('rembgPreview'),
-            fileName: document.getElementById('rembgFileName'),
-            fileSize: document.getElementById('rembgFileSize'),
-            removeBtn: document.getElementById('rembgRemoveFile'),
+            fileList: document.getElementById('rembgFileList'),
+            modelOptions: document.querySelectorAll('.model-option'),
             processBtn: document.getElementById('rembgProcessBtn'),
             progressContainer: document.getElementById('rembgProgressContainer'),
             progressFill: document.getElementById('rembgProgressFill'),
             progressText: document.getElementById('rembgProgressText'),
             resultContainer: document.getElementById('rembgResultContainer'),
-            resultImage: document.getElementById('rembgResultImage'),
             downloadBtn: document.getElementById('rembgDownloadBtn'),
             newBtn: document.getElementById('rembgNewBtn'),
             statusBadge: document.getElementById('rembgStatusBadge'),
@@ -28,6 +28,15 @@ export class RemoveBGModule {
     }
 
     async init() {
+        // Load default settings
+        const defaultModel = await Storage.get('ultra-rembg-default-model', 'u2net');
+        this.selectedModel = defaultModel;
+
+        // Update active class in UI
+        this.elements.modelOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.model === defaultModel);
+        });
+
         await this.checkServer();
         this.setupEventListeners();
     }
@@ -38,10 +47,29 @@ export class RemoveBGModule {
             const data = await res.json();
             this.isServerAvailable = data.available === true;
             this.updateServerStatus();
+            return this.isServerAvailable;
         } catch (error) {
             this.isServerAvailable = false;
             this.updateServerStatus();
+            return false;
         }
+    }
+
+    startAutoReconnect() {
+        if (this.reconnectInterval) return;
+
+        this.reconnectInterval = setInterval(async () => {
+            if (!this.isServerAvailable) {
+                const success = await this.checkServer();
+                if (success) {
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = null;
+                }
+            } else {
+                clearInterval(this.reconnectInterval);
+                this.reconnectInterval = null;
+            }
+        }, 3000);
     }
 
     updateServerStatus() {
@@ -60,27 +88,29 @@ export class RemoveBGModule {
             badge.classList.remove('connected');
             errorMsg.classList.remove('hidden');
             this.elements.dropZone.classList.add('disabled');
+            this.startAutoReconnect();
         }
     }
 
     setupEventListeners() {
         // Drop Zone
         this.elements.dropZone.onclick = () => {
-            if (this.isServerAvailable) {
+            if (this.isServerAvailable && !this.isProcessing) {
                 this.elements.fileInput.click();
             }
         };
 
         this.elements.fileInput.onchange = (e) => {
-            if (e.target.files[0]) {
-                this.handleFile(e.target.files[0]);
+            if (e.target.files.length > 0) {
+                this.handleFiles(Array.from(e.target.files));
+                this.elements.fileInput.value = '';
             }
         };
 
         // Drag & Drop
         this.elements.dropZone.ondragover = (e) => {
             e.preventDefault();
-            if (this.isServerAvailable) {
+            if (this.isServerAvailable && !this.isProcessing) {
                 this.elements.dropZone.classList.add('drag-over');
             }
         };
@@ -92,15 +122,24 @@ export class RemoveBGModule {
         this.elements.dropZone.ondrop = (e) => {
             e.preventDefault();
             this.elements.dropZone.classList.remove('drag-over');
-            if (this.isServerAvailable && e.dataTransfer.files.length) {
-                this.handleFile(e.dataTransfer.files[0]);
+            if (this.isServerAvailable && !this.isProcessing && e.dataTransfer.files.length) {
+                this.handleFiles(Array.from(e.dataTransfer.files));
             }
         };
 
         // Buttons
-        this.elements.removeBtn.onclick = () => this.reset();
-        this.elements.processBtn.onclick = () => this.processImage();
+        this.elements.processBtn.onclick = () => this.processImages();
         this.elements.newBtn.onclick = () => this.reset();
+
+        // Model Selection
+        this.elements.modelOptions.forEach(opt => {
+            opt.onclick = () => {
+                if (this.isProcessing) return;
+                this.elements.modelOptions.forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                this.selectedModel = opt.getAttribute('data-model');
+            };
+        });
 
         // Retry server check
         document.getElementById('rembgRetryBtn')?.addEventListener('click', () => {
@@ -108,127 +147,298 @@ export class RemoveBGModule {
         });
     }
 
-    handleFile(file) {
-        // Vérifier le type
+    handleFiles(files) {
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/bmp'];
-        if (!validTypes.includes(file.type)) {
-            alert('❌ Type de fichier non supporté. Utilisez PNG, JPG, WEBP, GIF ou BMP.');
-            return;
-        }
 
-        // Vérifier la taille (10MB max)
-        if (file.size > 10 * 1024 * 1024) {
-            alert('❌ Fichier trop volumineux. Maximum: 10MB');
-            return;
-        }
-
-        this.selectedFile = file;
-
-        // Afficher les infos
-        this.elements.dropZone.classList.add('hidden');
-        this.elements.fileInfo.classList.remove('hidden');
-        this.elements.resultContainer.classList.add('hidden');
-        this.elements.processBtn.classList.remove('hidden');
-
-        this.elements.fileName.textContent = file.name;
-        this.elements.fileSize.textContent = this.formatSize(file.size);
-
-        // Preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            this.elements.preview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    async processImage() {
-        if (!this.selectedFile) return;
-
-        // UI Loading state
-        this.elements.processBtn.disabled = true;
-        this.elements.progressContainer.classList.remove('hidden');
-        this.elements.progressText.textContent = 'Suppression de l\'arrière-plan...';
-        this.animateProgress(0, 90, 8000);
-
-        const formData = new FormData();
-        formData.append('file', this.selectedFile);
-
-        try {
-            const response = await fetch('/api/rembg/remove', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erreur lors du traitement');
+        files.forEach(file => {
+            // Vérifier le type
+            if (!validTypes.includes(file.type)) {
+                console.warn(`Type de fichier non supporté: ${file.name}`);
+                return;
             }
 
-            // Récupérer le blob résultat
-            const blob = await response.blob();
-            const imageUrl = URL.createObjectURL(blob);
+            // Vérifier la taille (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                console.warn(`Fichier trop volumineux: ${file.name}`);
+                return;
+            }
 
-            // Finaliser la progression
-            this.animateProgress(90, 100, 300);
+            // Ajouter à la liste s'il n'est pas déjà présent (par nom et taille)
+            const exists = this.selectedFiles.some(f => f.name === file.name && f.size === file.size);
+            if (!exists) {
+                this.selectedFiles.push({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    status: 'pending',
+                    preview: URL.createObjectURL(file)
+                });
+            }
+        });
 
-            setTimeout(() => {
-                this.showResult(imageUrl, blob);
-            }, 400);
+        this.updateUI();
+    }
 
-        } catch (error) {
-            console.error('REMBG Error:', error);
-            alert('🚨 ' + error.message);
-            this.elements.progressContainer.classList.add('hidden');
-            this.elements.processBtn.disabled = false;
+    updateUI() {
+        if (this.selectedFiles.length > 0) {
+            this.elements.dropZone.classList.add('hidden');
+            this.elements.fileList.classList.remove('hidden');
+            this.elements.processBtn.classList.remove('hidden');
+            this.renderFileList();
+        } else {
+            this.elements.dropZone.classList.remove('hidden');
+            this.elements.fileList.classList.add('hidden');
+            this.elements.processBtn.classList.add('hidden');
         }
     }
 
-    showResult(imageUrl, blob) {
-        this.elements.fileInfo.classList.add('hidden');
-        this.elements.progressContainer.classList.add('hidden');
+    renderFileList() {
+        this.elements.fileList.innerHTML = '';
+        this.selectedFiles.forEach((item, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = `rembg-file-item ${item.status}`;
+            fileItem.innerHTML = `
+                <div class="rembg-preview">
+                    <img src="${item.preview}" alt="Aperçu">
+                </div>
+                <div class="file-details">
+                    <h3>${item.name}</h3>
+                    <p>${this.formatSize(item.size)}</p>
+                    <div class="item-status">${this.getStatusText(item.status)}</div>
+                </div>
+                ${!this.isProcessing ? `
+                    <button class="btn-remove-item" data-index="${index}">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                ` : ''}
+            `;
+            this.elements.fileList.appendChild(fileItem);
+        });
+
+        // Initialize Lucide icons
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // Add remove events
+        this.elements.fileList.querySelectorAll('.btn-remove-item').forEach(btn => {
+            btn.onclick = (e) => {
+                const index = parseInt(btn.getAttribute('data-index'));
+                this.removeFile(index);
+            };
+        });
+    }
+
+    getStatusText(status) {
+        switch (status) {
+            case 'pending': return 'En attente';
+            case 'processing': return 'Traitement...';
+            case 'completed': return 'Terminé';
+            case 'error': return 'Erreur';
+            default: return '';
+        }
+    }
+
+    removeFile(index) {
+        const item = this.selectedFiles[index];
+        if (item.preview) URL.revokeObjectURL(item.preview);
+        this.selectedFiles.splice(index, 1);
+        this.updateUI();
+    }
+
+    async processImages() {
+        if (this.selectedFiles.length === 0 || this.isProcessing) return;
+
+        this.isProcessing = true;
+        this.results = [];
+        this.elements.processBtn.disabled = true;
         this.elements.processBtn.classList.add('hidden');
+        this.elements.progressContainer.classList.remove('hidden');
+
+        const total = this.selectedFiles.length;
+
+        for (let i = 0; i < this.selectedFiles.length; i++) {
+            const item = this.selectedFiles[i];
+            item.status = 'processing';
+            this.renderFileList();
+
+            this.elements.progressText.textContent = `Traitement de ${i + 1}/${total} : ${item.name}`;
+            this.updateProgress(((i) / total) * 100);
+
+            try {
+                const formData = new FormData();
+                formData.append('file', item.file);
+                formData.append('model', this.selectedModel);
+
+                const response = await fetch('/api/rembg/remove', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erreur lors du traitement');
+                }
+
+                const data = await response.json();
+                const resultUrl = `/databank/${data.fileName}`;
+
+                item.status = 'completed';
+                item.resultUrl = resultUrl;
+
+                this.results.push({
+                    name: item.name,
+                    url: resultUrl,
+                    fileName: data.fileName
+                });
+
+            } catch (error) {
+                console.error(`Error processing ${item.name}:`, error);
+                item.status = 'error';
+                item.error = error.message;
+            }
+        }
+
+        this.updateProgress(100);
+        this.elements.progressText.textContent = 'Traitement terminé !';
+        this.isProcessing = false;
+
+        setTimeout(() => {
+            this.showResults();
+
+            document.dispatchEvent(new CustomEvent('app-notification', {
+                detail: {
+                    title: 'Suppression de fond terminée',
+                    message: `${this.results.length} image(s) traitée(s) avec succès.`,
+                    type: 'success',
+                    icon: 'scissors'
+                }
+            }));
+        }, 800);
+    }
+
+    updateProgress(percent) {
+        this.elements.progressFill.style.width = `${percent}%`;
+    }
+
+    showResults() {
+        this.elements.fileList.classList.add('hidden');
+        this.elements.progressContainer.classList.add('hidden');
         this.elements.resultContainer.classList.remove('hidden');
 
-        this.elements.resultImage.src = imageUrl;
+        const resultGrid = document.createElement('div');
+        resultGrid.className = 'results-grid';
 
-        // Setup download
-        this.elements.downloadBtn.onclick = () => {
+        this.results.forEach((res, index) => {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+                <img src="${res.url}" alt="${res.name}">
+                <h4>${res.name}</h4>
+                <button class="btn-secondary btn-sm" onclick="window.downloadSingleResult(${index})">
+                    <i data-lucide="download"></i> Télécharger
+                </button>
+            `;
+            resultGrid.appendChild(card);
+        });
+
+        // Set up global download function for the results
+        window.downloadSingleResult = (index) => {
+            const res = this.results[index];
             const a = document.createElement('a');
-            a.href = imageUrl;
-            a.download = `nobg-${this.selectedFile.name.replace(/\.[^.]+$/, '')}.png`;
+            a.href = res.url;
+            a.download = `nobg-${res.name.replace(/\.[^.]+$/, '')}.png`;
             a.click();
         };
+
+        const container = this.elements.resultContainer;
+        container.innerHTML = '';
+
+        const header = document.createElement('h3');
+        header.textContent = `${this.results.length} image(s) traitée(s)`;
+        header.style.marginBottom = '24px';
+        container.appendChild(header);
+
+        container.appendChild(resultGrid);
+
+        const actions = document.createElement('div');
+        actions.className = 'result-actions';
+
+        if (this.results.length > 1) {
+            const downloadAllBtn = document.createElement('button');
+            downloadAllBtn.className = 'btn-convert';
+            downloadAllBtn.innerHTML = '<span class="btn-text"><i data-lucide="package"></i> Tout télécharger (ZIP)</span>';
+            downloadAllBtn.onclick = () => this.downloadAllAsZip();
+            actions.appendChild(downloadAllBtn);
+        } else if (this.results.length === 1) {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'btn-convert';
+            downloadBtn.innerHTML = '<span class="btn-text"><i data-lucide="download"></i> Télécharger</span>';
+            downloadBtn.onclick = () => window.downloadSingleResult(0);
+            actions.appendChild(downloadBtn);
+        }
+
+        const newBtn = document.createElement('button');
+        newBtn.className = 'btn-secondary';
+        newBtn.textContent = 'Nouvelles images';
+        newBtn.onclick = () => this.reset();
+        actions.appendChild(newBtn);
+
+        container.appendChild(actions);
+
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
-    animateProgress(from, to, duration) {
-        const startTime = Date.now();
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const current = from + (to - from) * this.easeOutQuad(progress);
-            this.elements.progressFill.style.width = `${current}%`;
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
+    async downloadAllAsZip() {
+        // We'll need JSZip for this. If it's not available, we can either alert or download one by one.
+        // For now, let's download them sequentially if JSZip isn't there, or provide a simple implementation.
+        // Actually, many of these projects use JSZip. Let me check if it's available.
+        if (window.JSZip || typeof JSZip !== 'undefined') {
+            const zip = new JSZip();
+            for (const res of this.results) {
+                const response = await fetch(res.url);
+                const blob = await response.blob();
+                zip.file(`nobg-${res.name.replace(/\.[^.]+$/, '')}.png`, blob);
             }
-        };
-        animate();
-    }
-
-    easeOutQuad(t) {
-        return t * (2 - t);
+            const content = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(content);
+            a.download = "images-sans-fond.zip";
+            a.click();
+        } else {
+            // Fallback: download each with a small delay
+            for (let i = 0; i < this.results.length; i++) {
+                window.downloadSingleResult(i);
+                await new Promise(r => setTimeout(r, 300));
+            }
+        }
     }
 
     reset() {
-        this.selectedFile = null;
+        this.selectedFiles.forEach(item => {
+            if (item.preview) URL.revokeObjectURL(item.preview);
+        });
+        this.results.forEach(res => {
+            if (res.url) URL.revokeObjectURL(res.url);
+        });
+
+        this.selectedFiles = [];
+        this.results = [];
+        this.isProcessing = false;
+
         this.elements.dropZone.classList.remove('hidden');
-        this.elements.fileInfo.classList.add('hidden');
+        this.elements.fileList.classList.add('hidden');
         this.elements.resultContainer.classList.add('hidden');
         this.elements.progressContainer.classList.add('hidden');
         this.elements.processBtn.classList.add('hidden');
         this.elements.processBtn.disabled = false;
         this.elements.fileInput.value = '';
         this.elements.progressFill.style.width = '0%';
+
+        // Restore initial result container structure if needed, but it's cleared in showResults
+        // So we just need to make sure the next showResults clears it again.
     }
 
     formatSize(bytes) {

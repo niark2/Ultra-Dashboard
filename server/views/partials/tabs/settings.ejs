@@ -5,203 +5,591 @@
     </header>
 
     <div class="settings-container">
-        <!-- Appearance Section -->
-        <div class="settings-group">
-            <div class="settings-group-title">Apparence</div>
+        <!-- Settings Tab Navigation -->
+        <div class="settings-nav">
+            <button class="settings-tab-link active" data-settings-tab="general">
+                <i data-lucide="settings"></i> Général
+            </button>
+            <button class="settings-tab-link" data-settings-tab="sidebar">
+                <i data-lucide="layout"></i> Navigation
+            </button>
+            <button class="settings-tab-link" data-settings-tab="plexus">
+                <i data-lucide="zap"></i> Outils & IA
+            </button>
+            <button class="settings-tab-link" data-settings-tab="status">
+                <i data-lucide="activity"></i> Serveurs
+            </button>
+            <button class="settings-tab-link" data-settings-tab="security">
+                <i data-lucide="shield"></i> Sécurité
+            </button>
+            <button class="settings-tab-link" data-settings-tab="env">
+                <i data-lucide="terminal"></i> Variables d'env
+            </button>
+            <button class="settings-tab-link" data-settings-tab="about">
+                <i data-lucide="info"></i> À propos
+            </button>
+        </div>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Thème Sombre</div>
-                    <div class="setting-description">Basculez entre le mode sombre et le mode clair</div>
+        <!-- Tab: General Settings -->
+        <div class="settings-tab-pane active" id="settings-general">
+
+            <!-- Appearance Section -->
+            <div class="settings-group">
+                <div class="settings-group-title">Apparence</div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Thème Sombre</div>
+                        <div class="setting-description">Basculez entre le mode sombre et le mode clair</div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-action">
-                    <label class="switch">
-                        <input type="checkbox" id="themeToggle" checked>
-                        <span class="slider"></span>
-                    </label>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Couleur d'accentuation</div>
+                        <div class="setting-description">Choisissez la couleur principale de l'interface</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="accent-picker" id="accentPicker">
+                            <button class="accent-dot active" data-color="#ffffff"
+                                style="background: #ffffff; border: 1px solid var(--border-strong)"></button>
+                            <button class="accent-dot" data-color="#3b82f6" style="background: #3b82f6"></button>
+                            <button class="accent-dot" data-color="#ef4444" style="background: #ef4444"></button>
+                            <button class="accent-dot" data-color="#10b981" style="background: #10b981"></button>
+                            <button class="accent-dot" data-color="#f59e0b" style="background: #f59e0b"></button>
+                            <button class="accent-dot" data-color="#8b5cf6" style="background: #8b5cf6"></button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Couleur d'accentuation</div>
-                    <div class="setting-description">Choisissez la couleur principale de l'interface</div>
+            <!-- Interface Section -->
+            <div class="settings-group">
+                <div class="settings-group-title">Interface</div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Animations réduites</div>
+                        <div class="setting-description">Désactive les animations pour plus de fluidité sur les
+                            vieux PC</div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" id="reduceMotionToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="setting-action">
-                    <div class="accent-picker" id="accentPicker">
-                        <button class="accent-dot active" data-color="#ffffff"
-                            style="background: #ffffff; border: 1px solid var(--border-strong)"></button>
-                        <button class="accent-dot" data-color="#3b82f6" style="background: #3b82f6"></button>
-                        <button class="accent-dot" data-color="#ef4444" style="background: #ef4444"></button>
-                        <button class="accent-dot" data-color="#10b981" style="background: #10b981"></button>
-                        <button class="accent-dot" data-color="#f59e0b" style="background: #f59e0b"></button>
-                        <button class="accent-dot" data-color="#8b5cf6" style="background: #8b5cf6"></button>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Barre latérale réduite</div>
+                        <div class="setting-description">Affiche uniquement les icônes dans la barre latérale
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" id="compactSidebarToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Section -->
+            <div class="settings-group">
+                <div class="settings-group-title">Système</div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Notification de fin</div>
+                        <div class="setting-description">Émettre un son quand une conversion est terminée</div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Cache local</div>
+                        <div class="setting-description">Vider le cache des fichiers temporaires</div>
+                    </div>
+                    <div class="setting-action">
+                        <button class="btn-secondary" id="clearCacheBtn">Vider le cache</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Interface Section -->
-        <div class="settings-group">
-            <div class="settings-group-title">Interface</div>
-
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Animations réduites</div>
-                    <div class="setting-description">Désactive les animations pour plus de fluidité sur les
-                        vieux PC</div>
+        <!-- Tab: Sidebar Items -->
+        <div class="settings-tab-pane" id="settings-sidebar">
+            <div class="settings-group">
+                <div class="settings-group-title">Éléments de la barre latérale</div>
+                <div class="sidebar-items-description">
+                    Choisissez les outils à afficher dans la barre latérale
                 </div>
-                <div class="setting-action">
-                    <label class="switch">
-                        <input type="checkbox" id="reduceMotionToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Barre latérale réduite</div>
-                    <div class="setting-description">Affiche uniquement les icônes dans la barre latérale
+                <div class="sidebar-items-grid">
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="home" checked disabled>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="home"></i></span>
+                            <span class="item-label">Accueil</span>
+                        </label>
+                        <div class="item-actions">
+                            <!-- Home is always pinned/base -->
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="convert" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="refresh-cw"></i></span>
+                            <span class="item-label">Convertisseur</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="convert" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="youtube" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="youtube"></i></span>
+                            <span class="item-label">YouTube</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="youtube" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="removebg" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="scissors"></i></span>
+                            <span class="item-label">Remove BG</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="removebg" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="stt" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="mic"></i></span>
+                            <span class="item-label">Speech-to-Text</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="stt" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="upscale" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="image"></i></span>
+                            <span class="item-label">AI Upscaler</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="upscale" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="chat" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="message-square"></i></span>
+                            <span class="item-label">AI Chat</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="chat" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="plexus" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="brain"></i></span>
+                            <span class="item-label">Plexus</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="plexus" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="metadata" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="tag"></i></span>
+                            <span class="item-label">Metadata Editor</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="metadata" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="torrent" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="zap"></i></span>
+                            <span class="item-label">Torrents</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="torrent" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="localdrop" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="share-2"></i></span>
+                            <span class="item-label">LocalDrop</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="localdrop" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="toolbox" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="wrench"></i></span>
+                            <span class="item-label">Toolbox</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="toolbox" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="setting-action">
-                    <label class="switch">
-                        <input type="checkbox" id="compactSidebarToggle">
-                        <span class="slider"></span>
-                    </label>
+            </div>
+        </div>
+
+        <!-- Tab: Outils & IA Settings -->
+        <div class="settings-tab-pane" id="settings-plexus">
+            <div class="settings-group">
+                <div class="settings-group-title">Configuration Plexus AI</div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Nombre de sources</div>
+                        <div class="setting-description">Nombre maximum de sources à utiliser pour les recherches</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="number-input-group">
+                            <input type="number" id="plexusSourceCount" min="1" max="10" value="3" class="input-modern">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">Informations complémentaires</div>
+                        <div class="setting-description">Context ou instructions spécifiques pour l'IA</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <textarea id="plexusExtraInfo" placeholder="Ex: Toujours répondre en français, être concis..."
+                            class="textarea-modern"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remove BG Settings -->
+            <div class="settings-group">
+                <div class="settings-group-title">Configuration Remove BG</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Modèle par défaut</div>
+                        <div class="setting-description">Choisissez le modèle de détourage utilisé par défaut</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="toggle-group wrap" id="settingsRembgModelToggle">
+                            <button class="toggle-btn active" data-model="u2net">U2NET</button>
+                            <button class="toggle-btn" data-model="u2netp">U2NETP</button>
+                            <button class="toggle-btn" data-model="u2net_human_seg">Human Seg</button>
+                            <button class="toggle-btn" data-model="isnet-general-use">ISNET</button>
+                            <button class="toggle-btn" data-model="silueta">Silueta</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upscale Settings -->
+            <div class="settings-group">
+                <div class="settings-group-title">Configuration AI Upscaler</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Modèle préféré</div>
+                        <div class="setting-description">Modèle utilisé par défaut pour l'agrandissement</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="toggle-group" id="settingsUpscaleModelToggle">
+                            <button class="toggle-btn active" data-model="edsr">EDSR</button>
+                            <button class="toggle-btn" data-model="msrn">MSRN</button>
+                            <button class="toggle-btn" data-model="pan">PAN</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Facteur par défaut</div>
+                        <div class="setting-description">Facteur d'agrandissement initial</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="toggle-group" id="settingsUpscaleScaleToggle">
+                            <button class="toggle-btn" data-scale="2">x2</button>
+                            <button class="toggle-btn" data-scale="3">x3</button>
+                            <button class="toggle-btn active" data-scale="4">x4</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STT Settings -->
+            <div class="settings-group">
+                <div class="settings-group-title">Speech-to-Text (STT)</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Modèle Whisper</div>
+                        <div class="setting-description">Taille du modèle pour la transcription (tiny à large)</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="toggle-group wrap" id="settingsWhisperModelToggle">
+                            <button class="toggle-btn" data-model="tiny">Tiny</button>
+                            <button class="toggle-btn active" data-model="base">Base</button>
+                            <button class="toggle-btn" data-model="small">Small</button>
+                            <button class="toggle-btn" data-model="medium">Medium</button>
+                            <button class="toggle-btn" data-model="large">Large</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar Items Section -->
-        <div class="settings-group">
-            <div class="settings-group-title">Éléments de la barre latérale</div>
-            <div class="sidebar-items-description">
-                Choisissez les outils à afficher dans la barre latérale
-            </div>
-
-            <div class="sidebar-items-grid">
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="home" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="home"></i></span>
-                    <span class="item-label">Accueil</span>
-                </label>
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="convert" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="refresh-cw"></i></span>
-                    <span class="item-label">Convertisseur</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="youtube" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="youtube"></i></span>
-                    <span class="item-label">YouTube</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="removebg" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="scissors"></i></span>
-                    <span class="item-label">Remove BG</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="stt" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="mic"></i></span>
-                    <span class="item-label">Speech-to-Text</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="upscale" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="image"></i></span>
-                    <span class="item-label">AI Upscaler</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="chat" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="message-square"></i></span>
-                    <span class="item-label">AI Chat</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="metadata" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="tag"></i></span>
-                    <span class="item-label">Metadata Editor</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="torrent" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="zap"></i></span>
-                    <span class="item-label">Torrents</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="localdrop" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="share-2"></i></span>
-                    <span class="item-label">LocalDrop</span>
-                </label>
-
-                <label class="sidebar-item-checkbox">
-                    <input type="checkbox" data-sidebar-item="toolbox" checked>
-                    <span class="checkbox-custom"></span>
-                    <span class="item-icon"><i data-lucide="wrench"></i></span>
-                    <span class="item-label">Toolbox</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- System Section -->
-        <div class="settings-group">
-            <div class="settings-group-title">Système</div>
-
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Notification de fin</div>
-                    <div class="setting-description">Émettre un son quand une conversion est terminée</div>
-                </div>
-                <div class="setting-action">
-                    <label class="switch">
-                        <input type="checkbox" id="soundToggle" checked>
-                        <span class="slider"></span>
-                    </label>
+        <!-- Tab: Server Status -->
+        <div class="settings-tab-pane" id="settings-status">
+            <div class="settings-group">
+                <div class="settings-group-title">État des Services AI</div>
+                <div id="servicesStatusContainer" class="status-grid">
+                    <div class="status-loading">
+                        <div class="spinner"></div>
+                        Chargement des serveurs...
+                    </div>
                 </div>
             </div>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-title">Cache local</div>
-                    <div class="setting-description">Vider le cache des fichiers temporaires</div>
+            <div class="settings-group">
+                <div class="settings-group-title">Métriques Système</div>
+                <div class="metrics-container" id="systemMetricsContainer">
+                    <!-- Dynamic system metrics here -->
                 </div>
-                <div class="setting-action">
-                    <button class="btn-secondary" id="clearCacheBtn">Vider le cache</button>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-group-title">Maintenance</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">Logs Serveur</div>
+                        <div class="setting-description">Voir les journaux d'activité en temps réel</div>
+                    </div>
+                    <div class="setting-action">
+                        <button class="btn-secondary" onclick="window.location.reload()"><i data-lucide="refresh-cw"
+                                style="width: 14px;"></i> Actualiser</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- About Info Card -->
-        <div class="settings-about">
-            <div class="about-card">
-                <div class="about-logo">
-                    <img src="favicon.png" alt="Ultra Logo"
-                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+        <!-- Tab: Security Settings -->
+        <div class="settings-tab-pane" id="settings-security">
+            <div class="settings-group">
+                <div class="settings-group-title">Changement de mot de passe</div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">Nom d'utilisateur</div>
+                        <div class="setting-description">Confirmez votre nom d'utilisateur</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="secUsername" placeholder="Votre nom d'utilisateur" class="input-modern">
+                    </div>
                 </div>
-                <div class="about-content">
-                    <h3>Ultra Dashboard Pro v1.0.0</h3>
-                    <p>Un outil tout-en-un conçu pour la performance et le style.</p>
-                    <div class="about-links">
-                        <a href="#">Documentation</a>
-                        <a href="#">Support</a>
-                        <a href="#">GitHub</a>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">Mot de passe actuel</div>
+                        <div class="setting-description">Saisissez votre mot de passe actuel pour vérification</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="password" id="secCurrentPassword" placeholder="••••••••" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">Nouveau mot de passe</div>
+                        <div class="setting-description">Choisissez un nouveau mot de passe fort</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="password" id="secNewPassword" placeholder="••••••••" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-action full-width" style="flex-direction: column; gap: 10px;">
+                        <button id="updatePasswordBtn" class="btn-primary"
+                            style="width: 100%; justify-content: center;">Mettre à jour le mot de passe</button>
+                        <div id="passwordUpdateMsg" style="font-size: 13px; text-align: center; display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Environment Variables -->
+        <div class="settings-tab-pane" id="settings-env">
+            <div class="settings-group">
+                <div class="settings-group-title">Configuration des API & Services</div>
+                <div class="sidebar-items-description">
+                    Ces réglages surchargent les valeurs par défaut du fichier .env pour votre compte.
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">OpenRouter API Key</div>
+                        <div class="setting-description">Clé API utilisée pour AI Chat et Plexus</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="password" id="envOpenRouterKey" placeholder="sk-or-v1-..." class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">Modèle OpenRouter</div>
+                        <div class="setting-description">Modèle par défaut (ex: google/gemini-2.0-pro-exp-02-05:free)
+                        </div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="envOpenRouterModel"
+                            placeholder="google/gemini-2.0-flash-lite-preview-02-05:free" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">URL SearXNG</div>
+                        <div class="setting-description">URL de votre instance SearXNG (utilisée par Plexus)</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="envSearxngUrl" value="http://localhost:8080"
+                            placeholder="http://localhost:8080" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">URL REMBG</div>
+                        <div class="setting-description">URL du service Python RemoveBG</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="envRembgUrl" value="http://localhost:5100"
+                            placeholder="http://localhost:5100" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">URL Whisper</div>
+                        <div class="setting-description">URL du service Python Speech-to-Text</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="envWhisperUrl" value="http://localhost:5200"
+                            placeholder="http://localhost:5200" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item vertical">
+                    <div class="setting-info">
+                        <div class="setting-title">URL Upscale</div>
+                        <div class="setting-description">URL du service Python AI Upscaler</div>
+                    </div>
+                    <div class="setting-action full-width">
+                        <input type="text" id="envUpscaleUrl" value="http://localhost:5300"
+                            placeholder="http://localhost:5300" class="input-modern">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-action full-width">
+                        <button id="saveEnvSettingsBtn" class="btn-primary"
+                            style="width: 100%; justify-content: center;">
+                            Enregistrer les variables d'environnement
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: About -->
+        <div class="settings-tab-pane" id="settings-about">
+            <div class="settings-about">
+                <div class="about-card">
+                    <div class="about-logo">
+                        <img src="favicon.png" alt="Ultra Logo"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+                    </div>
+                    <div class="about-content">
+                        <h3>Ultra Dashboard Pro v1.0.0</h3>
+                        <p>Un outil tout-en-un conçu pour la performance et le style.</p>
+                        <div class="about-links">
+                            <a href="#">Documentation</a>
+                            <a href="#">Support</a>
+                            <a href="#">GitHub</a>
+                        </div>
                     </div>
                 </div>
             </div>

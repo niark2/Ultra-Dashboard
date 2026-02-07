@@ -53,24 +53,20 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="compress-level hidden" id="compressLevelContainer">
-                <label class="compress-label">Niveau de compression</label>
-                <div class="compress-slider-container">
-                    <input type="range" id="compressLevel" min="1" max="100" value="75" class="compress-slider">
-                    <span id="compressLevelValue" class="compress-value">75%</span>
-                </div>
-                <div class="compress-hints">
-                    <span>Plus léger</span>
-                    <span>Meilleure qualité</span>
-                </div>
-            </div>
         </div>
 
-        <!-- Convert Button -->
-        <button class="btn-convert hidden" id="convertBtn">
-            <span class="btn-text">Convertir</span>
-            <span class="btn-loader hidden"></span>
-        </button>
+        <!-- Convert Buttons -->
+        <div class="action-buttons-container" style="display: flex; gap: 10px; margin-top: 24px;">
+            <button class="btn-convert hidden" id="convertBtn" style="flex: 1; margin-top: 0;">
+                <span class="btn-text">Convertir</span>
+                <span class="btn-loader hidden"></span>
+            </button>
+            <a id="convertSaveBtn" class="btn-convert hidden"
+                style="flex: 1; margin-top: 0; text-decoration: none; display: flex; align-items: center; justify-content: center; background: #10b981;"
+                download>
+                <i data-lucide="download" style="margin-right: 8px;"></i> Sauvegarder
+            </a>
+        </div>
 
         <!-- Progress -->
         <div class="progress-container hidden" id="progressContainer">

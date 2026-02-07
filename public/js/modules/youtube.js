@@ -12,6 +12,7 @@ export class YoutubeModule {
             channel: document.getElementById('ytChannel'),
             duration: document.getElementById('ytDuration'),
             downloadBtn: document.getElementById('ytDownloadBtn'),
+            saveBtn: document.getElementById('ytSaveBtn'),
 
             // Advanced Controls
             modeToggles: document.querySelectorAll('.mode-toggle .toggle-btn'),
@@ -26,7 +27,12 @@ export class YoutubeModule {
             chkSubs: document.getElementById('chkSubs'),
             trimStart: document.getElementById('trimStart'),
             trimEnd: document.getElementById('trimEnd'),
-            containerSubtitles: document.getElementById('containerSubtitles')
+            containerSubtitles: document.getElementById('containerSubtitles'),
+
+            // Empty State
+            emptyState: document.getElementById('ytEmptyState'),
+            historyList: document.getElementById('ytHistoryList'),
+            clearHistoryBtn: document.getElementById('btnClearYtHistory')
         };
 
         this.currentMode = 'video'; // video | audio
@@ -59,6 +65,10 @@ export class YoutubeModule {
 
         // Download
         this.elements.downloadBtn.onclick = () => this.download();
+
+        // History
+        this.elements.clearHistoryBtn.onclick = () => this.clearHistory();
+        this.loadHistory();
     }
 
     setMode(mode) {
@@ -98,6 +108,9 @@ export class YoutubeModule {
         this.currentUrl = url;
         this.showLoading(true);
         this.elements.preview.classList.add('hidden');
+        this.elements.emptyState.classList.add('hidden');
+        this.elements.saveBtn.classList.add('hidden');
+        this.elements.downloadBtn.classList.remove('hidden');
 
         try {
             const res = await fetch(`/api/youtube/info?url=${encodeURIComponent(url)}`);
@@ -127,6 +140,60 @@ export class YoutubeModule {
         this.setMode('video');
 
         this.elements.preview.classList.remove('hidden');
+        this.elements.emptyState.classList.add('hidden');
+    }
+
+    async addToHistory(data) {
+        let history = await this.getHistory();
+        const newItem = {
+            id: Date.now(),
+            title: data.title,
+            thumbnail: data.thumbnail,
+            platform: 'YouTube',
+            timestamp: new Date().toISOString()
+        };
+
+        // Remove duplicates
+        history = history.filter(item => item.title !== data.title);
+        history.unshift(newItem);
+        history = history.slice(0, 10);
+
+        localStorage.setItem('ultra-yt-history', JSON.stringify(history));
+        this.renderHistory(history);
+    }
+
+    async getHistory() {
+        const history = localStorage.getItem('ultra-yt-history');
+        return history ? JSON.parse(history) : [];
+    }
+
+    async loadHistory() {
+        const history = await this.getHistory();
+        this.renderHistory(history);
+    }
+
+    renderHistory(history) {
+        const list = this.elements.historyList;
+        if (!history || history.length === 0) {
+            list.innerHTML = '<p class="empty-history-text">Aucun téléchargement récent</p>';
+            return;
+        }
+
+        list.innerHTML = history.map(item => `
+            <div class="history-item">
+                <img src="${item.thumbnail}" class="history-item-thumb">
+                <div class="history-item-info">
+                    <div class="history-item-title">${item.title}</div>
+                    <div class="history-item-meta">YOUTUBE • ${new Date(item.timestamp).toLocaleDateString()}</div>
+                </div>
+            </div>
+        `).join('');
+        refreshIcons();
+    }
+
+    clearHistory() {
+        localStorage.removeItem('ultra-yt-history');
+        this.renderHistory([]);
     }
 
     populateQualities(resolutions) {
@@ -184,6 +251,7 @@ export class YoutubeModule {
                 if (progressPercent) progressPercent.textContent = '100%';
                 if (progressStatus) progressStatus.textContent = 'Prêt pour le téléchargement !';
                 btnText.textContent = 'Finalisation...';
+                this.addToHistory(this.videoInfo);
             }
         };
 
@@ -219,18 +287,30 @@ export class YoutubeModule {
             // Success! Close event source
             eventSource.close();
 
-            // Trigger download browser-side
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            // Use the video title for the downloaded file if available
-            const finalName = this.videoInfo ? `${this.videoInfo.title}.${body.format}` : `video.${body.format}`;
-            a.download = finalName;
-            a.click();
-            URL.revokeObjectURL(url);
+            const data = await res.json();
 
-            if (progressStatus) progressStatus.textContent = 'Téléchargé !';
+            document.dispatchEvent(new CustomEvent('app-notification', {
+                detail: {
+                    title: 'Téléchargement terminé',
+                    message: `La vidéo "${this.videoInfo.title}" est prête.`,
+                    type: 'success',
+                    icon: 'youtube'
+                }
+            }));
+
+            if (progressStatus) progressStatus.textContent = 'Enregistré dans la Databank !';
+
+            // Show Save Button
+            if (data.fileName) {
+                this.elements.saveBtn.href = `/databank/${data.fileName}`;
+                this.elements.saveBtn.download = data.prettyName || data.fileName; // Use pretty name if available
+                this.elements.saveBtn.classList.remove('hidden');
+
+                // Hide download button or change text? Let's hide it to avoid confusion or keep it as "Restart"
+                // User complaint was about "restarting". So maybe hide it is safer, or rename.
+                // Let's hide the big Download button and show the Save button instead.
+                this.elements.downloadBtn.classList.add('hidden');
+            }
 
         } catch (error) {
             eventSource.close();
@@ -252,6 +332,10 @@ export class YoutubeModule {
             this.elements.loading.classList.remove('hidden');
         } else {
             this.elements.loading.classList.add('hidden');
+            // If no preview is shown, restore empty state
+            if (this.elements.preview.classList.contains('hidden')) {
+                this.elements.emptyState.classList.remove('hidden');
+            }
         }
     }
 

@@ -3,6 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const ffmpegPath = require('ffmpeg-static');
 const { spawn } = require('child_process');
+const db = require('../lib/db');
+const axios = require('axios');
+
 
 // Store active connections for progress updates
 const progressClients = new Map();
@@ -142,6 +145,7 @@ exports.downloadVideo = async (req, res) => {
             });
             // Nettoyer le titre pour les noms de fichiers (supprimer caractères invalides)
             videoTitle = info.title.replace(/[<>:"/\\|?*]/g, '').substring(0, 100);
+            req.body.thumbnailUrl = info.thumbnail; // Save for databank copy
         } catch (e) {
             console.log('Could not fetch video title, using default');
         }
@@ -302,17 +306,73 @@ exports.downloadVideo = async (req, res) => {
         const fileExtension = path.extname(downloadedFile);
         const finalFileName = `${videoTitle}${fileExtension}`;
 
-        res.download(filePath, finalFileName, (err) => {
-            // Clean up after download
-            setTimeout(() => {
+        // --- COPIE VERS LA DATABANK ---
+        let databankFileName = null; // Declare outside try block
+        try {
+            const databankDir = path.join(__dirname, '../../public/databank');
+            if (!fs.existsSync(databankDir)) fs.mkdirSync(databankDir, { recursive: true });
+
+            databankFileName = `yt-${videoId}${fileExtension}`;
+            const databankPath = path.join(databankDir, databankFileName);
+
+            fs.copyFileSync(filePath, databankPath);
+
+            // Download Thumbnail if available
+            let thumbnailPath = null;
+            if (req.body.thumbnailUrl) {
                 try {
-                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-                } catch (e) {
-                    console.log('Could not delete file after download:', e.message);
+                    const thumbExt = path.extname(new URL(req.body.thumbnailUrl).pathname) || '.jpg';
+                    const thumbFileName = `thumb-${videoId}${thumbExt}`;
+                    const thumbLocalPath = path.join(databankDir, thumbFileName);
+
+                    const response = await axios({
+                        url: req.body.thumbnailUrl,
+                        method: 'GET',
+                        responseType: 'stream'
+                    });
+
+                    const writer = fs.createWriteStream(thumbLocalPath);
+                    response.data.pipe(writer);
+
+                    await new Promise((resolve, reject) => {
+                        writer.on('finish', resolve);
+                        writer.on('error', reject);
+                    });
+
+                    thumbnailPath = `/databank/${thumbFileName}`;
+                } catch (thumbErr) {
+                    console.error('⚠️ Could not save thumbnail:', thumbErr.message);
                 }
-            }, 1000);
-            if (err) console.error('Download Error:', err);
+            }
+
+            const userId = req.session.user ? req.session.user.id : 1;
+            db.addDatabankItem(mode === 'audio' ? 'audio' : 'video', `/databank/${databankFileName}`, {
+                tool: 'youtube',
+                title: videoTitle,
+                url: url,
+                thumbnail: thumbnailPath,
+                timestamp: Date.now()
+            }, userId);
+            console.log(`✅ YouTube: Résultat ajouté à la Databank (${databankFileName})`);
+        } catch (dbErr) {
+            console.error('⚠️ Erreur Databank YouTube:', dbErr.message);
+        }
+
+        // Clean up temporary file
+        try {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        } catch (e) {
+            console.log('Could not delete file after processing:', e.message);
+        }
+
+        res.json({
+            success: true,
+            message: 'Vidéo téléchargée et enregistrée dans la Databank',
+            title: videoTitle,
+            fileName: databankFileName,
+            prettyName: finalFileName
         });
+
 
     } catch (error) {
         console.error('Download Error:', error);

@@ -20,7 +20,6 @@
 /* Layout */
 @import url('./layout/_sidebar.css');
 @import 'youtube.css';
-@import 'modules/_chat.css';
 @import url('./layout/_main-content.css');
 
 /* Components */
@@ -28,17 +27,21 @@
 @import url('./components/_badges.css');
 @import url('./components/_forms.css');
 @import url('./components/_cards.css');
+@import url('./components/_empty-state.css');
 
 /* Modules */
+@import url('./modules/_plexus.css');
 @import url('./modules/_home.css');
+@import url('./modules/_chat.css');
 @import url('./modules/_converter.css');
-@import url('./modules/_rembg.css');
-@import url('./modules/_upscale.css');
+@import url('./modules/_image-ai.css');
 @import url('./modules/_stt.css');
 @import url('./modules/_toolbox.css');
 @import url('./modules/_metadata.css');
 @import url('./modules/_localdrop.css');
 @import url('./modules/_settings.css');
+@import url('./modules/_databank.css');
+@import url('./modules/_notifications.css');
 
 /* Utils */
 @import url('./utils/_states.css');

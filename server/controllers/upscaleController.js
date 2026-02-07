@@ -2,14 +2,17 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration du serveur Python Upscale
-const UPSCALE_SERVER_URL = process.env.UPSCALE_URL || 'http://localhost:5300';
+const UPSCALE_SERVER_URL_ENV = process.env.UPSCALE_URL || 'http://localhost:5300';
+const db = require('../lib/db');
 
 /**
  * Vérifie si le serveur Upscale est disponible
  */
 exports.checkHealth = async (req, res) => {
     try {
-        const response = await fetch(`${UPSCALE_SERVER_URL}/health`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('UPSCALE_URL', userId, UPSCALE_SERVER_URL_ENV) : UPSCALE_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/health`);
         if (response.ok) {
             const data = await response.json();
             res.json({ available: true, ...data });
@@ -35,6 +38,7 @@ exports.upscaleImage = async (req, res) => {
 
     const inputPath = req.file.path;
     const scale = req.body.scale || 4;
+    const model = req.body.model || 'edsr';
     const denoise = req.body.denoise || 'false';
 
     const cleanUp = () => {
@@ -43,19 +47,27 @@ exports.upscaleImage = async (req, res) => {
         }
     };
 
+    // ... (imports)
+
+    // ...
+
     try {
-        console.log(`🔄 Upscale: Traitement de ${req.file.originalname} (x${scale}, denoise=${denoise})...`);
+        console.log(`🔄 Upscale: Traitement de ${req.file.originalname} (x${scale}, model=${model}, denoise=${denoise})...`);
 
         // Créer un FormData pour envoyer au serveur Python
         const formData = new FormData();
-        const fileBuffer = fs.readFileSync(inputPath);
+        const fileBuffer = fs.readFileSync(inputPath); // read before cleanup
         const blob = new Blob([fileBuffer], { type: req.file.mimetype });
         formData.append('file', blob, req.file.originalname);
         formData.append('scale', scale);
+        formData.append('model', model);
         formData.append('denoise', denoise);
 
         // Envoyer au serveur Upscale
-        const response = await fetch(`${UPSCALE_SERVER_URL}/upscale`, {
+        const userId = req.session.user ? req.session.user.id : 1;
+        const serverUrl = db.getConfigValue('UPSCALE_URL', userId, UPSCALE_SERVER_URL_ENV);
+
+        const response = await fetch(`${serverUrl}/upscale`, {
             method: 'POST',
             body: formData
         });
@@ -69,20 +81,43 @@ exports.upscaleImage = async (req, res) => {
         // Récupérer l'image traitée
         const outputBuffer = Buffer.from(await response.arrayBuffer());
         const outputFilename = `upscaled-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../uploads', outputFilename);
 
-        // Sauvegarder temporairement
+        // Dossier Databank
+        const databankDir = path.join(__dirname, '../../public/databank');
+        if (!fs.existsSync(databankDir)) {
+            fs.mkdirSync(databankDir, { recursive: true });
+        }
+
+        const outputPath = path.join(databankDir, outputFilename);
+
+        // Sauvegarder fichier
         fs.writeFileSync(outputPath, outputBuffer);
 
         console.log(`✅ Upscale: Image agrandie avec succès!`);
 
-        // Envoyer le fichier
-        res.download(outputPath, outputFilename, (err) => {
-            cleanUp();
-            if (fs.existsSync(outputPath)) {
-                fs.unlinkSync(outputPath);
-            }
-            if (err) console.error('Download Error:', err);
+        // Ajouter à la Databank
+        try {
+            const userId = req.session.user ? req.session.user.id : 1;
+            db.addDatabankItem('image', `/databank/${outputFilename}`, {
+                tool: 'upscale',
+                scale: scale,
+                denoise: denoise,
+                originalName: req.file.originalname,
+                timestamp: Date.now()
+            }, userId);
+        } catch (dbError) {
+            console.error('⚠️ Erreur ajout Databank:', dbError.message);
+        }
+
+        // Clean up input file
+        cleanUp();
+
+        // Return JSON instead of triggering download
+        res.json({
+            success: true,
+            message: 'Image agrandie et enregistrée dans la Databank',
+            fileName: outputFilename,
+            originalName: req.file.originalname
         });
 
     } catch (error) {

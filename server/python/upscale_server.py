@@ -19,35 +19,82 @@ import numpy as np
 
 # Force CPU mode
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
+os.environ['ORT_DISABLE_ALL_CUDA'] = '1'
+
+import torch
+# Optimize CPU threads
+num_cores = os.cpu_count() or 4
+torch.set_num_threads(num_cores)
 
 app = Flask(__name__)
 CORS(app)
 
-# Global model reference
-model = None
-model_loaded = False
+# Global models cache: {(model_name, scale): model_object}
+models = {}
 
-def get_model():
-    """Load super-image model on first use"""
-    global model, model_loaded
-    if model is None and not model_loaded:
+MODEL_MAPPING = {
+    'edsr': 'eugenesiow/edsr-base',
+    'msrn': 'eugenesiow/msrn',
+    'pan': 'eugenesiow/pan',
+    'drln': 'eugenesiow/drln'
+}
+
+def get_model(model_name='edsr', scale=4):
+    """Load super-image model based on name and scale"""
+    global models
+    
+    # Normalize model name
+    model_key = model_name.lower()
+    if model_key not in MODEL_MAPPING:
+        model_key = 'edsr'
+        
+    cache_key = (model_key, scale)
+    
+    if cache_key not in models:
         try:
-            from super_image import EdsrModel, ImageLoader
-            print("Loading EDSR x4 model...")
-            model = EdsrModel.from_pretrained('eugenesiow/edsr-base', scale=4)
-            model_loaded = True
-            print("Model loaded successfully!")
-        except ImportError:
-            print("super-image not installed. Run: pip install super-image")
-            model_loaded = True  # Mark as tried
+            from super_image import EdsrModel, MsrnModel, PanModel, DrlnModel
+            
+            pretrained_id = MODEL_MAPPING[model_key]
+            print(f"Loading {model_key} model for x{scale}...")
+            
+            if model_key == 'edsr':
+                models[cache_key] = EdsrModel.from_pretrained(pretrained_id, scale=scale)
+            elif model_key == 'msrn':
+                from super_image import MsrnModel
+                models[cache_key] = MsrnModel.from_pretrained(pretrained_id, scale=scale)
+            elif model_key == 'pan':
+                from super_image import PanModel
+                models[cache_key] = PanModel.from_pretrained(pretrained_id, scale=scale)
+            elif model_key == 'drln':
+                from super_image import DrlnModel
+                models[cache_key] = DrlnModel.from_pretrained(pretrained_id, scale=scale)
+            
+            print(f"Model {model_key} x{scale} loaded successfully!")
         except Exception as e:
-            print(f"Error loading model: {e}")
-            model_loaded = True
-    return model
+            print(f"Error loading model {model_key} x{scale}: {e}")
+            return None
+            
+    return models[cache_key]
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({'status': 'ok', 'service': 'upscale'})
+    return jsonify({
+        'status': 'ok', 
+        'service': 'upscale',
+        'device': 'cpu',
+        'threads': torch.get_num_threads()
+    })
+
+@app.route('/info', methods=['GET'])
+def get_info():
+    return jsonify({
+        'models': [
+            {'id': 'edsr', 'name': 'EDSR (Base)', 'description': 'Équilibré et robuste', 'speed': 'Médium'},
+            {'id': 'pan', 'name': 'PAN (Pixel Attention)', 'description': 'Très rapide, idéal pour CPU', 'speed': 'Rapide'},
+            {'id': 'msrn', 'name': 'MSRN', 'description': 'Multi-échelle, bons détails', 'speed': 'Médium'},
+        ],
+        'scales': [2, 3, 4]
+    })
 
 @app.route('/upscale', methods=['POST'])
 def upscale_image():
@@ -56,14 +103,18 @@ def upscale_image():
 
     file = request.files['file']
     scale = int(request.form.get('scale', 4))
+    model_name = request.form.get('model', 'edsr')
     denoise = request.form.get('denoise', 'false').lower() == 'true'
 
     if file.filename == '':
         return jsonify({'error': 'Nom de fichier vide'}), 400
 
-    mdl = get_model()
+    mdl = get_model(model_name, scale)
     if mdl is None:
-        return jsonify({'error': 'Modele non disponible. Installez super-image: pip install super-image'}), 500
+        # Fallback to EDSR x4 if requested combination fails
+        mdl = get_model('edsr', 4)
+        if mdl is None:
+            return jsonify({'error': 'Modèle non disponible'}), 500
 
     try:
         from super_image import ImageLoader
@@ -71,21 +122,19 @@ def upscale_image():
         
         # Load image
         img = Image.open(file.stream).convert('RGB')
-        print(f"Upscaling {file.filename} (x{scale}, denoise={denoise})...")
         
-        # Apply denoising if requested
+        # Apply denoising if requested (before upscaling to save time)
         if denoise:
             img_array = np.array(img)
-            # OpenCV denoising (h=10 for luminance, hColor=10 for color)
+            # Denoising on smaller image is much faster
             denoised = cv2.fastNlMeansDenoisingColored(img_array, None, 10, 10, 7, 21)
             img = Image.fromarray(denoised)
-            print("Denoising applied")
         
         # Prepare for model
         inputs = ImageLoader.load_image(img)
         
         # Run inference
-        with __import__('torch').no_grad():
+        with torch.no_grad():
             preds = mdl(inputs)
         
         # Convert tensor output to PIL Image
@@ -93,18 +142,10 @@ def upscale_image():
         output_array = (output_tensor * 255).astype(np.uint8)
         output_img = Image.fromarray(output_array)
         
-        # Handle scale != 4 by resizing
-        if scale != 4:
-            new_w = img.width * scale
-            new_h = img.height * scale
-            output_img = output_img.resize((new_w, new_h), Image.LANCZOS)
-        
         # Save to buffer
         output_buffer = io.BytesIO()
         output_img.save(output_buffer, format='PNG')
         output_buffer.seek(0)
-        
-        print(f"Upscale finished for {file.filename}")
         
         return send_file(
             output_buffer,
@@ -120,7 +161,8 @@ def upscale_image():
         return jsonify({'error': f'Erreur de traitement: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    print("AI Upscale Server starting on http://localhost:5300")
-    # Pre-load model
-    get_model()
+    print(f"AI Upscale Server starting on http://localhost:5300 (CPU Mode, {torch.get_num_threads()} threads)")
+    # Pre-load default model
+    get_model('edsr', 4)
     app.run(host='0.0.0.0', port=5300, debug=False)
+

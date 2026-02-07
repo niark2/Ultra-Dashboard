@@ -1,10 +1,13 @@
 /**
  * STT Module - Speech-to-Text avec Whisper
  */
+import { Storage } from '../utils/storage.js';
+
 export class STTModule {
     constructor() {
         this.selectedFile = null;
         this.isServerAvailable = false;
+        this.reconnectInterval = null;
         this.availableModels = [];
         this.elements = {
             dropZone: document.getElementById('sttDropZone'),
@@ -34,6 +37,13 @@ export class STTModule {
         await this.checkServer();
         await this.loadModels();
         this.setupEventListeners();
+
+        // Reload settings when tab is activated
+        document.addEventListener('tab-changed', (e) => {
+            if (e.detail.tabId === 'stt') {
+                this.loadModels();
+            }
+        });
     }
 
     async checkServer() {
@@ -42,10 +52,30 @@ export class STTModule {
             const data = await res.json();
             this.isServerAvailable = data.available === true;
             this.updateServerStatus();
+            return this.isServerAvailable;
         } catch (error) {
             this.isServerAvailable = false;
             this.updateServerStatus();
+            return false;
         }
+    }
+
+    startAutoReconnect() {
+        if (this.reconnectInterval) return;
+
+        this.reconnectInterval = setInterval(async () => {
+            if (!this.isServerAvailable) {
+                const success = await this.checkServer();
+                if (success) {
+                    await this.loadModels();
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = null;
+                }
+            } else {
+                clearInterval(this.reconnectInterval);
+                this.reconnectInterval = null;
+            }
+        }, 3000);
     }
 
     async loadModels() {
@@ -55,11 +85,16 @@ export class STTModule {
             const res = await fetch('/api/stt/models');
             const data = await res.json();
             this.availableModels = data.models || [];
-            this.populateModelSelect(data.default || 'base');
+
+            // Priority: Storage > Server Default
+            const { Storage } = await import('../utils/storage.js');
+            const savedModel = await Storage.get('ultra-whisper-default-model', '');
+            this.populateModelSelect(savedModel || data.default || 'base');
         } catch (error) {
             console.error('Failed to load models:', error);
         }
     }
+
 
     populateModelSelect(defaultModel) {
         const select = this.elements.modelSelect;
@@ -91,6 +126,7 @@ export class STTModule {
             badge.classList.remove('connected');
             errorMsg.classList.remove('hidden');
             this.elements.dropZone.classList.add('disabled');
+            this.startAutoReconnect();
         }
     }
 
@@ -230,6 +266,15 @@ export class STTModule {
 
             setTimeout(() => {
                 this.showResult(result);
+
+                document.dispatchEvent(new CustomEvent('app-notification', {
+                    detail: {
+                        title: 'Transcription terminée',
+                        message: `La transcription de ${this.selectedFile.name} est prête.`,
+                        type: 'success',
+                        icon: 'mic'
+                    }
+                }));
             }, 400);
 
         } catch (error) {

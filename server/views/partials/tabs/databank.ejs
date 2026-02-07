@@ -1,0 +1,60 @@
+<section class="tab-content" id="tab-databank">
+    <div class="content-header">
+        <div class="header-title">
+            <h2><i data-lucide="database"></i> Databank</h2>
+            <p>Historique et stockage centralisé de toutes vos générations</p>
+        </div>
+        <div class="header-actions">
+            <div class="search-bar">
+                <i data-lucide="search"></i>
+                <input type="text" id="databankSearch" placeholder="Rechercher...">
+            </div>
+            <select id="databankFilterType" class="select-input">
+                <option value="all">Tous les types</option>
+                <option value="image">Images</option>
+                <option value="audio">Audio</option>
+                <option value="text">Texte</option>
+                <option value="video">Vidéo</option>
+            </select>
+            <button class="btn-icon-large" id="databankRefreshBtn" title="Actualiser">
+                <i data-lucide="refresh-cw"></i>
+            </button>
+            <button class="btn-danger" id="databankClearBtn">
+                <i data-lucide="trash-2"></i> Tout effacer
+            </button>
+        </div>
+    </div>
+
+    <div class="databank-container">
+        <div class="databank-grid" id="databankGrid">
+            <!-- Items loaded via JS -->
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Chargement des données...</p>
+            </div>
+        </div>
+
+        <div class="pagination-controls hidden" id="databankPagination">
+            <button id="databankPrevBtn" disabled><i data-lucide="chevron-left"></i> Précédent</button>
+            <span id="databankPageInfo">Page 1</span>
+            <button id="databankNextBtn">Suivant <i data-lucide="chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="databankPreviewModal">
+        <div class="modal-content preview-modal-content">
+            <div class="modal-header">
+                <h3 id="previewTitle">Aperçu</h3>
+                <button class="modal-close" id="closePreviewModal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body" id="previewBody">
+                <!-- Content injected here -->
+            </div>
+            <div class="modal-footer">
+                <div class="preview-meta" id="previewMeta"></div>
+                <button class="btn-primary" id="previewDownloadBtn"><i data-lucide="download"></i> Télécharger</button>
+            </div>
+        </div>
+    </div>
+</section>

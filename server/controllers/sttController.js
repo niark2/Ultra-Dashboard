@@ -1,15 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const db = require('../lib/db');
 
 // Configuration du serveur Python Whisper
-const WHISPER_SERVER_URL = process.env.WHISPER_URL || 'http://localhost:5200';
+const WHISPER_SERVER_URL_ENV = process.env.WHISPER_URL || 'http://localhost:5200';
 
 /**
  * Vérifie si le serveur Whisper est disponible
  */
 exports.checkHealth = async (req, res) => {
     try {
-        const response = await fetch(`${WHISPER_SERVER_URL}/health`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('WHISPER_URL', userId, WHISPER_SERVER_URL_ENV) : WHISPER_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/health`);
         if (response.ok) {
             const data = await response.json();
             res.json({ available: true, ...data });
@@ -29,7 +32,9 @@ exports.checkHealth = async (req, res) => {
  */
 exports.getModels = async (req, res) => {
     try {
-        const response = await fetch(`${WHISPER_SERVER_URL}/models`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('WHISPER_URL', userId, WHISPER_SERVER_URL_ENV) : WHISPER_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/models`);
         if (response.ok) {
             const data = await response.json();
             res.json(data);
@@ -49,7 +54,9 @@ exports.getModels = async (req, res) => {
  */
 exports.getInfo = async (req, res) => {
     try {
-        const response = await fetch(`${WHISPER_SERVER_URL}/info`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('WHISPER_URL', userId, WHISPER_SERVER_URL_ENV) : WHISPER_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/info`);
         if (response.ok) {
             const data = await response.json();
             res.json(data);
@@ -96,7 +103,10 @@ exports.transcribe = async (req, res) => {
         }
 
         // Envoyer au serveur Whisper
-        const response = await fetch(`${WHISPER_SERVER_URL}/transcribe`, {
+        const userId = req.session.user ? req.session.user.id : 1;
+        const serverUrl = db.getConfigValue('WHISPER_URL', userId, WHISPER_SERVER_URL_ENV);
+
+        const response = await fetch(`${serverUrl}/transcribe`, {
             method: 'POST',
             body: formData
         });
@@ -110,6 +120,23 @@ exports.transcribe = async (req, res) => {
 
         const result = await response.json();
         console.log(`✅ STT: Transcription terminée!`);
+
+        // Ajouter à la Databank
+        try {
+            const userId = req.session.user ? req.session.user.id : 1;
+            db.addDatabankItem('text', result.text, {
+                tool: 'stt',
+                model: modelName,
+                language: result.language,
+                originalName: req.file.originalname,
+                duration: result.duration,
+                segments: result.segments ? result.segments.length : 0,
+                timestamp: Date.now()
+            }, userId);
+            console.log('✅ STT: Résultat ajouté à la Databank');
+        } catch (dbError) {
+            console.error('⚠️ Erreur ajout Databank:', dbError.message);
+        }
 
         res.json(result);
 

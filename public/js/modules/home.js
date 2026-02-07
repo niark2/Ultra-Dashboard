@@ -1,32 +1,34 @@
+import { Storage } from '../utils/storage.js';
+
 export class HomeModule {
     constructor() {
+        this.widgets = [];
+        this.locked = false;
+        this.initialized = false;
+        this.init();
+    }
+
+    async init() {
+        if (this.initialized) return;
+
         const defaultWidgets = [
             { id: 'clock', type: 'clock', title: 'Heure & Date', w: 6 },
             { id: 'weather', type: 'weather', title: 'Météo', w: 3 },
             { id: 'quick-actions', type: 'quick-actions', title: 'Actions Rapides', w: 3 }
         ];
 
-        // Load from localStorage or use defaults
-        const saved = localStorage.getItem('ultra-home-widgets');
-        this.widgets = saved ? JSON.parse(saved) : defaultWidgets;
+        // Load from Storage (SQLite)
+        this.widgets = await Storage.get('ultra-home-widgets', defaultWidgets);
+        this.locked = await Storage.get('ultra-home-locked', false);
 
-        this.locked = localStorage.getItem('ultra-home-locked') === 'true';
-
-        this.initialized = false;
-        this.init();
-    }
-
-    init() {
-        if (this.initialized) return;
-
-        // Render initial structure if needed, or just bind events
+        // Render initial structure
         this.renderWidgets();
         this.startClock();
         this.bindEvents();
         this.updateAllWeather();
 
         this.initialized = true;
-        console.log('🏠 Home Module Initialized');
+        console.log('🏠 Home Module Initialized (SQLite)');
     }
 
     bindEvents() {
@@ -54,7 +56,6 @@ export class HomeModule {
             });
         }
 
-        // Listen for store item clicks (dynamic binding or delegated)
         const storeItems = document.querySelectorAll('.store-item');
         storeItems.forEach(item => {
             item.addEventListener('click', () => {
@@ -75,9 +76,9 @@ export class HomeModule {
         if (overlay) overlay.classList.remove('active');
     }
 
-    toggleLock() {
+    async toggleLock() {
         this.locked = !this.locked;
-        localStorage.setItem('ultra-home-locked', this.locked);
+        await Storage.set('ultra-home-locked', this.locked);
         this.updateLockUI();
         this.renderWidgets();
     }
@@ -99,16 +100,11 @@ export class HomeModule {
             if (addBtn) addBtn.style.display = 'flex';
         }
 
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+        if (window.lucide) window.lucide.createIcons();
     }
 
-    addWidget(type) {
-        // Simple logic: check if already exists, if not add
-        // For 'clock' and 'weather' we usually only want one
+    async addWidget(type) {
         if (this.widgets.find(w => w.type === type)) {
-            // Shake or alert? For now just log
             console.warn('Widget already exists');
             return;
         }
@@ -121,12 +117,12 @@ export class HomeModule {
         };
 
         this.widgets.push(newWidget);
-        this.saveWidgets();
+        await this.saveWidgets();
         this.renderWidgets();
     }
 
-    saveWidgets() {
-        localStorage.setItem('ultra-home-widgets', JSON.stringify(this.widgets));
+    async saveWidgets() {
+        await Storage.set('ultra-home-widgets', this.widgets);
     }
 
     getWidgetWidth(type) {
@@ -159,7 +155,7 @@ export class HomeModule {
         const grid = document.getElementById('homeWidgetGrid');
         if (!grid) return;
 
-        grid.innerHTML = ''; // Clear current
+        grid.innerHTML = '';
 
         this.widgets.forEach(widget => {
             const el = document.createElement('div');
@@ -169,20 +165,18 @@ export class HomeModule {
 
             el.innerHTML = this.getWidgetHTML(widget);
 
-            // Add remove button logic
             const removeBtn = el.querySelector('.btn-remove-widget');
             if (removeBtn) {
-                removeBtn.addEventListener('click', (e) => {
+                removeBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     this.widgets = this.widgets.filter(w => w.id !== widget.id);
-                    this.saveWidgets();
+                    await this.saveWidgets();
                     this.renderWidgets();
                 });
             }
 
             grid.appendChild(el);
 
-            // Trigger specific widget updates
             if (widget.type === 'weather') {
                 this.fetchWeatherForWidget(widget.id);
             } else if (widget.type === 'note') {
@@ -194,7 +188,6 @@ export class HomeModule {
             }
         });
 
-        // Re-initialize dynamic content if needed (like lucide icons)
         if (window.lucide) window.lucide.createIcons();
     }
 
@@ -272,16 +265,14 @@ export class HomeModule {
         return header + content;
     }
 
-    initNoteWidget(id) {
+    async initNoteWidget(id) {
         const textarea = document.getElementById(`note-${id}`);
         if (!textarea) return;
 
-        // Load saved note
-        textarea.value = localStorage.getItem(`ultra-note-${id}`) || '';
+        textarea.value = await Storage.get(`ultra-note-${id}`, '');
 
-        // Save on change
-        textarea.addEventListener('input', (e) => {
-            localStorage.setItem(`ultra-note-${id}`, e.target.value);
+        textarea.addEventListener('input', async (e) => {
+            await Storage.set(`ultra-note-${id}`, e.target.value);
         });
     }
 
@@ -291,9 +282,7 @@ export class HomeModule {
 
         try {
             const rssUrl = 'https://www.franceinfo.fr/titres.rss';
-            // Use rss2json to convert RSS to JSON as it's easier to handle client-side without CORS issues for this specific feed
             const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-
             const response = await fetch(apiUrl);
             const data = await response.json();
 
@@ -310,7 +299,7 @@ export class HomeModule {
             }
         } catch (error) {
             console.error('News fetch error:', error);
-            listContainer.innerHTML = '<div style="color: var(--error); font-size: 0.82rem; text-align: center; padding: 15px;">Impossible de charger les actualités France Info.</div>';
+            listContainer.innerHTML = '<div style="color: var(--error); font-size: 0.82rem; text-align: center; padding: 15px;">Impossible de charger les actualités.</div>';
         }
     }
 
@@ -319,7 +308,6 @@ export class HomeModule {
         if (!listContainer) return;
 
         try {
-            // Check torrent list as an example of active downloads
             const response = await fetch('/api/torrent/list');
             if (response.ok) {
                 const torrents = await response.json();
@@ -352,7 +340,6 @@ export class HomeModule {
 
     async fetchWeatherForWidget(widgetId) {
         const fallbackCoords = { latitude: 48.8566, longitude: 2.3522, name: "Paris, France" };
-
         if (!navigator.geolocation) {
             this.fetchWeatherFromAPI(widgetId, fallbackCoords.latitude, fallbackCoords.longitude, fallbackCoords.name);
             return;
@@ -364,16 +351,14 @@ export class HomeModule {
                 this.fetchWeatherFromAPI(widgetId, latitude, longitude, "Position actuelle");
             },
             (error) => {
-                console.warn('Geolocation error, falling back to Paris:', error);
                 this.fetchWeatherFromAPI(widgetId, fallbackCoords.latitude, fallbackCoords.longitude, fallbackCoords.name);
             },
-            { timeout: 5000 } // Add a timeout to geolocation
+            { timeout: 5000 }
         );
     }
 
     async fetchWeatherFromAPI(widgetId, lat, lon, locationName) {
         try {
-            // Use Open-Meteo (No API Key needed)
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
             const response = await fetch(url);
             const data = await response.json();
@@ -422,14 +407,13 @@ export class HomeModule {
     }
 
     getWeatherIconByCode(code) {
-        // WMO Weather interpretation codes (https://open-meteo.com/en/docs)
-        if (code === 0) return '☀️'; // Clear sky
-        if (code <= 3) return '🌤️'; // Partly cloudy
-        if (code <= 48) return '☁️'; // Fog
-        if (code <= 67) return '🌧️'; // Rain
-        if (code <= 77) return '❄️'; // Snow
-        if (code <= 82) return '🌧️'; // Rain showers
-        if (code <= 99) return '⚡'; // Thunderstorm
+        if (code === 0) return '☀️';
+        if (code <= 3) return '🌤️';
+        if (code <= 48) return '☁️';
+        if (code <= 67) return '🌧️';
+        if (code <= 77) return '❄️';
+        if (code <= 82) return '🌧️';
+        if (code <= 99) return '⚡';
         return '☀️';
     }
 
@@ -446,7 +430,6 @@ export class HomeModule {
         };
         return codes[code] || "Ensoleillé";
     }
-
 
     getWidgetIcon(type) {
         switch (type) {
@@ -465,14 +448,12 @@ export class HomeModule {
         const updateTime = () => {
             const timeEl = document.getElementById('widgetTime');
             const dateEl = document.getElementById('widgetDate');
-
             if (timeEl && dateEl) {
                 const now = new Date();
                 timeEl.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
                 dateEl.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
             }
         };
-
         updateTime();
         setInterval(updateTime, 1000);
     }

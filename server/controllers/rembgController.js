@@ -2,14 +2,17 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration du serveur Python REMBG
-const REMBG_SERVER_URL = process.env.REMBG_URL || 'http://localhost:5100';
+const REMBG_SERVER_URL_ENV = process.env.REMBG_URL || 'http://localhost:5100';
+const db = require('../lib/db');
 
 /**
  * Vérifie si le serveur REMBG est disponible
  */
 exports.checkHealth = async (req, res) => {
     try {
-        const response = await fetch(`${REMBG_SERVER_URL}/health`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('REMBG_URL', userId, REMBG_SERVER_URL_ENV) : REMBG_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/health`);
         if (response.ok) {
             const data = await response.json();
             res.json({ available: true, ...data });
@@ -29,7 +32,9 @@ exports.checkHealth = async (req, res) => {
  */
 exports.getInfo = async (req, res) => {
     try {
-        const response = await fetch(`${REMBG_SERVER_URL}/info`);
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('REMBG_URL', userId, REMBG_SERVER_URL_ENV) : REMBG_SERVER_URL_ENV;
+        const response = await fetch(`${serverUrl}/info`);
         if (response.ok) {
             const data = await response.json();
             res.json(data);
@@ -54,6 +59,7 @@ exports.removeBackground = async (req, res) => {
     }
 
     const inputPath = req.file.path;
+    const model = req.body.model || 'u2net';
 
     const cleanUp = () => {
         if (fs.existsSync(inputPath)) {
@@ -61,17 +67,25 @@ exports.removeBackground = async (req, res) => {
         }
     };
 
+    // ... (imports)
+
+    // ...
+
     try {
-        console.log(`🔄 REMBG: Traitement de ${req.file.originalname}...`);
+        console.log(`🔄 REMBG: Traitement de ${req.file.originalname} avec le modele ${model}...`);
 
         // Créer un FormData pour envoyer au serveur Python
         const formData = new FormData();
-        const fileBuffer = fs.readFileSync(inputPath);
+        const fileBuffer = fs.readFileSync(inputPath); // read before cleanup
         const blob = new Blob([fileBuffer], { type: req.file.mimetype });
         formData.append('file', blob, req.file.originalname);
+        formData.append('model', model);
+
+        const userId = req.session.user ? req.session.user.id : null;
+        const serverUrl = userId ? db.getConfigValue('REMBG_URL', userId, REMBG_SERVER_URL_ENV) : REMBG_SERVER_URL_ENV;
 
         // Envoyer au serveur REMBG
-        const response = await fetch(`${REMBG_SERVER_URL}/remove`, {
+        const response = await fetch(`${serverUrl}/remove`, {
             method: 'POST',
             body: formData
         });
@@ -85,20 +99,43 @@ exports.removeBackground = async (req, res) => {
         // Récupérer l'image traitée
         const outputBuffer = Buffer.from(await response.arrayBuffer());
         const outputFilename = `nobg-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../uploads', outputFilename);
 
-        // Sauvegarder temporairement
+        // Dossier de destination permanent (Databank)
+        const databankDir = path.join(__dirname, '../../public/databank');
+        if (!fs.existsSync(databankDir)) {
+            fs.mkdirSync(databankDir, { recursive: true });
+        }
+
+        const outputPath = path.join(databankDir, outputFilename);
+
+        // Sauvegarder le fichier
         fs.writeFileSync(outputPath, outputBuffer);
 
-        console.log(`✅ REMBG: Arrière-plan supprimé!`);
+        console.log(`✅ REMBG: Arrière-plan supprimé avec ${model}!`);
 
-        // Envoyer le fichier
-        res.download(outputPath, outputFilename, (err) => {
-            cleanUp();
-            if (fs.existsSync(outputPath)) {
-                fs.unlinkSync(outputPath);
-            }
-            if (err) console.error('Download Error:', err);
+        // Ajouter à la Databank
+        try {
+            const userId = req.session.user ? req.session.user.id : 1;
+            db.addDatabankItem('image', `/databank/${outputFilename}`, {
+                tool: 'rembg',
+                model: model,
+                originalName: req.file.originalname,
+                timestamp: Date.now()
+            }, userId);
+            console.log('✅ REMBG: Résultat ajouté à la Databank');
+        } catch (dbError) {
+            console.error('⚠️ Erreur ajout Databank:', dbError.message);
+        }
+
+        // Clean up input file
+        cleanUp();
+
+        // Return JSON instead of triggering download
+        res.json({
+            success: true,
+            message: 'Arrière-plan supprimé et enregistré dans la Databank',
+            fileName: outputFilename,
+            originalName: req.file.originalname
         });
 
     } catch (error) {

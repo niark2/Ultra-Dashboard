@@ -31,6 +31,7 @@ export class TorrentModule {
 
         this.pollingInterval = null;
         this.cache = new Map(); // Store row elements by hash
+        this.completedTorrents = new Set();
         this.init();
     }
 
@@ -166,6 +167,19 @@ export class TorrentModule {
             }
 
             this.updateRow(row, t);
+
+            // Notify on completion
+            if (t.progress === 1 && !this.completedTorrents.has(t.hash)) {
+                this.completedTorrents.add(t.hash);
+                document.dispatchEvent(new CustomEvent('app-notification', {
+                    detail: {
+                        title: 'Torrent terminé',
+                        message: `Le téléchargement de "${t.name}" est fini.`,
+                        type: 'success',
+                        icon: 'package'
+                    }
+                }));
+            }
         });
 
         // Remove old

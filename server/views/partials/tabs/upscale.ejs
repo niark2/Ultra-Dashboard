@@ -23,9 +23,18 @@
         <!-- Options -->
         <div class="upscale-options" id="upscaleOptionsSection">
             <div class="option-row">
+                <label class="model-label">Modèle d'IA</label>
+                <div class="toggle-group model-toggle">
+                    <button class="toggle-btn active" data-model="edsr">EDSR (Précis)</button>
+                    <button class="toggle-btn" data-model="msrn">MSRN (Détails)</button>
+                    <button class="toggle-btn" data-model="pan">PAN (Ultra-Rapide CPU)</button>
+                </div>
+            </div>
+            <div class="option-row" style="margin-top: 16px;">
                 <label class="model-label">Facteur d'agrandissement</label>
                 <div class="toggle-group scale-toggle">
                     <button class="toggle-btn" data-scale="2">x2</button>
+                    <button class="toggle-btn" data-scale="3">x3</button>
                     <button class="toggle-btn active" data-scale="4">x4</button>
                 </div>
             </div>

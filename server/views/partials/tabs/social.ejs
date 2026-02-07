@@ -1,0 +1,150 @@
+<section class="tab-content" id="tab-social">
+    <header class="content-header">
+        <h1>Social Media Downloader</h1>
+        <p class="subtitle">Téléchargez des vidéos de TikTok, Instagram, Twitter, Facebook et plus</p>
+    </header>
+
+    <div class="converter-container">
+        <!-- URL Input -->
+        <div class="input-group">
+            <input type="text" id="socialUrl" placeholder="Collez le lien (TikTok, Instagram, Twitter...) ici..."
+                class="url-input">
+            <button id="socialSearchBtn" class="btn-search"><i data-lucide="search"></i></button>
+        </div>
+
+        <!-- Empty State (Shown by default) -->
+        <div id="socialEmptyState" class="empty-state-container">
+            <!-- Platform Grid -->
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <i data-lucide="video"></i>
+                    <span>TikTok</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="instagram"></i>
+                    <span>Instagram</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="twitter"></i>
+                    <span>Twitter / X</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="facebook"></i>
+                    <span>Facebook</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="twitch"></i>
+                    <span>Twitch</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="message-square"></i>
+                    <span>Reddit</span>
+                </div>
+            </div>
+
+            <!-- Features Row -->
+            <div class="features-row">
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="zap"></i></div>
+                    <div class="feature-text">
+                        <h4>Ultra Rapide</h4>
+                        <p>Traitement instantané et téléchargement direct.</p>
+                    </div>
+                </div>
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="shield-check"></i></div>
+                    <div class="feature-text">
+                        <h4>Sécurisé</h4>
+                        <p>Aucune conservation de vos données personnelles.</p>
+                    </div>
+                </div>
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="star"></i></div>
+                    <div class="feature-text">
+                        <h4>Qualité Pro</h4>
+                        <p>Format MP3 (320kbps) et MP4 (HD) disponibles.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>Téléchargements Récents</h3>
+                    <button id="btnClearSocialHistory" class="btn-clear-history">Effacer</button>
+                </div>
+                <div id="socialHistoryList" class="history-list">
+                    <p class="empty-history-text">Aucun téléchargement récent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Preview -->
+        <div id="socialPreview" class="yt-preview hidden">
+            <div class="yt-thumbnail-container">
+                <img id="socialThumbnail" src="" alt="Thumbnail">
+                <div class="yt-duration" id="socialDuration">00:00</div>
+            </div>
+            <div class="yt-info">
+                <h3 id="socialTitle">Titre du média</h3>
+                <p id="socialChannel" class="yt-channel">Plateforme</p>
+
+                <!-- Options Grid -->
+                <div class="yt-options-grid">
+                    <div class="option-group">
+                        <label>Mode</label>
+                        <div class="toggle-group social-mode-toggle">
+                            <button class="toggle-btn active" data-mode="video">Vidéo <i data-lucide="video"
+                                    class="inline-icon"></i></button>
+                            <button class="toggle-btn" data-mode="audio">Audio <i data-lucide="music"
+                                    class="inline-icon"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Qualité</label>
+                        <select id="socialQuality" class="yt-select">
+                            <option value="best">Auto (Max)</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Format</label>
+                        <select id="socialFormat" class="yt-select">
+                            <!-- Will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-buttons-container" style="display: flex; gap: 10px; margin-top: 24px;">
+                    <button id="socialDownloadBtn" class="btn-convert" style="flex: 1; margin-top: 0;">
+                        <span class="btn-text">Télécharger</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                    <a id="socialSaveBtn" class="btn-convert hidden"
+                        style="flex: 1; margin-top: 0; text-decoration: none; display: flex; align-items: center; justify-content: center; background: #10b981;"
+                        download>
+                        <i data-lucide="download" style="margin-right: 8px;"></i> Sauvegarder
+                    </a>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="socialProgressContainer" class="yt-progress-container hidden">
+                    <div class="yt-progress-bar">
+                        <div id="socialProgressFill" class="yt-progress-fill"></div>
+                    </div>
+                    <div class="yt-progress-info">
+                        <span id="socialProgressStatus">Initialisation...</span>
+                        <span id="socialProgressPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="socialLoading" class="yt-loading-container hidden">
+            <div class="loader-spinner"></div>
+            <p style="color: var(--text-secondary); font-size: 15px;">Analyse du lien en cours...</p>
+        </div>
+    </div>
+</section>

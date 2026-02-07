@@ -6,6 +6,7 @@ require('dotenv').config();
 // Nous utilisons node-fetch pour appeler l'API OpenRouter
 // Si node-fetch v3+ est utilisé, il faut un import dynamique car c'est un module ESM
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const db = require('../lib/db');
 
 const chatController = {
     /**
@@ -14,8 +15,9 @@ const chatController = {
     sendMessage: async (req, res) => {
         try {
             const { message, history, context } = req.body;
-            const apiKey = process.env.OPENROUTER_API_KEY;
-            const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-pro-exp-02-05:free';
+            const userId = req.session.user.id;
+            const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
+            const model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-pro-exp-02-05:free');
 
             if (!apiKey) {
                 return res.status(500).json({ error: "Clé API OpenRouter manquante dans le fichier .env" });
@@ -94,8 +96,9 @@ const chatController = {
      * Retourne la configuration (modèle utilisé)
      */
     getConfig: (req, res) => {
+        const userId = req.session.user.id;
         res.json({
-            model: process.env.OPENROUTER_MODEL || 'google/gemini-2.0-pro-exp-02-05:free'
+            model: db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-pro-exp-02-05:free')
         });
     }
 };

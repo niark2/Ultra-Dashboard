@@ -12,10 +12,10 @@ import sys
 import io
 
 # Force UTF-8 for Windows console
-if sys.platform == 'win32':
-    import codecs
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
+# if sys.platform == 'win32':
+#     import codecs
+#     sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+#     sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
 
 try:
     from rembg import remove, new_session
@@ -31,8 +31,15 @@ CORS(app)
 MAX_SIZE_MB = 10
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'}
 
-# Create session with CPU provider only
-session = new_session("u2net", providers=["CPUExecutionProvider"])
+# Global sessions cache
+sessions = {}
+
+
+def get_session(model_name):
+    if model_name not in sessions:
+        print(f"Initialisation de la session pour le modele: {model_name}...")
+        sessions[model_name] = new_session(model_name, providers=["CPUExecutionProvider"])
+    return sessions[model_name]
 
 
 def allowed_file(filename):
@@ -50,6 +57,7 @@ def remove_background():
         return jsonify({'error': 'Aucun fichier fourni'}), 400
 
     file = request.files['file']
+    model_name = request.form.get('model', 'u2net')
     
     if file.filename == '':
         return jsonify({'error': 'Nom de fichier vide'}), 400
@@ -66,15 +74,16 @@ def remove_background():
 
     try:
         input_data = file.read()
-        print(f"Traitement de {file.filename} ({size_mb:.2f}MB) sur CPU...")
+        print(f"Traitement de {file.filename} avec le modele {model_name} sur CPU...")
         
-        # Use CPU session
+        # Use specific model session
+        session = get_session(model_name)
         output_data = remove(input_data, session=session)
         
         output_buffer = io.BytesIO(output_data)
         output_buffer.seek(0)
         
-        print("Arriere-plan supprime!")
+        print(f"Arriere-plan supprime avec {model_name}!")
         
         return send_file(
             output_buffer,
@@ -94,7 +103,14 @@ def get_info():
         'service': 'REMBG Background Remover (CPU)',
         'max_size_mb': MAX_SIZE_MB,
         'allowed_extensions': list(ALLOWED_EXTENSIONS),
-        'status': 'ready'
+        'status': 'ready',
+        'available_models': [
+            {'id': 'u2net', 'name': 'U2NET', 'description': 'Equilibre (Par defaut)', 'efficiency': 'Medium', 'power': 'Medium'},
+            {'id': 'u2netp', 'name': 'U2NETP', 'description': 'Tres rapide, moins de ram', 'efficiency': 'High', 'power': 'Low'},
+            {'id': 'u2net_human_seg', 'name': 'Human Seg', 'description': 'Specialise pour les humains', 'efficiency': 'Medium', 'power': 'Medium'},
+            {'id': 'isnet-general-use', 'name': 'ISNET General', 'description': 'Haute precision, plus lourd', 'efficiency': 'Low', 'power': 'High'},
+            {'id': 'silueta', 'name': 'Silueta', 'description': 'Rapide pour les silhouettes', 'efficiency': 'High', 'power': 'Low'}
+        ]
     })
 
 

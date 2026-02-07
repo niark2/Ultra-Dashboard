@@ -1,59 +1,68 @@
-# Ultra Dashboard 🚀
+# 🚀 Ultra Dashboard
 
-A comprehensive, modular dashboard for media management, AI processing, and local networking. Built with Node.js and Python microservices.
+Ultra Dashboard est une plateforme modulaire et élégante conçue pour centraliser vos outils numériques, la gestion de vos médias et des services d'Intelligence Artificielle de pointe, le tout dans une interface haut de gamme et réactive.
 
-## ✨ Features
-
-### 🤖 AI Suite (Python Integration)
-- **RemoveBG**: Instant background removal for images using AI.
-- **Whisper STT**: High-accuracy local speech-to-text transcription.
-- **AI Upscaler**: Enhance image resolution using deep learning.
-- **AI Chat**: Integrated LLM chat interface.
-
-### 🎬 Media Tools
-- **YouTube Hub**: Compact interface for downloading/converting videos & audio (yt-dlp).
-- **Format Converter**: Advanced FFmpeg frontend for all your conversion needs.
-- **Metadata Editor**: Edit ID3 tags and metadata for audio/video files.
-
-### ⚡ Network & Utils
-- **LocalDrop**: Seamless p2p file sharing (WebRTC) - AirDrop for your local network.
-- **Torrent Client**: Integrated qBittorrent management interface.
-- **Home Widgets**: Personal dashboard with weather, time, and system stats.
-- **Toolbox**: Collection of useful utilities (Webcam Mirror, etc.).
-
-## 🛠️ Tech Stack
-- **Frontend**: EJS, CSS Variables, Lucide Icons
-- **Backend**: Node.js (Express), Socket.io
-- **AI Services**: Python (Rembg, OpenAI Whisper)
-- **Core Processing**: FFmpeg, yt-dlp, Sharp
-
-## 📦 Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/niark2/Niark-Dashboard.git
-   cd Niark-Dashboard
-   ```
-
-2. **Install Node.js dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Install Python dependencies**
-   Ensure you have Python 3.x installed, then install required packages for AI features:
-   ```bash
-   pip install rembg openai-whisper torch
-   ```
-
-4. **Start the server**
-   ```bash
-   npm run dev
-   ```
-   Access the dashboard at `http://localhost:3000`
-
-## 🤝 Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+![Dashboard Preview](https://via.placeholder.com/1200x600/18181b/ffffff?text=Ultra+Dashboard+Premium+Experience)
 
 ---
-*Created by [Niark2](https://github.com/niark2)*
+
+## ✨ Fonctionnalités Clés
+
+### 🤖 Suite AI Intégrée
+- **Plexus (Deep Research)** : Un moteur de recherche IA avancé (clone Perplexity) qui synthétise le web en temps réel avec des sources citées.
+- **AI Chat** : Assistant intelligent avec support de lecture de documents PDF pour une analyse contextuelle.
+- **Remove BG** : Détourage automatique d'images via des modèles Python locaux (U2NET, ISNET, etc.).
+- **AI Upscaler** : Agrandissement et amélioration de la résolution d'image par deep learning.
+- **Speech-to-Text (STT)** : Transcription audio précise utilisant les modèles Whisper de OpenAI.
+
+### 🎬 Outils Média & Téléchargement
+- **YouTube Hub** : Téléchargement et conversion de vidéos/audio YouTube via `yt-dlp`.
+- **Social Downloader** : Récupération de médias depuis Instagram, TikTok et plus encore.
+- **Convertisseur Universel** : Interface FFmpeg complète pour transformer tous vos fichiers audio et vidéo.
+- **Metadata Editor** : Édition des tags ID3 et métadonnées pour organiser votre bibliothèque.
+
+### ⚡ Réseau & Utilitaires
+- **LocalDrop** : Partage de fichiers P2P ultra-rapide via WebRTC (le "AirDrop" de votre réseau local).
+- **Torrent Manager** : Gestionnaire de téléchargements intégré.
+- **Toolbox** : Miroir webcam, utilitaires système et widgets (Météo, Stats CPU/RAM).
+- **Databank** : Votre coffre-fort centralisé où tous les fichiers générés et téléchargés sont automatiquement indexés et triés.
+
+---
+
+## 🛠️ Stack Technique
+- **Backend** : Node.js (Express), Socket.io, Better-SQLite3
+- **Frontend** : EJS, Vanilla JS, CSS Variables (Design System custom)
+- **AI Backend** : Microservices Python (Flask), PyTorch, ONNX
+- **Processing** : FFmpeg, yt-dlp, Sharp
+
+---
+
+## 📦 Installation Rapide
+
+### 🐳 Via Docker (Recommandé)
+Le moyen le plus simple de tout lancer (Node, Python, FFmpeg, Nginx) en une commande :
+```bash
+docker-compose up -d --build
+```
+L'application sera disponible sur `http://localhost`.
+
+### 💻 Installation Locale
+1. **Node.js** : `npm install`
+2. **Python** : `pip install -r server/python/requirements.txt`
+3. **Lancement** : `npm run dev`
+Accès sur `http://localhost:3000`.
+
+> [!IMPORTANT]
+> Pour plus de détails sur les prérequis et la configuration avancée, consultez le **[Guide d'Installation Complet (INSTALL.md)](./INSTALL.md)**.
+
+---
+
+## ⚙️ Configuration
+Pas besoin de manipuler des fichiers de configuration complexes. Une fois lancé, allez dans l'onglet **Réglages > Variables d'env** pour configurer :
+- Votre clé **OpenRouter** pour l'IA.
+- Les URLs de vos microservices personnalisés.
+- Vos préférences d'interface.
+
+---
+
+*Créé par [Niark2](https://github.com/niark2) - Conçu pour la vitesse, le style et la polyvalence.*
