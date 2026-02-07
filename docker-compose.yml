@@ -6,13 +6,44 @@ services:
     env_file: .env
     environment:
       - NODE_ENV=production
+      - REMBG_URL=http://rembg:5100
+      - WHISPER_URL=http://whisper:5200
+      - UPSCALE_URL=http://upscale:5300
     volumes:
       - ./uploads:/app/uploads
       - ./data:/app/data
+      - ./public/databank:/app/public/databank
     restart: unless-stopped
-    # Pas besoin d'exposer le port 3000 au public, Nginx s'en occupe en interne
     expose:
       - "3000"
+    depends_on:
+      - rembg
+      - whisper
+      - upscale
+
+  rembg:
+    build: .
+    container_name: ultra_rembg
+    command: python server/python/rembg_server.py
+    restart: unless-stopped
+    expose:
+      - "5100"
+
+  whisper:
+    build: .
+    container_name: ultra_whisper
+    command: python server/python/whisper_server.py
+    restart: unless-stopped
+    expose:
+      - "5200"
+
+  upscale:
+    build: .
+    container_name: ultra_upscale
+    command: python server/python/upscale_server.py
+    restart: unless-stopped
+    expose:
+      - "5300"
 
   nginx:
     image: nginx:alpine
