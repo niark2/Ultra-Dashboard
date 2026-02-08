@@ -2,7 +2,7 @@
 
 Ultra Dashboard est une plateforme modulaire et élégante conçue pour centraliser vos outils numériques, la gestion de vos médias et des services d'Intelligence Artificielle de pointe, le tout dans une interface haut de gamme et réactive.
 
-![Dashboard Preview](https://imgur.com/a/N5QlREp)
+![Dashboard Preview](https://i.imgur.com/zUNtJVL.png)
 
 ---
 
@@ -80,4 +80,5 @@ Pas besoin de manipuler des fichiers de configuration complexes. Une fois lancé
 ---
 
 *Créé par [Niark2](https://github.com/niark2) - Conçu pour la vitesse, le style et la polyvalence.*
+
 
