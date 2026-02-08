@@ -4,6 +4,9 @@ Ultra Dashboard est une plateforme modulaire et élégante conçue pour centrali
 
 ![Dashboard Preview](https://i.imgur.com/zUNtJVL.png)
 
+![Dashboard Preview](https://i.imgur.com/GowGm9r.png)
+
+
 ---
 
 ## ✨ Fonctionnalités Clés
@@ -80,5 +83,6 @@ Pas besoin de manipuler des fichiers de configuration complexes. Une fois lancé
 ---
 
 *Créé par [Niark2](https://github.com/niark2) - Conçu pour la vitesse, le style et la polyvalence.*
+
 
 
