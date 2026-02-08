@@ -4,663 +4,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Dashboard - Le Hub de Services Ultime</title>
+    <title>Ultra Dashboard - Self-Hosted Services Hub</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
 
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <style>
-        :root {
-            /* Copied from project _variables.css */
-            --bg-primary: #020617;
-            --bg-secondary: #0f172a;
-            --bg-surface: #1e293b;
-            --bg-element: #1e293b;
-            --bg-card: rgba(30, 41, 59, 0.5);
-            --bg-hover: #1e293b;
-            --bg-glass: rgba(15, 23, 42, 0.8);
-
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-
-            --accent: #2563eb;
-            --accent-dim: rgba(37, 99, 235, 0.1);
-            --accent-hover: #3b82f6;
-
-            --primary: #2563eb;
-            --primary-light: rgba(37, 99, 235, 0.1);
-
-            --border: rgba(255, 255, 255, 0.05);
-            --border-strong: rgba(255, 255, 255, 0.1);
-            --border-subtle: rgba(255, 255, 255, 0.03);
-
-            --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-            --radius-xl: 32px;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-
-            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Abstract Background */
-        .glow-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .glow-sphere {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.15;
-            animation: move 20s infinite alternate ease-in-out;
-        }
-
-        .sphere-1 {
-            width: 600px;
-            height: 600px;
-            background: var(--primary);
-            top: -100px;
-            right: -100px;
-        }
-
-        .sphere-2 {
-            width: 500px;
-            height: 500px;
-            background: #6366f1;
-            bottom: -100px;
-            left: -100px;
-            animation-delay: -5s;
-        }
-
-        @keyframes move {
-            from {
-                transform: translate(0, 0) scale(1);
-            }
-
-            to {
-                transform: translate(50px, 50px) scale(1.1);
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        /* Navigation */
-        nav {
-            height: 90px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-        }
-
-        .logo i {
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition-base);
-            font-size: 0.95rem;
-        }
-
-        .nav-links a:hover {
-            color: white;
-        }
-
-        /* Hero */
-        .hero {
-            padding: 100px 0;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            background: var(--accent-dim);
-            border: 1px solid var(--primary);
-            border-radius: 99px;
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        h1 {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 24px;
-            color: white;
-            letter-spacing: -2px;
-        }
-
-        h1 span {
-            background: linear-gradient(to right, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 40px;
-        }
-
-        .cta-group {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: var(--radius-md);
-            font-family: var(--font-display);
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition-base);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.5);
-        }
-
-        .btn-outline {
-            border: 1px solid var(--border-strong);
-            color: white;
-        }
-
-        .btn-outline:hover {
-            background: var(--border);
-            border-color: var(--text-muted);
-        }
-
-        /* Features */
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-title h2 {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: white;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-            margin-bottom: 100px;
-        }
-
-        .feature-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
-            padding: 40px;
-            border-radius: var(--radius-xl);
-            transition: var(--transition-base);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            background: rgba(30, 41, 59, 0.4);
-        }
-
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--accent-dim);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            margin-bottom: 24px;
-        }
-
-        .feature-card h3 {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: white;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        .feature-list {
-            margin-top: 20px;
-            list-style: none;
-        }
-
-        .feature-list li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .feature-list li i {
-            width: 16px;
-            color: var(--primary);
-        }
-
-        /* App Preview Mockup */
-        .app-preview {
-            max-width: 1000px;
-            margin: 0 auto 100px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
-            display: flex;
-            aspect-ratio: 16/10;
-        }
-
-        .mock-sidebar {
-            width: 220px;
-            background: #020617;
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .mock-nav-item {
-            height: 40px;
-            border-radius: 8px;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            gap: 10px;
-        }
-
-        .mock-nav-item.active {
-            background: var(--accent-dim);
-            color: var(--primary);
-        }
-
-        .mock-nav-icon {
-            width: 16px;
-            height: 16px;
-            background: currentColor;
-            opacity: 0.2;
-            border-radius: 4px;
-        }
-
-        .mock-nav-text {
-            width: 80px;
-            height: 8px;
-            background: currentColor;
-            opacity: 0.2;
-            border-radius: 2px;
-        }
-
-        .mock-content {
-            flex: 1;
-            padding: 40px;
-            background: var(--bg-primary);
-        }
-
-        .mock-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 32px;
-        }
-
-        .mock-title {
-            width: 200px;
-            height: 24px;
-            background: var(--text-muted);
-            opacity: 0.2;
-            border-radius: 4px;
-        }
-
-        .mock-stat {
-            width: 100px;
-            height: 40px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-
-        .mock-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        .mock-card {
-            height: 200px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-        }
-
-        /* Footer */
-        footer {
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .footer-logo {
-            margin-bottom: 24px;
-            justify-content: center;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .social-links a {
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            transition: var(--transition-base);
-        }
-
-        .social-links a:hover {
-            color: white;
-        }
-
-        .copyright {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-preview {
-                display: none;
-            }
-
-            .hero {
-                padding: 60px 0;
-            }
-
-            h1 {
-                font-size: 3rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div class="glow-bg">
-        <div class="glow-sphere sphere-1"></div>
-        <div class="glow-sphere sphere-2"></div>
-    </div>
-
     <div class="container">
-        <nav>
+        <header>
             <a href="#" class="logo">
                 <i data-lucide="layout-dashboard"></i>
                 ULTRA DASHBOARD
             </a>
-            <div class="nav-links">
-                <a href="#features">Fonctionnalités</a>
-                <a href="#preview">Interface</a>
-                <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-outline" style="padding: 10px 20px;">
-                    <i data-lucide="github"></i> GitHub
-                </a>
-            </div>
-        </nav>
+            <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-outline">
+                <i data-lucide="github"></i> GitHub
+            </a>
+        </header>
 
-        <section class="hero">
-            <div class="hero-badge">
-                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
-                Version 1.0.0 disponible
-            </div>
-            <h1>Le futur de la <span>productivité</span> est ici.</h1>
-            <p>Une suite d'outils puissants regroupés dans une interface unifiée. IA, Médias, Fichiers — Gérez tout
-                depuis votre dashboard personnel.</p>
+        <main>
+            <section class="hero">
+                <span class="badge">V1.0.0 Stable</span>
+                <h1>Plus qu'un dashboard.<br>Votre centre de contrôle.</h1>
+                <p>Regroupez vos outils d'IA, de téléchargement et de gestion de fichiers dans une interface sobre,
+                    rapide et auto-hébergée.</p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <a href="#features" class="btn btn-primary">Découvrir les outils</a>
+                    <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-outline">Installation</a>
+                </div>
+            </section>
 
-            <div class="cta-group">
-                <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-primary">
-                    Commencer l'auto-hébergement
-                    <i data-lucide="arrow-right"></i>
-                </a>
-                <a href="#features" class="btn btn-outline">Découvrir les outils</a>
-            </div>
-        </section>
-
-        <section id="features">
-            <div class="section-title">
-                <h2>Outils & Intelligence Artificielle</h2>
-                <p style="color: var(--text-secondary);">Tout ce dont vous avez besoin, sans changer d'onglet.</p>
-            </div>
-
-            <div class="features-grid">
+            <section id="features" class="features-grid">
                 <!-- AI Section -->
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="brain-circuit"></i></div>
                     <h3>Intelligence Artificielle</h3>
-                    <p>Accédez à une suite de modèles IA directement depuis votre dashboard.</p>
+                    <p>Des modèles de pointe accessibles localement pour vos tâches quotidiennes.</p>
                     <ul class="feature-list">
-                        <li><i data-lucide="check"></i> Chat IA intelligent intégré</li>
-                        <li><i data-lucide="check"></i> Suppression d'arrière-plan (RemBG)</li>
-                        <li><i data-lucide="check"></i> Upscale d'images (AI Resolution)</li>
-                        <li><i data-lucide="check"></i> Transcription Vocale (Whisper STT)</li>
+                        <li><i data-lucide="check"></i> <b>Assistant Chat</b> : Interface conversationnelle fluide.</li>
+                        <li><i data-lucide="check"></i> <b>RemBG</b> : Suppression d'arrière-plan instantanée.</li>
+                        <li><i data-lucide="check"></i> <b>AI Upscale</b> : Amélioration de la résolution d'image.</li>
+                        <li><i data-lucide="check"></i> <b>Whisper STT</b> : Transcription audio vers texte.</li>
                     </ul>
                 </div>
 
                 <!-- Media Section -->
                 <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="download-cloud"></i></div>
-                    <h3>Gestion des Médias</h3>
-                    <p>Téléchargez et traitez vos contenus préférés en quelques secondes.</p>
+                    <div class="feature-icon"><i data-lucide="download"></i></div>
+                    <h3>Gestion Médias</h3>
+                    <p>Outils de téléchargement et de traitement pour tous vos contenus.</p>
                     <ul class="feature-list">
-                        <li><i data-lucide="check"></i> YouTube & Social Downloader HD</li>
-                        <li><i data-lucide="check"></i> Convertisseur de fichiers universel</li>
-                        <li><i data-lucide="check"></i> Éditeur de métadonnées complet</li>
-                        <li><i data-lucide="check"></i> Client Torrent intégré</li>
+                        <li><i data-lucide="check"></i> <b>Downloader</b> : YouTube, FB, Instagram, TikTok.</li>
+                        <li><i data-lucide="check"></i> <b>Converter</b> : Conversion de formats vidéo et audio.</li>
+                        <li><i data-lucide="check"></i> <b>Metadata</b> : Édition complète des tags de fichiers.</li>
+                        <li><i data-lucide="check"></i> <b>Torrents</b> : Client de téléchargement intégré.</li>
                     </ul>
                 </div>
 
-                <!-- System Section -->
+                <!-- Shared Section -->
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="share-2"></i></div>
-                    <h3>Partage & Stockage</h3>
-                    <p>Gérez vos fichiers locaux et distants en toute simplicité.</p>
+                    <h3>Partage & Système</h3>
+                    <p>Sécurité et transfert de fichiers simplifiés au sein de votre réseau.</p>
                     <ul class="feature-list">
-                        <li><i data-lucide="check"></i> LocalDrop : Transfert P2P local</li>
-                        <li><i data-lucide="check"></i> Databank : Explorateur de fichiers</li>
-                        <li><i data-lucide="check"></i> Plexus : Connectivité multi-nœuds</li>
-                        <li><i data-lucide="check"></i> Toolbox : Utilitaires système</li>
+                        <li><i data-lucide="check"></i> <b>LocalDrop</b> : Partage de fichiers P2P ultra-rapide.</li>
+                        <li><i data-lucide="check"></i> <b>Databank</b> : Explorateur et gestionnaire de fichiers.</li>
+                        <li><i data-lucide="check"></i> <b>Plexus</b> : Gestion de nœuds et services distants.</li>
+                        <li><i data-lucide="check"></i> <b>Toolbox</b> : Suite d'utilitaires système essentiels.</li>
                     </ul>
                 </div>
-            </div>
-        </section>
-
-        <section id="preview">
-            <div class="section-title">
-                <h2>Une interface pensée pour vous</h2>
-                <p style="color: var(--text-secondary);">Glassmorphism, réactivité et fluidité.</p>
-            </div>
-
-            <div class="app-preview">
-                <div class="mock-sidebar">
-                    <div class="mock-nav-item active">
-                        <div class="mock-nav-icon"></div>
-                        <div class="mock-nav-text"></div>
-                    </div>
-                    <div class="mock-nav-item">
-                        <div class="mock-nav-icon"></div>
-                        <div class="mock-nav-text"></div>
-                    </div>
-                    <div class="mock-nav-item">
-                        <div class="mock-nav-icon"></div>
-                        <div class="mock-nav-text"></div>
-                    </div>
-                    <div class="mock-nav-item">
-                        <div class="mock-nav-icon"></div>
-                        <div class="mock-nav-text"></div>
-                    </div>
-                    <div style="flex: 1;"></div>
-                    <div class="mock-nav-item">
-                        <div class="mock-nav-icon" style="background:var(--primary)"></div>
-                        <div class="mock-nav-text"></div>
-                    </div>
-                </div>
-                <div class="mock-content">
-                    <div class="mock-header">
-                        <div class="mock-title"></div>
-                        <div style="display:flex; gap:12px;">
-                            <div class="mock-stat"></div>
-                            <div class="mock-stat"></div>
-                        </div>
-                    </div>
-                    <div class="mock-grid">
-                        <div class="mock-card">
-                            <div
-                                style="width:100%; height:8px; background:var(--border-strong); border-radius:4px; margin-bottom:12px;">
-                            </div>
-                            <div
-                                style="width:60%; height:8px; background:var(--border-strong); border-radius:4px; opacity:0.5;">
-                            </div>
-                        </div>
-                        <div class="mock-card">
-                            <div
-                                style="width:100%; height:120px; background:var(--accent-dim); border:1px dashed var(--primary); border-radius:12px;">
-                            </div>
-                        </div>
-                        <div class="mock-card" style="grid-column: span 2; height: 120px;"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
         <footer>
-            <div class="logo footer-logo">
-                <i data-lucide="layout-dashboard"></i>
-                ULTRA DASHBOARD
-            </div>
-            <div class="social-links">
-                <a href="https://github.com/niark2/Ultra-Dashboard"><i data-lucide="github"></i></a>
-                <a href="#"><i data-lucide="twitter"></i></a>
-                <a href="#"><i data-lucide="external-link"></i></a>
-            </div>
-            <p class="copyright">&copy; 2024 Niark2. Sous licence MIT.</p>
+            <p>&copy; 2024 Ultra Dashboard par Niark2. Sous licence MIT.</p>
         </footer>
     </div>
 
     <script>
         lucide.createIcons();
-
-        // Smooth Display Animation on Scroll
-        const observerOptions = { threshold: 0.1 };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = "1";
-                    entry.target.style.transform = "translateY(0)";
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = "0";
-            card.style.transform = "translateY(20px)";
-            card.style.transition = "all 0.6s ease-out";
-            observer.observe(card);
-        });
     </script>
 </body>
 
