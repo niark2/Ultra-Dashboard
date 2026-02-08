@@ -13,18 +13,17 @@ Ultra Dashboard est une plateforme modulaire et élégante conçue pour centrali
 
 ### 🤖 Suite AI Intégrée
 - **Plexus (Deep Research)** : Un moteur de recherche IA avancé (clone Perplexity) qui synthétise le web en temps réel avec des sources citées.
-- **AI Chat** : Assistant intelligent avec support de lecture de documents PDF pour une analyse contextuelle.
+- **AI Chat** : Assistant intelligent multi-modèles compatible **OpenRouter** et **Ollama** (IA locale).
 - **Remove BG** : Détourage automatique d'images via des modèles Python locaux (U2NET, ISNET, etc.).
 - **AI Upscaler** : Agrandissement et amélioration de la résolution d'image utilisant le modèle **PAN** (optimisé CPU) par défaut.
 - **Speech-to-Text (STT)** : Transcription audio précise via Whisper (modèle `base` pré-chargé).
 
 ### 🎬 Outils Média & Téléchargement
-- **YouTube Hub** : Téléchargement et conversion de vidéos/audio YouTube via `yt-dlp`.
-- **Social Downloader** : Récupération de médias depuis Instagram, TikTok et plus encore.
+- **Downloader Global** : Téléchargement et conversion unifiés de vidéos/audio depuis **YouTube**, **Instagram**, **TikTok** et bien plus via `yt-dlp`.
 - **Convertisseur Universel** : Interface FFmpeg complète pour transformer tous vos fichiers audio et vidéo.
-- **Metadata Editor** : Édition des tags ID3 et métadonnées pour organiser votre bibliothèque.
 
 ### ⚡ Réseau & Utilitaires
+- **Notes & Idées** : Prise de notes rapide avec support Markdown et assistants IA pour la rédaction.
 - **LocalDrop** : Partage de fichiers P2P ultra-rapide via WebRTC (le "AirDrop" de votre réseau local).
 - **Torrent Manager** : Gestionnaire de téléchargements intégré.
 - **Toolbox** : Miroir webcam, utilitaires système et widgets (Météo, Stats CPU/RAM).
@@ -76,13 +75,11 @@ Accès sur `http://localhost:3000`.
 
 ## ⚙️ Configuration
 Pas besoin de manipuler des fichiers de configuration complexes. Une fois lancé, allez dans l'onglet **Réglages > Variables d'env** pour configurer :
-- Votre clé **OpenRouter** pour l'IA.
+- Votre clé **OpenRouter** pour l'IA (optionnelle si vous utilisez Ollama).
+- L'URL de votre instance **Ollama** locale (ex: `http://localhost:11434`).
 - Les URLs de vos microservices personnalisés.
 - Vos préférences d'interface.
 
 ---
 
 *Créé par [Niark2](https://github.com/niark2) - Conçu pour la vitesse, le style et la polyvalence.*
-
-
-
