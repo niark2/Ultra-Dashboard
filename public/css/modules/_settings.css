@@ -348,24 +348,6 @@ input:checked+.slider:before {
 }
 
 
-/* Sidebar Footer & Navigation Footer */
-.sidebar-nav-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.sidebar-footer .version {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    opacity: 0.5;
-    text-align: center;
-}
-
 /* Settings Tabs Navigation */
 .settings-nav {
     display: flex;

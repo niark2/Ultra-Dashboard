@@ -48,7 +48,18 @@
 }
 
 .sidebar-footer {
-    padding: 32px;
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
 }
 
 /* Logo */
@@ -147,10 +158,12 @@
 /* Version */
 .version {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    opacity: 0.5;
+    text-align: center;
 }
 
 /* Nav Sections */
