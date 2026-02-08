@@ -1,10 +1,57 @@
 const express = require('express');
+
+// Flag to enable full logs via DEBUG=true environment variable
+const IS_DEBUG = process.env.DEBUG === 'true';
+
+let originalStdoutWrite, originalStderrWrite, originalConsoleLog, originalConsoleInfo, originalConsoleWarn;
+
+if (!IS_DEBUG) {
+    // Silence loud dotenv@17/dotenvx logs and tips during initialization
+    originalStdoutWrite = process.stdout.write;
+    originalStderrWrite = process.stderr.write;
+    originalConsoleLog = console.log;
+    originalConsoleInfo = console.info;
+    originalConsoleWarn = console.warn;
+
+    const silenceFilter = (args) => {
+        const str = args.map(a => String(a)).join(' ');
+        return str.includes('[dotenv@') || str.includes('dotenvx') || str.includes('https://dotenvx.com');
+    };
+
+    const filterWrite = (original) => function (chunk, ...args) {
+        if (typeof chunk === 'string' && (chunk.includes('[dotenv@') || chunk.includes('dotenvx'))) return true;
+        return original.apply(this, [chunk, ...args]);
+    };
+
+    const filterConsole = (original) => function (...args) {
+        if (silenceFilter(args)) return;
+        return original.apply(this, args);
+    };
+
+    process.stdout.write = filterWrite(originalStdoutWrite);
+    process.stderr.write = filterWrite(originalStderrWrite);
+    console.log = filterConsole(originalConsoleLog);
+    console.info = filterConsole(originalConsoleInfo);
+    console.warn = filterConsole(originalConsoleWarn);
+}
+
 require('dotenv').config();
+
+if (!IS_DEBUG) {
+    // Restore logs after dotenv is loaded
+    process.stdout.write = originalStdoutWrite;
+    process.stderr.write = originalStderrWrite;
+    console.log = originalConsoleLog;
+    console.info = originalConsoleInfo;
+    console.warn = originalConsoleWarn;
+}
+
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const session = require('express-session');
+const os = require('os');
 
 const LOCK_FILE = path.join(__dirname, '../server.lock');
 
@@ -86,19 +133,61 @@ function startPythonServer(name, scriptName) {
     });
 
     let isReady = false;
-    proc.stdout.on('data', (data) => {
-        const output = data.toString().trim();
-        if (output) console.log(`[${name} STDOUT] ${output}`);
 
-        if (!isReady && output.includes('http://localhost')) {
-            console.log(`✅ ${name} service is ready`);
-            isReady = true;
+    const filterLog = (data, isError = false) => {
+        const lines = data.toString().split('\n');
+        for (let line of lines) {
+            line = line.trim();
+            if (!line) continue;
+
+            const noise = [
+                'WARNING: This is a development server',
+                'Press CTRL+C to quit',
+                'Running on',
+                'Serving Flask app',
+                'Debug mode:',
+                '🔎 Whisper: Recherche de FFmpeg',
+                '✅ FFmpeg trouvé:',
+                '➕ Ajouté au PATH:',
+                '🧵 Thread count set from AI_THREADS',
+                'Loading pan model',
+                'Model pan',
+                'loaded successfully!',
+                'Initialisation de la session',
+                'Chargement du modèle',
+                'Modèle',
+                'chargé!',
+                'http://localhost',
+                'http://127.0.0.1',
+                'https://huggingface.co',
+                '* Running on',
+                'Whisper STT Server starting',
+                'AI Upscale Server starting',
+                'REMBG Server'
+            ];
+
+            const isNoise = noise.some(n => line.includes(n));
+
+            if (!isReady && line.includes('http://localhost')) {
+                console.log(`✅ ${name} service ready`);
+                isReady = true;
+                if (!IS_DEBUG) continue;
+            }
+
+            if (!IS_DEBUG && isNoise) continue;
+
+            if (isError) {
+                if (line.toLowerCase().includes('error') || line.toLowerCase().includes('exception')) {
+                    console.error(`[${name} ERROR] ${line}`);
+                }
+            } else {
+                console.log(`[${name}] ${line}`);
+            }
         }
-    });
-    proc.stderr.on('data', (data) => {
-        const error = data.toString().trim();
-        if (error) console.error(`[${name} STDERR] ${error}`);
-    });
+    };
+
+    proc.stdout.on('data', filterLog);
+    proc.stderr.on('data', (data) => filterLog(data, true));
     proc.on('close', () => pythonProcesses.delete(name));
 
     pythonProcesses.set(name, proc);
@@ -300,7 +389,6 @@ const { Server } = require('socket.io');
 const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
 
 const clients = new Map();
-const os = require('os');
 
 function getLocalIP() {
     const interfaces = os.networkInterfaces();
@@ -328,7 +416,7 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Ultra Dashboard running at http://localhost:${PORT}`);
+    console.log(`\n🚀 Ultra Dashboard: http://localhost:${PORT}`);
     startPythonServer('REMBG', 'rembg_server.py');
     startPythonServer('Whisper', 'whisper_server.py');
     startPythonServer('Upscale', 'upscale_server.py');
