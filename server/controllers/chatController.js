@@ -14,49 +14,86 @@ const chatController = {
      */
     sendMessage: async (req, res) => {
         try {
-            const { message, history, context } = req.body;
+            const { message, history, context, systemPrompt } = req.body;
             const userId = req.session.user.id;
-            const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
-            const model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-pro-exp-02-05:free');
+            const provider = db.getConfigValue('AI_PROVIDER', userId, 'openrouter');
+            const plexusModel = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-pro-exp-02-05:free');
+            const ollamaModel = db.getConfigValue('OLLAMA_MODEL', userId, 'llama3');
+            const ollamaUrl = db.getConfigValue('OLLAMA_URL', userId, 'http://localhost:11434');
 
-            if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
-                return res.status(401).json({ error: "Clé API OpenRouter manquante ou non valide (placeholder détecté). Veuillez la configurer dans les réglages." });
-            }
+            const defaultSystemPrompt = "Tu es Ultra AI, un assistant intelligent intégré au dashboard Ultra.";
+            const finalSystemPrompt = systemPrompt || defaultSystemPrompt;
 
             const messages = [
                 {
                     role: "system",
-                    content: "Tu es Ultra AI, un assistant intelligent intégré au dashboard Ultra. " +
-                        (context ? `Voici un contexte extrait d'un document PDF pour t'aider à répondre : \n\n${context}` : "")
+                    content: finalSystemPrompt +
+                        (context ? `\n\nVoici un contexte extrait d'un document PDF pour t'aider à répondre : \n${context}` : "")
                 },
                 ...history,
                 { role: "user", content: message }
             ];
 
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "http://localhost:3000",
-                    "X-Title": "Ultra Dashboard"
-                },
-                body: JSON.stringify({
-                    model: model,
-                    messages: messages
-                })
-            });
+            let reply = "";
+            let finalHistory = [];
 
-            const data = await response.json();
+            if (provider === 'ollama') {
+                console.log(`[Chat] Calling Ollama (${ollamaModel}) at ${ollamaUrl}`);
+                const response = await fetch(`${ollamaUrl}/api/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: ollamaModel,
+                        messages: messages,
+                        stream: false
+                    })
+                });
 
-            if (data.error) {
-                console.error("OpenRouter Error:", data.error);
-                return res.status(500).json({ error: data.error.message || "Erreur de l'API OpenRouter" });
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error(`Ollama Error: ${response.status} - ${err}`);
+                }
+
+                const data = await response.json();
+                reply = data.message.content;
+                finalHistory = [...history, { role: "user", content: message }, data.message];
+
+            } else {
+                // OpenRouter (Default)
+                const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
+                if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
+                    return res.status(401).json({ error: "Clé API OpenRouter manquante ou non valide (placeholder détecté). Veuillez la configurer dans les réglages." });
+                }
+
+                console.log(`[Chat] Calling OpenRouter (${plexusModel})`);
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "http://localhost:3000",
+                        "X-Title": "Ultra Dashboard"
+                    },
+                    body: JSON.stringify({
+                        model: plexusModel,
+                        messages: messages
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("OpenRouter Error:", data.error);
+                    return res.status(500).json({ error: data.error.message || "Erreur de l'API OpenRouter" });
+                }
+
+                reply = data.choices[0].message.content;
+                finalHistory = [...history, { role: "user", content: message }, data.choices[0].message];
             }
 
             res.json({
-                reply: data.choices[0].message.content,
-                history: [...history, { role: "user", content: message }, data.choices[0].message]
+                reply,
+                history: finalHistory
             });
 
         } catch (error) {

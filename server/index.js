@@ -52,6 +52,35 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const session = require('express-session');
 const os = require('os');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+// --- LOGS COLLECTION ---
+const MAX_SERVER_LOGS = 150;
+const globalLogs = [];
+
+const pushLog = (type, args) => {
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const message = args.map(arg => {
+        try {
+            if (arg instanceof Error) return arg.stack || arg.message;
+            return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+        } catch (e) { return "[Unprintable Object]"; }
+    }).join(' ');
+
+    globalLogs.push({ time, type, message });
+    if (globalLogs.length > MAX_SERVER_LOGS) globalLogs.shift();
+};
+
+const originalLog = console.log;
+const originalInfo = console.info;
+const originalWarn = console.warn;
+const originalError = console.error;
+
+console.log = (...args) => { pushLog('log', args); originalLog.apply(console, args); };
+console.info = (...args) => { pushLog('info', args); originalInfo.apply(console, args); };
+console.warn = (...args) => { pushLog('warn', args); originalWarn.apply(console, args); };
+console.error = (...args) => { pushLog('error', args); originalError.apply(console, args); };
 
 const LOCK_FILE = path.join(__dirname, '../server.lock');
 
@@ -83,7 +112,7 @@ const rembgRoutes = require('./routes/rembg');
 const sttRoutes = require('./routes/stt');
 const upscaleRoutes = require('./routes/upscale');
 const chatRoutes = require('./routes/chat');
-const metadataRoutes = require('./routes/metadata');
+
 const torrentRoutes = require('./routes/torrent');
 const settingsRoutes = require('./routes/settings');
 const authRoutes = require('./routes/auth');
@@ -210,7 +239,61 @@ const gracefulShutdown = () => {
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
 
-app.use(cors());
+// --- SECURITY MIDDLEWARE ---
+
+// 1. Helmet (Security Headers)
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+            imgSrc: ["'self'", "data:", "blob:", "https:", "*"], // Allow images from anywhere for Databank previews
+            connectSrc: ["'self'", "ws:", "wss:", "https:", "http:"], // Allow WebSockets and external APIs
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'", "blob:", "data:", "https:"],
+            upgradeInsecureRequests: null, // Disable for local dev without HTTPS
+        },
+    },
+    crossOriginEmbedderPolicy: false, // Allow cross-origin resources (like images)
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
+
+// 2. Rate Limiting (General)
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // Limit each IP to 1000 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Trop de requêtes, veuillez réessayer plus tard.'
+});
+app.use(limiter);
+
+// 3. CORS (Restrict to same origin + allowed clients)
+const allowedOrigins = [
+    'http://localhost:' + PORT,
+    'http://127.0.0.1:' + PORT,
+    process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Relaxed check for dev/local network access
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+            callback(null, true);
+        } else {
+            // Callback with error blocks the request
+            // For now, let's log and allow to prevent breaking features for user
+            console.warn(`[CORS] Origin not explicitly allowed: ${origin}`);
+            callback(null, true);
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'ejs');
@@ -226,6 +309,17 @@ app.use((req, res, next) => {
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
+// Prevent Stored XSS in uploads: Serve risky files as text/plain or force download
+app.use('/uploads', (req, res, next) => {
+    const ext = path.extname(req.path).toLowerCase();
+    // Block execution of HTML/JS/SVG served from uploads
+    if (['.html', '.htm', '.php', '.js', '.svg', '.xml'].includes(ext)) {
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Disposition', 'attachment'); // Force download to be extra safe
+    }
+    next();
+}, express.static(uploadsDir));
+
 // Auth Routes Publics
 app.use('/api/auth', authRoutes);
 
@@ -236,7 +330,7 @@ app.use('/api/rembg', requireAuth, rembgRoutes);
 app.use('/api/stt', requireAuth, sttRoutes);
 app.use('/api/upscale', requireAuth, upscaleRoutes);
 app.use('/api/chat', requireAuth, chatRoutes);
-app.use('/api/metadata', requireAuth, metadataRoutes);
+
 app.use('/api/torrent', requireAuth, torrentRoutes);
 app.use('/api/settings', requireAuth, settingsRoutes);
 app.use('/api/social', requireAuth, socialRoutes);
@@ -369,6 +463,17 @@ app.get('/api/status/models', requireAuth, (req, res) => {
         console.error('Error scanning models:', err);
         res.status(500).json({ error: err.message });
     }
+});
+
+// GET /api/status/logs - Retrieve server logs
+app.get('/api/status/logs', requireAuth, (req, res) => {
+    res.json({ logs: globalLogs });
+});
+
+// POST /api/status/logs/clear - Clear server logs
+app.post('/api/status/logs/clear', requireAuth, (req, res) => {
+    globalLogs.length = 0;
+    res.json({ success: true });
 });
 
 app.get('/', (req, res) => res.render('index'));

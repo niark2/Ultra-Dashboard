@@ -64,6 +64,31 @@ export class HomeModule {
                 this.closeWidgetStore();
             });
         });
+
+        const closeSettingsBtn = document.getElementById('closeWidgetSettings');
+        if (closeSettingsBtn) {
+            closeSettingsBtn.addEventListener('click', () => this.closeWidgetSettings());
+        }
+
+        const saveSettingsBtn = document.getElementById('saveWidgetSettings');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', () => this.saveCurrentWidgetSettings());
+        }
+
+        const settingsOverlay = document.getElementById('widgetSettingsOverlay');
+        if (settingsOverlay) {
+            settingsOverlay.addEventListener('click', (e) => {
+                if (e.target === settingsOverlay) this.closeWidgetSettings();
+            });
+        }
+
+        // Store navigation
+        const navItems = document.querySelectorAll('.store-nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                this.filterStoreByCategory(item.dataset.category);
+            });
+        });
     }
 
     openWidgetStore() {
@@ -74,6 +99,45 @@ export class HomeModule {
     closeWidgetStore() {
         const overlay = document.getElementById('widgetStoreOverlay');
         if (overlay) overlay.classList.remove('active');
+    }
+
+    openWidgetSettings(widgetId) {
+        const widget = this.widgets.find(w => w.id === widgetId);
+        if (!widget) return;
+
+        this.currentConfiguringWidgetId = widgetId;
+        const overlay = document.getElementById('widgetSettingsOverlay');
+        const content = document.getElementById('widgetSettingsContent');
+
+        if (overlay && content) {
+            content.innerHTML = this.getWidgetSettingsHTML(widget);
+            overlay.classList.add('active');
+            this.bindSettingsEvents();
+        }
+    }
+
+    closeWidgetSettings() {
+        const overlay = document.getElementById('widgetSettingsOverlay');
+        if (overlay) overlay.classList.remove('active');
+        this.currentConfiguringWidgetId = null;
+    }
+
+    filterStoreByCategory(category) {
+        // Update nav active state
+        document.querySelectorAll('.store-nav-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.category === category);
+        });
+
+        // Filter widgets
+        const allItems = document.querySelectorAll('.store-item');
+        allItems.forEach(item => {
+            const itemCategories = item.dataset.categories || '';
+            if (category === 'all') {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = itemCategories.includes(category) ? 'flex' : 'none';
+            }
+        });
     }
 
     async toggleLock() {
@@ -113,7 +177,8 @@ export class HomeModule {
             id: type + '-' + Date.now(),
             type: type,
             title: this.getWidgetTitle(type),
-            w: this.getWidgetWidth(type)
+            w: this.getWidgetWidth(type),
+            config: this.getDefaultConfig(type)
         };
 
         this.widgets.push(newWidget);
@@ -134,6 +199,7 @@ export class HomeModule {
             case 'note': return 4;
             case 'news': return 4;
             case 'downloads': return 4;
+            case 'notifications': return 4;
             default: return 3;
         }
     }
@@ -147,8 +213,24 @@ export class HomeModule {
             case 'note': return 'Notes';
             case 'news': return 'Actualités';
             case 'downloads': return 'Téléchargements';
+            case 'notifications': return 'Notifications';
             default: return 'Widget';
         }
+    }
+
+    getDefaultConfig(type) {
+        switch (type) {
+            case 'news':
+                return { rssUrl: 'https://www.franceinfo.fr/titres.rss', limit: 4 };
+            case 'quick-actions':
+                return { actions: ['convert', 'youtube'] };
+            default:
+                return {};
+        }
+    }
+
+    isConfigurable(type) {
+        return ['news', 'quick-actions'].includes(type);
     }
 
     renderWidgets() {
@@ -175,6 +257,14 @@ export class HomeModule {
                 });
             }
 
+            const settingsBtn = el.querySelector('.btn-widget-settings');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openWidgetSettings(widget.id);
+                });
+            }
+
             grid.appendChild(el);
 
             if (widget.type === 'weather') {
@@ -185,6 +275,8 @@ export class HomeModule {
                 this.fetchNewsForWidget(widget.id);
             } else if (widget.type === 'downloads') {
                 this.updateDownloadsForWidget(widget.id);
+            } else if (widget.type === 'notifications') {
+                this.updateNotificationsForWidget(widget.id);
             }
         });
 
@@ -198,7 +290,10 @@ export class HomeModule {
                     <i data-lucide="${this.getWidgetIcon(widget.type)}"></i> ${widget.title}
                 </span>
                 <div class="widget-controls">
-                    ${this.locked ? '' : '<button class="btn-widget-control btn-remove-widget"><i data-lucide="x"></i></button>'}
+                    ${this.locked ? '' : `
+                        ${this.isConfigurable(widget.type) ? '<button class="btn-widget-control btn-widget-settings"><i data-lucide="settings"></i></button>' : ''}
+                        <button class="btn-widget-control btn-remove-widget"><i data-lucide="x"></i></button>
+                    `}
                 </div>
             </div>
         `;
@@ -228,14 +323,29 @@ export class HomeModule {
                 `;
                 break;
             case 'quick-actions':
+                const actionsConfig = widget.config?.actions || ['convert', 'youtube'];
                 content = `
                     <div class="quick-actions-grid">
+                        ${actionsConfig.includes('convert') ? `
                         <button class="quick-action-btn" onclick="document.querySelector('[data-tab=\\'convert\\']').click()">
                             <i data-lucide="refresh-cw"></i> <span>Convertir</span>
-                        </button>
+                        </button>` : ''}
+                        ${actionsConfig.includes('youtube') ? `
                         <button class="quick-action-btn" onclick="document.querySelector('[data-tab=\\'youtube\\']').click()">
                             <i data-lucide="youtube"></i> <span>YouTube</span>
-                        </button>
+                        </button>` : ''}
+                        ${actionsConfig.includes('torrent') ? `
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-tab=\\'torrent\\']').click()">
+                            <i data-lucide="download"></i> <span>Torrents</span>
+                        </button>` : ''}
+                        ${actionsConfig.includes('databank') ? `
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-tab=\\'databank\\']').click()">
+                            <i data-lucide="database"></i> <span>Databank</span>
+                        </button>` : ''}
+                        ${actionsConfig.includes('chat') ? `
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-tab=\\'chat\\']').click()">
+                            <i data-lucide="message-square"></i> <span>AI Chat</span>
+                        </button>` : ''}
                     </div>
                 `;
                 break;
@@ -255,6 +365,13 @@ export class HomeModule {
                 content = `
                     <div class="download-status-list" id="download-list-${widget.id}">
                         <div style="color: var(--text-muted); padding: 20px; text-align: center;">Aucun téléchargement actif</div>
+                    </div>
+                `;
+                break;
+            case 'notifications':
+                content = `
+                    <div class="notifications-list" id="notifications-list-${widget.id}">
+                        <div style="color: var(--text-muted); padding: 20px; text-align: center;">Aucune notification</div>
                     </div>
                 `;
                 break;
@@ -280,18 +397,21 @@ export class HomeModule {
         const listContainer = document.getElementById(`news-list-${id}`);
         if (!listContainer) return;
 
+        const widget = this.widgets.find(w => w.id === id);
+        const rssUrl = widget?.config?.rssUrl || 'https://www.franceinfo.fr/titres.rss';
+        const limit = widget?.config?.limit || 4;
+
         try {
-            const rssUrl = 'https://www.franceinfo.fr/titres.rss';
             const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
             const response = await fetch(apiUrl);
             const data = await response.json();
 
             if (data.status === 'ok') {
-                const items = data.items.slice(0, 4);
+                const items = data.items.slice(0, limit);
                 listContainer.innerHTML = items.map(item => `
                     <a href="${item.link}" target="_blank" class="news-item">
                         <span class="news-title">${item.title}</span>
-                        <span class="news-meta">France Info • ${new Date(item.pubDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="news-meta">${data.feed.title || 'RSS'} • ${new Date(item.pubDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                     </a>
                 `).join('');
             } else {
@@ -332,6 +452,54 @@ export class HomeModule {
         } catch (error) {
             listContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Service indisponible</div>';
         }
+    }
+
+    async updateNotificationsForWidget(id) {
+        const listContainer = document.getElementById(`notifications-list-${id}`);
+        if (!listContainer) return;
+
+        // Fetch notifications from Storage (same key as NotificationModule)
+        const notifications = await Storage.get('ultra-notifications', []);
+
+        // Take latest 3
+        const latest = notifications.slice(0, 3);
+
+        if (latest.length > 0) {
+            listContainer.innerHTML = latest.map(n => `
+                <div class="notification-item ${n.type} ${n.read ? 'read' : 'unread'}">
+                    <div class="notification-icon">
+                        <i data-lucide="${n.icon || 'bell'}"></i>
+                    </div>
+                    <div class="notification-body">
+                        <div class="notification-header-row">
+                            <span class="notification-title">${n.title}</span>
+                            <span class="notification-time">${this.formatRelativeTime(n.time)}</span>
+                        </div>
+                        <div class="notification-message">${n.message || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) window.lucide.createIcons();
+        } else {
+            listContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px;">Tout est en ordre !</div>';
+        }
+    }
+
+    formatRelativeTime(isoString) {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diff = now - date;
+
+        if (isNaN(diff)) return 'Récemment';
+        if (diff < 60000) return 'À l\'instant';
+
+        const minutes = Math.floor(diff / 60000);
+        if (minutes < 60) return `Il y a ${minutes}m`;
+
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `Il y a ${hours}h`;
+
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
     }
 
     updateAllWeather() {
@@ -440,6 +608,7 @@ export class HomeModule {
             case 'note': return 'sticky-note';
             case 'news': return 'newspaper';
             case 'downloads': return 'download';
+            case 'notifications': return 'bell';
             default: return 'layout';
         }
     }
@@ -456,5 +625,81 @@ export class HomeModule {
         };
         updateTime();
         setInterval(updateTime, 1000);
+    }
+
+    getWidgetSettingsHTML(widget) {
+        switch (widget.type) {
+            case 'news':
+                return `
+                    <div class="widget-config-form">
+                        <div class="config-group">
+                            <label>URL du flux RSS</label>
+                            <input type="url" id="config-rss-url" value="${widget.config?.rssUrl || ''}" placeholder="https://example.com/rss">
+                        </div>
+                        <div class="config-group">
+                            <label>Nombre d'actualités</label>
+                            <input type="number" id="config-rss-limit" value="${widget.config?.limit || 4}" min="1" max="10">
+                        </div>
+                    </div>
+                `;
+            case 'quick-actions':
+                const currentActions = widget.config?.actions || [];
+                const availableActions = [
+                    { id: 'convert', label: 'Convertir', icon: 'refresh-cw' },
+                    { id: 'youtube', label: 'YouTube', icon: 'youtube' },
+                    { id: 'torrent', label: 'Torrents', icon: 'download' },
+                    { id: 'databank', label: 'Databank', icon: 'database' },
+                    { id: 'chat', label: 'AI Chat', icon: 'message-square' }
+                ];
+                return `
+                    <div class="widget-config-form">
+                        <label>Actions à afficher</label>
+                        <div class="actions-selector">
+                            ${availableActions.map(action => `
+                                <div class="action-checkbox" data-action-id="${action.id}">
+                                    <input type="checkbox" value="${action.id}" ${currentActions.includes(action.id) ? 'checked' : ''}>
+                                    <i data-lucide="${action.icon}"></i>
+                                    <span>${action.label}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            default:
+                return `<p style="text-align: center; color: var(--text-muted); padding: 20px;">Ce widget n'a pas de paramètres configurables.</p>`;
+        }
+    }
+
+    bindSettingsEvents() {
+        const checkboxes = document.querySelectorAll('.action-checkbox');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('click', () => {
+                const input = cb.querySelector('input');
+                input.checked = !input.checked;
+                cb.classList.toggle('selected', input.checked);
+            });
+            // Initial state
+            const input = cb.querySelector('input');
+            if (input.checked) cb.classList.add('selected');
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    async saveCurrentWidgetSettings() {
+        const widget = this.widgets.find(w => w.id === this.currentConfiguringWidgetId);
+        if (!widget) return;
+
+        if (widget.type === 'news') {
+            const rssUrl = document.getElementById('config-rss-url').value;
+            const limit = parseInt(document.getElementById('config-rss-limit').value);
+            widget.config = { rssUrl, limit };
+        } else if (widget.type === 'quick-actions') {
+            const selectedActions = Array.from(document.querySelectorAll('.action-checkbox input:checked')).map(i => i.value);
+            widget.config = { actions: selectedActions };
+        }
+
+        await this.saveWidgets();
+        this.closeWidgetSettings();
+        this.renderWidgets();
     }
 }

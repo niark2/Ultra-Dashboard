@@ -12,7 +12,7 @@
             <span class="nav-label">Accueil</span>
         </button>
 
-        <div id="pinnedItemsContainer" class="pinned-items-nav">
+        <div id="pinnedItemsContainer" class="pinned-items-nav" style="display: none;">
             <!-- Pinned items will be injected here -->
         </div>
 
@@ -67,10 +67,7 @@
                 <span class="nav-section-arrow"><i data-lucide="chevron-down"></i></span>
             </div>
             <div class="nav-section-content">
-                <button class="nav-item" data-tab="metadata">
-                    <span class="nav-icon"><i data-lucide="tag"></i></span>
-                    <span class="nav-label">Metadata Editor</span>
-                </button>
+
                 <button class="nav-item" data-tab="torrent">
                     <span class="nav-icon"><i data-lucide="zap"></i></span>
                     <span class="nav-label">Torrents</span>
@@ -78,6 +75,11 @@
                 <button class="nav-item" data-tab="localdrop">
                     <span class="nav-icon"><i data-lucide="share-2"></i></span>
                     <span class="nav-label">LocalDrop</span>
+                </button>
+
+                <button class="nav-item" data-tab="notes">
+                    <span class="nav-icon"><i data-lucide="sticky-note"></i></span>
+                    <span class="nav-label">Notes</span>
                 </button>
 
                 <button class="nav-item" data-tab="toolbox">

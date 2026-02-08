@@ -293,7 +293,7 @@ body.no-sidebar-sections .nav-section-header {
 
 body.no-sidebar-sections .nav-section {
     margin-top: 0;
-    gap: 2px;
+    gap: 0;
 }
 
 body.no-sidebar-sections .nav-section-content {
@@ -312,4 +312,37 @@ body.no-sidebar-sections .nav-section.collapsed .nav-section-content {
     max-height: none !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    margin-top: 0 !important;
+    /* Fix for that weird space */
+}
+
+/* ============================================
+   PINNED ITEMS
+   ============================================ */
+.pinned-items-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 16px;
+    /* Match sidebar-nav padding */
+    margin-bottom: 4px;
+}
+
+/* When displayed, add some spacing */
+.pinned-items-nav[style*="display: flex"] {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.pinned-nav-item {
+    opacity: 0.9;
+}
+
+.pinned-nav-item:hover {
+    opacity: 1;
+}
+
+/* Hide when empty or display none */
+.pinned-items-nav:empty {
+    display: none !important;
 }

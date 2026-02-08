@@ -1,13 +1,43 @@
+# Dependencies
 node_modules
 .git
+
+# Environment
 .env
+.env.*
+
+# Local specific
+.gitignore
+.dockerignore
+build.js
+
+# Data & Uploads
 uploads
 data
 models
 server.lock
+
+# Logs
 npm-debug.log
+logs
+*.log
+
+# Docker
 Dockerfile
 docker-compose.yml
+
+# Agent
 .agent
+
+# Documentation & Reports
 README.md
 INSTALL.md
+SECURITY_AUDIT_REPORT.md
+
+# Editor Configs
+.vscode
+.idea
+*.suo
+*.ntvs
+*.njsproj
+*.sln

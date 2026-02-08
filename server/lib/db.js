@@ -86,9 +86,27 @@ if (databankColumns.length > 0 && !databankColumns.some(c => c.name === 'user_id
             type TEXT NOT NULL,
             content TEXT NOT NULL,
             metadata TEXT,
+            folder_id INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     `);
+}
+
+// 4. DATABANK FOLDERS
+db.exec(`
+    CREATE TABLE IF NOT EXISTS databank_folders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT NOT NULL,
+        parent_id INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+`);
+
+// Add folder_id column to databank if it doesn't exist
+const databankInfo = db.prepare("PRAGMA table_info(databank)").all();
+if (!databankInfo.some(c => c.name === 'folder_id')) {
+    db.prepare('ALTER TABLE databank ADD COLUMN folder_id INTEGER').run();
 }
 
 module.exports = {
@@ -150,12 +168,12 @@ module.exports = {
     },
 
     // Databank
-    addDatabankItem: (type, content, metadata = {}, userId) => {
+    addDatabankItem: (type, content, metadata = {}, userId, folderId = null) => {
         if (!userId) throw new Error('User ID required for databank item');
         const metadataStr = JSON.stringify(metadata);
-        return db.prepare('INSERT INTO databank (type, content, metadata, user_id) VALUES (?, ?, ?, ?)').run(type, content, metadataStr, userId);
+        return db.prepare('INSERT INTO databank (type, content, metadata, user_id, folder_id) VALUES (?, ?, ?, ?, ?)').run(type, content, metadataStr, userId, folderId);
     },
-    getDatabankItems: (userId, limit = 50, offset = 0, typeFilter = null) => {
+    getDatabankItems: (userId, limit = 50, offset = 0, typeFilter = null, folderId = null, search = null) => {
         if (!userId) return [];
         let query = 'SELECT * FROM databank WHERE user_id = ?';
         const params = [userId];
@@ -163,6 +181,19 @@ module.exports = {
         if (typeFilter) {
             query += ' AND type = ?';
             params.push(typeFilter);
+        }
+
+        if (search) {
+            query += ' AND (content LIKE ? OR metadata LIKE ?)';
+            params.push(`%${search}%`, `%${search}%`);
+        }
+
+        if (folderId === 'root' || folderId === null) {
+            // When searching, we might want to ignore folders to find items everywhere
+            if (!search) query += ' AND folder_id IS NULL';
+        } else if (folderId !== 'all') {
+            query += ' AND folder_id = ?';
+            params.push(folderId);
         }
 
         query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -179,5 +210,59 @@ module.exports = {
     },
     clearDatabank: (userId) => {
         return db.prepare('DELETE FROM databank WHERE user_id = ?').run(userId);
+    },
+
+    // Databank Folders
+    getDatabankFolders: (userId, parentId = null, search = null) => {
+        if (!userId) return [];
+        let query = 'SELECT * FROM databank_folders WHERE user_id = ?';
+        const params = [userId];
+
+        if (search) {
+            query += ' AND name LIKE ?';
+            params.push(`%${search}%`);
+        } else {
+            if (parentId === null) {
+                query += ' AND parent_id IS NULL';
+            } else {
+                query += ' AND parent_id = ?';
+                params.push(parentId);
+            }
+        }
+
+        query += ' ORDER BY name ASC';
+        return db.prepare(query).all(...params);
+    },
+    getDatabankFolderName: (folderId, userId) => {
+        const row = db.prepare('SELECT name FROM databank_folders WHERE id = ? AND user_id = ?').get(folderId, userId);
+        return row ? row.name : null;
+    },
+    createDatabankFolder: (userId, name, parentId = null) => {
+        return db.prepare('INSERT INTO databank_folders (user_id, name, parent_id) VALUES (?, ?, ?)').run(userId, name, parentId);
+    },
+    deleteDatabankFolder: (folderId, userId) => {
+        // First move items in this folder to root or parent? Let's say root (null) or just leave them as they are but they might become "orphans" if they references a non-existent folder
+        // Better: move items to parent_id of the folder being deleted
+        const folder = db.prepare('SELECT parent_id FROM databank_folders WHERE id = ? AND user_id = ?').get(folderId, userId);
+        if (folder) {
+            db.prepare('UPDATE databank SET folder_id = ? WHERE folder_id = ? AND user_id = ?').run(folder.parent_id, folderId, userId);
+            db.prepare('UPDATE databank_folders SET parent_id = ? WHERE parent_id = ? AND user_id = ?').run(folder.parent_id, folderId, userId);
+        }
+        return db.prepare('DELETE FROM databank_folders WHERE id = ? AND user_id = ?').run(folderId, userId);
+    },
+    moveDatabankItemToFolder: (itemId, folderId, userId) => {
+        return db.prepare('UPDATE databank SET folder_id = ? WHERE id = ? AND user_id = ?').run(folderId, itemId, userId);
+    },
+    renameDatabankFolder: (folderId, newName, userId) => {
+        return db.prepare('UPDATE databank_folders SET name = ? WHERE id = ? AND user_id = ?').run(newName, folderId, userId);
+    },
+    updateDatabankItemContent: (id, content, userId) => {
+        return db.prepare('UPDATE databank SET content = ? WHERE id = ? AND user_id = ?').run(content, id, userId);
+    },
+    getValidDatabankIds: (userId, ids) => {
+        if (!userId || !ids || ids.length === 0) return [];
+        const placeholders = ids.map(() => '?').join(',');
+        const rows = db.prepare(`SELECT id FROM databank WHERE user_id = ? AND id IN (${placeholders})`).all(userId, ...ids);
+        return rows.map(r => r.id);
     }
 };

@@ -6,7 +6,8 @@ import { STTModule } from './modules/stt.js';
 import { SettingsModule } from './modules/settings.js';
 import { initChat } from './modules/chat.js';
 import { initToolbox } from './modules/toolbox.js';
-import { MetadataModule } from './modules/metadata.js';
+import { NotesModule } from './modules/notes.js';
+
 import { TorrentModule } from './modules/torrent.js';
 import { LocalDropModule } from './modules/localdrop.js';
 import { HomeModule } from './modules/home.js';
@@ -34,11 +35,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     new ImageAIModule();
     new STTModule();
     new SettingsModule();
-    new MetadataModule();
+
     new TorrentModule();
     new LocalDropModule();
     new DatabankModule();
     new HomeModule();
+    new NotesModule();
 
     initChat();
     initToolbox();

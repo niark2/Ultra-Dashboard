@@ -1,0 +1,231 @@
+<section class="tab-content" id="tab-notes">
+    <header class="content-header">
+        <h1>📝 Bloc-Notes</h1>
+        <p class="subtitle">Créez et organisez vos notes avec un éditeur Markdown complet</p>
+    </header>
+
+    <div class="notes-container">
+        <!-- Sidebar: Liste des notes -->
+        <aside class="notes-sidebar">
+            <div class="notes-sidebar-header">
+                <button class="btn-primary" id="newNoteBtn">
+                    <i data-lucide="plus"></i> Nouvelle note
+                </button>
+                <div class="notes-search">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="notesSearchInput" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div class="notes-list" id="notesList">
+                <div class="notes-empty">
+                    <i data-lucide="file-text" class="notes-empty-icon"></i>
+                    <p>Aucune note</p>
+                    <p class="notes-empty-hint">Créez votre première note</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main: Éditeur -->
+        <main class="notes-main">
+            <div class="notes-welcome" id="notesWelcome">
+                <div class="notes-welcome-content">
+                    <i data-lucide="book-open" class="notes-welcome-icon"></i>
+                    <h2>Bienvenue dans votre bloc-notes</h2>
+                    <p>Créez une nouvelle note ou sélectionnez-en une dans la liste</p>
+                    <button class="btn-primary" id="newNoteWelcomeBtn">
+                        <i data-lucide="plus"></i> Créer une note
+                    </button>
+                </div>
+            </div>
+
+            <div class="notes-editor-container" id="notesEditorContainer" style="display: none;">
+                <!-- Header de la note -->
+                <div class="notes-editor-header">
+                    <input type="text" id="noteTitleInput" class="note-title-input" placeholder="Titre de la note...">
+                    <div class="notes-editor-actions">
+                        <button class="btn-icon" id="togglePreviewBtn" title="Aperçu Markdown">
+                            <i data-lucide="eye"></i>
+                        </button>
+                        <button class="btn-icon" id="exportNoteBtn" title="Exporter vers Databank">
+                            <i data-lucide="download"></i>
+                        </button>
+                        <button class="btn-icon" id="deleteNoteBtn" title="Supprimer">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toolbar Markdown -->
+                <div class="markdown-toolbar">
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" data-action="bold" title="Gras (Ctrl+B)">
+                            <i data-lucide="bold"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="italic" title="Italique (Ctrl+I)">
+                            <i data-lucide="italic"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="strikethrough" title="Barré">
+                            <i data-lucide="strikethrough"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" data-action="heading" title="Titre">
+                            <i data-lucide="heading"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="quote" title="Citation">
+                            <i data-lucide="quote"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="code" title="Code">
+                            <i data-lucide="code"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" data-action="list-ul" title="Liste à puces">
+                            <i data-lucide="list"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="list-ol" title="Liste numérotée">
+                            <i data-lucide="list-ordered"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="checkbox" title="Case à cocher">
+                            <i data-lucide="check-square"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" data-action="link" title="Lien">
+                            <i data-lucide="link"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="image" title="Image">
+                            <i data-lucide="image"></i>
+                        </button>
+                        <button class="toolbar-btn" data-action="table" title="Tableau">
+                            <i data-lucide="table"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <!-- AI Group -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn ai-btn" id="notesAiBtn" title="Assistant IA">
+                            <i data-lucide="sparkles"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div class="notes-tags-container">
+                    <i data-lucide="tag"></i>
+                    <input type="text" id="noteTagsInput" class="note-tags-input"
+                        placeholder="Tags (séparés par des virgules)">
+                </div>
+
+                <!-- Éditeur / Preview -->
+                <div class="notes-editor-wrapper">
+                    <textarea id="noteContentEditor" class="note-content-editor" placeholder="Écrivez votre note en Markdown...
+
+# Titre 1
+## Titre 2
+
+**Gras** *Italique* ~~Barré~~
+
+- Liste à puces
+1. Liste numérotée
+
+> Citation
+
+`code inline`
+
+```
+Bloc de code
+```
+
+[Lien](https://example.com)
+![Image](url)
+
+| Colonne 1 | Colonne 2 |
+|-----------|-----------|
+| A         | B         |
+"></textarea>
+                    <div id="noteContentPreview" class="note-content-preview" style="display: none;"></div>
+                </div>
+
+                <!-- Footer: Stats & Auto-save -->
+                <div class="notes-editor-footer">
+                    <div class="note-stats">
+                        <span id="noteWordCount">0 mots</span>
+                        <span class="stat-divider">•</span>
+                        <span id="noteCharCount">0 caractères</span>
+                        <span class="stat-divider">•</span>
+                        <span id="noteLastSaved">Non sauvegardé</span>
+                    </div>
+                    <div class="note-save-status" id="noteSaveStatus">
+                        <i data-lucide="check-circle"></i>
+                        <span>Sauvegardé</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<!-- AI Modal -->
+<div class="ai-modal-overlay" id="notesAiModal" style="display: none;">
+    <div class="ai-modal">
+        <div class="ai-modal-header">
+            <h3><i data-lucide="sparkles"></i> Assistant IA</h3>
+            <button class="btn-icon" id="closeAiModalBtn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="ai-modal-body">
+            <!-- État initial : Liste des actions -->
+            <div class="ai-actions" id="aiActionsList">
+                <button class="ai-action-btn" data-action="summarize">
+                    <div class="ai-action-icon"><i data-lucide="file-text"></i></div>
+                    <div class="ai-action-info">
+                        <strong>Résumer</strong>
+                        <span>Générer un résumé concis de la note</span>
+                    </div>
+                </button>
+                <button class="ai-action-btn" data-action="fix">
+                    <div class="ai-action-icon"><i data-lucide="check"></i></div>
+                    <div class="ai-action-info">
+                        <strong>Corriger</strong>
+                        <span>Correction orthographe et grammaire</span>
+                    </div>
+                </button>
+                <button class="ai-action-btn" data-action="continue">
+                    <div class="ai-action-icon"><i data-lucide="pen-tool"></i></div>
+                    <div class="ai-action-info">
+                        <strong>Continuer</strong>
+                        <span>Compléter la rédaction du texte</span>
+                    </div>
+                </button>
+                <button class="ai-action-btn" data-action="ideas">
+                    <div class="ai-action-icon"><i data-lucide="lightbulb"></i></div>
+                    <div class="ai-action-info">
+                        <strong>Idées</strong>
+                        <span>Générer des idées liées au contenu</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- État chargement -->
+            <div class="ai-processing" id="aiProcessing" style="display: none;">
+                <div class="ai-spinner">
+                    <i data-lucide="loader" class="spin"></i>
+                </div>
+                <p>L'IA réfléchit...</p>
+            </div>
+
+            <!-- État résultat -->
+            <div class="ai-result" id="aiResult" style="display: none;">
+                <div class="ai-result-content" id="aiResultContent"></div>
+                <div class="ai-result-actions">
+                    <button class="btn-secondary" id="aiRetryBtn">Réessayer</button>
+                    <button class="btn-primary" id="aiApplyBtn">Insérer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

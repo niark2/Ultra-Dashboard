@@ -40,7 +40,13 @@ export class DownloaderModule {
             // Empty State
             emptyState: document.getElementById('dlEmptyState'),
             historyList: document.getElementById('dlHistoryList'),
-            clearHistoryBtn: document.getElementById('btnClearDlHistory')
+            clearHistoryBtn: document.getElementById('btnClearDlHistory'),
+
+            // Playlist
+            playlistContainer: document.getElementById('dlPlaylistContainer'),
+            playlistList: document.getElementById('dlPlaylistList'),
+            playlistCount: document.getElementById('playlistCount'),
+            btnPlaylistSelectAll: document.getElementById('btnPlaylistSelectAll')
         };
 
         this.currentMode = 'video';
@@ -83,6 +89,11 @@ export class DownloaderModule {
         // History
         this.elements.clearHistoryBtn.onclick = () => this.clearHistory();
         this.loadHistory();
+
+        // Playlist Select All
+        if (this.elements.btnPlaylistSelectAll) {
+            this.elements.btnPlaylistSelectAll.onclick = () => this.toggleAllPlaylistEntries();
+        }
 
         // Initial format population
         this.setMode('video');
@@ -156,13 +167,49 @@ export class DownloaderModule {
 
         let platformLabel = data.platform ? data.platform.toUpperCase() : 'YOUTUBE';
         this.elements.channel.textContent = platformLabel + (data.channel ? ` • ${data.channel}` : '');
-        this.elements.duration.textContent = formatDuration(data.duration);
 
-        this.populateQualities(data.resolutions);
-        this.setMode(this.currentMode);
+        if (data.isPlaylist) {
+            this.elements.duration.textContent = `${data.entriesCount} vidéos`;
+            this.renderPlaylist(data.entries);
+            this.elements.playlistContainer.classList.remove('hidden');
+        } else {
+            this.elements.duration.textContent = formatDuration(data.duration);
+            this.elements.playlistContainer.classList.add('hidden');
+            this.populateQualities(data.resolutions);
+            this.setMode(this.currentMode);
+        }
 
         this.elements.preview.classList.remove('hidden');
         this.elements.emptyState.classList.add('hidden');
+    }
+
+    renderPlaylist(entries) {
+        this.elements.playlistCount.textContent = `${entries.length} vidéos`;
+        this.elements.playlistList.innerHTML = entries.map((entry, index) => `
+            <div class="playlist-entry" data-index="${index}" data-url="${entry.url}">
+                <input type="checkbox" class="playlist-entry-checkbox" checked>
+                <img src="${entry.thumbnail || '/img/social-placeholder.png'}" class="playlist-entry-thumb">
+                <div class="playlist-entry-info">
+                    <div class="playlist-entry-title">${entry.title}</div>
+                    <div class="playlist-entry-duration">${formatDuration(entry.duration)}</div>
+                </div>
+            </div>
+        `).join('');
+
+        // Handle entry click
+        this.elements.playlistList.querySelectorAll('.playlist-entry').forEach(el => {
+            el.onclick = (e) => {
+                if (e.target.type === 'checkbox') return;
+                const cb = el.querySelector('.playlist-entry-checkbox');
+                cb.checked = !cb.checked;
+            };
+        });
+    }
+
+    toggleAllPlaylistEntries() {
+        const checkboxes = this.elements.playlistList.querySelectorAll('.playlist-entry-checkbox');
+        const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
+        checkboxes.forEach(cb => cb.checked = anyUnchecked);
     }
 
     async addToHistory(data) {
@@ -251,23 +298,50 @@ export class DownloaderModule {
     }
 
     async download() {
+        const selectedEntries = Array.from(this.elements.playlistList.querySelectorAll('.playlist-entry'))
+            .filter(el => el.querySelector('.playlist-entry-checkbox').checked);
+
+        if (this.mediaInfo.isPlaylist && selectedEntries.length > 0) {
+            // Playlist mode - download each selected item
+            const total = selectedEntries.length;
+            let current = 0;
+
+            for (const entryId of selectedEntries) {
+                current++;
+                const url = entryId.dataset.url;
+                const title = entryId.querySelector('.playlist-entry-title').textContent;
+
+                try {
+                    await this.downloadItem(url, title, `${current}/${total}`, total);
+                } catch (err) {
+                    console.error(`Failed to download ${title}:`, err);
+                }
+            }
+        } else {
+            // Single video mode
+            await this.downloadItem(this.currentUrl, this.mediaInfo.title);
+        }
+    }
+
+    async downloadItem(url, title, prefix = '', total = 1) {
         const btn = this.elements.downloadBtn;
         const btnText = btn.querySelector('.btn-text');
         const btnLoader = btn.querySelector('.btn-loader');
-        const downloadId = Date.now().toString();
+        const downloadId = Date.now().toString() + Math.floor(Math.random() * 1000);
 
         btn.disabled = true;
-        btnText.textContent = I18n.t('Initialisation...');
+        const label = prefix ? `[${prefix}] ` : '';
+        btnText.textContent = label + I18n.t('Initialisation...');
         btnLoader.classList.remove('hidden');
 
         if (this.elements.progressContainer) {
             this.elements.progressContainer.classList.remove('hidden');
             this.elements.progressFill.style.width = '0%';
-            this.elements.progressStatus.textContent = I18n.t('Démarrage...');
+            this.elements.progressStatus.textContent = label + I18n.t('Démarrage...');
             this.elements.progressPercent.textContent = '0%';
         }
 
-        const isYt = this.isYoutube(this.currentUrl);
+        const isYt = this.isYoutube(url);
         const progressEndpoint = isYt ? `/api/youtube/progress/${downloadId}` : `/api/social/progress/${downloadId}`;
         const downloadEndpoint = isYt ? '/api/youtube/download' : '/api/social/download';
 
@@ -278,33 +352,29 @@ export class DownloaderModule {
             if (data.type === 'progress') {
                 if (this.elements.progressFill) this.elements.progressFill.style.width = `${data.percent}%`;
                 if (this.elements.progressPercent) this.elements.progressPercent.textContent = `${Math.round(data.percent)}%`;
-                if (this.elements.progressStatus) this.elements.progressStatus.textContent = data.status;
-                btnText.textContent = `${data.status} (${Math.round(data.percent)}%)`;
+                if (this.elements.progressStatus) this.elements.progressStatus.textContent = label + data.status;
+                btnText.textContent = `${label}${data.status} (${Math.round(data.percent)}%)`;
             } else if (data.type === 'complete') {
                 if (this.elements.progressFill) this.elements.progressFill.style.width = '100%';
                 if (this.elements.progressPercent) this.elements.progressPercent.textContent = '100%';
-                if (this.elements.progressStatus) this.elements.progressStatus.textContent = I18n.t('Prêt !');
-                btnText.textContent = I18n.t('Téléchargement...');
-                this.addToHistory(this.mediaInfo);
+                if (this.elements.progressStatus) this.elements.progressStatus.textContent = label + I18n.t('Prêt !');
             }
         };
 
         try {
             const body = {
-                url: this.currentUrl,
+                url: url,
                 mode: this.currentMode,
                 quality: this.elements.qualitySelect.value,
                 format: this.elements.formatSelect.value,
             };
 
-            // Add specific fields for YouTube controller
             if (isYt) {
                 body.videoId = downloadId;
                 body.embedMetadata = this.elements.chkMetadata.checked;
                 body.embedThumbnail = this.elements.chkThumbnail.checked;
                 body.embedSubs = this.elements.chkSubs.checked;
-                body.trimStart = this.elements.trimStart.value;
-                body.trimEnd = this.elements.trimEnd.value;
+                // No trim for playlist items usually, but we could add it
             } else {
                 body.downloadId = downloadId;
             }
@@ -326,30 +396,31 @@ export class DownloaderModule {
             document.dispatchEvent(new CustomEvent('app-notification', {
                 detail: {
                     title: I18n.t('Téléchargement terminé'),
-                    message: `${I18n.t('Le média')} "${this.mediaInfo.title}" ${I18n.t('est prêt.')}`,
+                    message: `${I18n.t('Le média')} "${title}" ${I18n.t('est prêt.')}`,
                     type: 'success',
                     icon: 'download'
                 }
             }));
 
-            if (data.fileName) {
+            if (data.fileName && !prefix) {
                 this.elements.saveBtn.href = `/databank/${data.fileName}`;
                 this.elements.saveBtn.download = data.prettyName || data.fileName;
                 this.elements.saveBtn.classList.remove('hidden');
                 this.elements.downloadBtn.classList.add('hidden');
-                if (this.elements.progressStatus) this.elements.progressStatus.textContent = I18n.t('Enregistré dans la Databank !');
             }
 
         } catch (error) {
             eventSource.close();
             alert(I18n.t('Erreur') + ': ' + error.message);
         } finally {
-            btn.disabled = false;
-            btnText.textContent = I18n.t('Télécharger');
-            btnLoader.classList.add('hidden');
-            setTimeout(() => {
-                if (this.elements.progressContainer) this.elements.progressContainer.classList.add('hidden');
-            }, 5000);
+            if (!prefix || prefix.endsWith(`${total}/${total}`)) {
+                btn.disabled = false;
+                btnText.textContent = I18n.t('Télécharger');
+                btnLoader.classList.add('hidden');
+                setTimeout(() => {
+                    if (this.elements.progressContainer) this.elements.progressContainer.classList.add('hidden');
+                }, 5000);
+            }
         }
     }
 

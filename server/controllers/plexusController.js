@@ -111,15 +111,25 @@ function buildSearchContext(sources) {
  * @returns {Promise<Object>} AI response with answer and follow-up questions
  */
 async function generateAIResponse(query, context, userId, extraInfo = '', isDeepResearch = false, onProgress = null) {
-    const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
-    const model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-flash-lite-preview-02-05:free');
+    const provider = db.getConfigValue('AI_PROVIDER', userId, 'openrouter');
+    let apiKey = '';
+    let model = '';
+    let apiUrl = '';
 
-    console.log(`[Plexus] Appel OpenRouter avec modèle: ${model}`);
-    console.log(`[Plexus] API Key présente: ${!!apiKey} (Length: ${apiKey ? apiKey.length : 0})`);
+    if (provider === 'ollama') {
+        model = db.getConfigValue('OLLAMA_MODEL', userId, 'llama3');
+        apiUrl = db.getConfigValue('OLLAMA_URL', userId, 'http://localhost:11434') + '/api/chat';
+        console.log(`[Plexus] Appel Ollama avec modèle: ${model} à ${apiUrl}`);
+    } else {
+        apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
+        model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-flash-lite-preview-02-05:free');
+        apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+        console.log(`[Plexus] Appel OpenRouter avec modèle: ${model}`);
 
-    if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
-        console.error("[Plexus] Erreur: Clé API OpenRouter non configurée ou placeholder détecté");
-        throw new Error("Clé API OpenRouter manquante ou non valide. Veuillez la configurer dans les réglages.");
+        if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
+            console.error("[Plexus] Erreur: Clé API OpenRouter non configurée ou placeholder détecté");
+            throw new Error("Clé API OpenRouter manquante ou non valide. Veuillez la configurer dans les réglages.");
+        }
     }
 
     let systemPrompt;
@@ -185,14 +195,19 @@ ${context}`;
     const timeout = setTimeout(() => controller.abort(), timeoutDuration);
 
     // Prepare request options (conditionally add stream: true)
+    const requestHeaders = {
+        "Content-Type": "application/json"
+    };
+
+    if (provider !== 'ollama') {
+        requestHeaders["Authorization"] = `Bearer ${apiKey}`;
+        requestHeaders["HTTP-Referer"] = "http://localhost:3000";
+        requestHeaders["X-Title"] = "Ultra Dashboard - Plexus";
+    }
+
     const requestOptions = {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "Ultra Dashboard - Plexus"
-        },
+        headers: requestHeaders,
         body: JSON.stringify({
             model: model,
             messages: [
@@ -206,14 +221,14 @@ ${context}`;
         signal: controller.signal
     };
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", requestOptions);
+    const response = await fetch(apiUrl, requestOptions);
 
     clearTimeout(timeout);
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error('[Plexus] Erreur OpenRouter:', errorText);
-        throw new Error(`Erreur API OpenRouter: ${response.status}`);
+        console.error(`[Plexus] Erreur ${provider}:`, errorText);
+        throw new Error(`Erreur API ${provider}: ${response.status}`);
     }
 
     if (onProgress && response.body) {
@@ -242,9 +257,17 @@ ${context}`;
                                 fullResponse += content;
                                 onProgress(content);
                             }
-                        } catch (e) {
-                            // ignore parsing errors for partial/malformed lines
-                        }
+                        } catch (e) { }
+                    } else if (trimmedLine.startsWith('{')) {
+                        // Likely Ollama native JSON stream
+                        try {
+                            const data = JSON.parse(trimmedLine);
+                            const content = data.message?.content || '';
+                            if (content) {
+                                fullResponse += content;
+                                onProgress(content);
+                            }
+                        } catch (e) { }
                     }
                 }
             }
@@ -254,19 +277,22 @@ ${context}`;
     } else {
         // Handle Standard JSON Response (Fallback)
         const data = await response.json();
-        console.log(`[Plexus] Réponse reçue de OpenRouter (modèle: ${model})`);
+        console.log(`[Plexus] Réponse reçue de ${provider} (modèle: ${model})`);
 
         if (data.error) {
-            console.error('[Plexus] Erreur OpenRouter JSON:', JSON.stringify(data.error));
-            throw new Error(data.error.message || "Erreur API OpenRouter");
+            console.error(`[Plexus] Erreur ${provider} JSON:`, JSON.stringify(data.error));
+            throw new Error(data.error.message || `Erreur API ${provider}`);
         }
 
-        if (!data.choices || !data.choices[0]) {
-            console.error('[Plexus] Réponse OpenRouter invalide (pas de choices):', JSON.stringify(data));
-            throw new Error("Réponse vide d'OpenRouter");
+        if (provider === 'ollama') {
+            fullResponse = data.message?.content || "";
+        } else {
+            if (!data.choices || !data.choices[0]) {
+                console.error(`[Plexus] Réponse ${provider} invalide (pas de choices):`, JSON.stringify(data));
+                throw new Error(`Réponse vide de ${provider}`);
+            }
+            fullResponse = data.choices[0].message.content;
         }
-
-        fullResponse = data.choices[0].message.content;
     }
 
     // Continue common processing...

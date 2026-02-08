@@ -11,7 +11,7 @@ export const translations = {
         "AI Chat": "AI Chat",
         "Plexus": "Plexus",
         "UTILITAIRES": "UTILITIES",
-        "Metadata Editor": "Metadata Editor",
+
         "Torrents": "Torrents",
         "LocalDrop": "LocalDrop",
         "Toolbox": "Toolbox",
@@ -187,39 +187,7 @@ export const translations = {
         "Posez votre question ici...": "Ask your question here...",
         "Posez votre question": "Ask your question",
 
-        // Metadata Editor
-        "Éditez les métadonnées de vos fichiers localement (Audio, Images, Vidéos)": "Edit file metadata locally (Audio, Images, Videos)",
-        "Parcourir...": "Browse...",
-        "Chemin du dossier (ex: C:\\Musique\\Album)": "Folder path (ex: C:\\Music\\Album)",
-        "Scanner": "Scan",
-        "Appliquer les modifications": "Apply changes",
-        "Magic Auto-Tag": "Magic Auto-Tag",
-        "0 fichiers chargés": "0 files loaded",
-        "Filtrer...": "Filter...",
-        "Fichier": "File",
-        "Titre": "Title",
-        "Artiste": "Artist",
-        "Album": "Album",
-        "Genre": "Genre",
-        "Année": "Year",
-        "Aucun dossier sélectionné": "No folder selected",
-        "Entrez le chemin d'un dossier pour commencer l'édition.": "Enter a folder path to start editing.",
-        "Analyse des fichiers...": "Analyzing files...",
-        "Dossier sélectionné": "Selected folder",
-        "fichiers": "files",
-        "modifiés": "modified",
-        "mis à jour avec succès !": "updated successfully!",
-        "Application...": "Applying...",
-        "Voulez-vous appliquer les modifications à": "Do you want to apply changes to",
-        "fichiers chargés": "files loaded",
-        "Deep Research: Exploration approfondie...": "Deep Research: Deep exploration...",
-        "Recherche sur le web...": "Searching the web...",
-        "Sources trouvées": "Sources found",
-        "Analyse et synthèse...": "Analysis and synthesis...",
-        "Rédaction de la réponse...": "Drafting answer...",
-        "Analyse terminée": "Analysis complete",
-        "Aucune source trouvée": "No sources found",
-        "Erreur lors de la recherche": "Error during search",
+
 
 
 
@@ -380,6 +348,12 @@ export const translations = {
         "URL du service Python Speech-to-Text": "Python Speech-to-Text service URL",
         "URL Upscale": "Upscale URL",
         "URL du service Python AI Upscaler": "Python AI Upscaler service URL",
+        "Fournisseur d'IA": "AI Provider",
+        "Choisissez entre OpenRouter (Cloud) ou Ollama (Local)": "Choose between OpenRouter (Cloud) or Ollama (Local)",
+        "URL Ollama": "Ollama URL",
+        "URL de votre instance locale Ollama": "URL of your local Ollama instance",
+        "Modèle Ollama": "Ollama Model",
+        "Nom du modèle Local (ex: llama3, mistral, deepseek-r1)": "Name of the local model (ex: llama3, mistral, deepseek-r1)",
         "Enregistrer les variables d'environnement": "Save environment variables",
 
         // Settings - À propos
@@ -387,6 +361,7 @@ export const translations = {
         "Documentation": "Documentation",
         "Support": "Support",
         "GitHub": "GitHub",
+        "Logs d'activité serveur": "Server Activity Logs",
 
         // Other common terms
         "Chargement...": "Loading...",
@@ -407,7 +382,7 @@ export const translations = {
         "AI Chat": "AI Chat",
         "Plexus": "Plexus",
         "UTILITAIRES": "UTILITAIRES",
-        "Metadata Editor": "Metadata Editor",
+
         "Torrents": "Torrents",
         "LocalDrop": "LocalDrop",
         "Toolbox": "Toolbox",
@@ -579,39 +554,7 @@ export const translations = {
         "Posez votre question ici...": "Posez votre question ici...",
         "Posez votre question": "Posez votre question",
 
-        // Metadata Editor
-        "Éditez les métadonnées de vos fichiers localement (Audio, Images, Vidéos)": "Éditez les métadonnées de vos fichiers localement (Audio, Images, Vidéos)",
-        "Parcourir...": "Parcourir...",
-        "Chemin du dossier (ex: C:\\Musique\\Album)": "Chemin du dossier (ex: C:\\Musique\\Album)",
-        "Scanner": "Scanner",
-        "Appliquer les modifications": "Appliquer les modifications",
-        "Magic Auto-Tag": "Magic Auto-Tag",
-        "0 fichiers chargés": "0 fichiers chargés",
-        "Filtrer...": "Filtrer...",
-        "Fichier": "Fichier",
-        "Titre": "Titre",
-        "Artiste": "Artiste",
-        "Album": "Album",
-        "Genre": "Genre",
-        "Année": "Année",
-        "Aucun dossier sélectionné": "Aucun dossier sélectionné",
-        "Entrez le chemin d'un dossier pour commencer l'édition.": "Entrez le chemin d'un dossier pour commencer l'édition.",
-        "Analyse des fichiers...": "Analyse des fichiers...",
-        "Dossier sélectionné": "Dossier sélectionné",
-        "fichiers": "fichiers",
-        "modifiés": "modifiés",
-        "mis à jour avec succès !": "mis à jour avec succès !",
-        "Application...": "Application...",
-        "Voulez-vous appliquer les modifications à": "Voulez-vous appliquer les modifications à",
-        "fichiers chargés": "fichiers chargés",
-        "Deep Research: Exploration approfondie...": "Deep Research: Exploration approfondie...",
-        "Recherche sur le web...": "Recherche sur le web...",
-        "Sources trouvées": "Sources trouvées",
-        "Analyse et synthèse...": "Analyse et synthèse...",
-        "Rédaction de la réponse...": "Rédaction de la réponse...",
-        "Analyse terminée": "Analyse terminée",
-        "Aucune source trouvée": "Aucune source trouvée",
-        "Erreur lors de la recherche": "Erreur lors de la recherche",
+
 
 
 
@@ -708,6 +651,7 @@ export const translations = {
         "Erreur serveur": "Erreur serveur",
         "Modèles IA Téléchargés": "Modèles IA Téléchargés",
         "Recherche des modèles...": "Recherche des modèles...",
+        "Logs d'activité serveur": "Logs d'activité serveur",
 
         // Other common terms
         "Chargement...": "Chargement...",

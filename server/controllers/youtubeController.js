@@ -47,8 +47,37 @@ exports.getVideoInfo = async (req, res) => {
             noCheckCertificates: true,
             noWarnings: true,
             preferFreeFormats: true,
-            addHeader: ['referer:youtube.com', 'user-agent:googlebot']
+            addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
+            flatPlaylist: true
         });
+
+        // Detection Playlist
+        if (output._type === 'playlist' || output.entries) {
+            return res.json({
+                isPlaylist: true,
+                title: output.title,
+                thumbnail: output.thumbnails ? output.thumbnails[0].url : (output.entries[0] ? output.entries[0].thumbnail : null),
+                entriesCount: output.entries.length,
+                entries: output.entries.map(e => {
+                    let thumb = e.thumbnail;
+                    if (!thumb && e.thumbnails && e.thumbnails.length > 0) {
+                        thumb = e.thumbnails[e.thumbnails.length - 1].url;
+                    }
+                    // Fallback to official YT thumbnail if ID is available
+                    if (!thumb && e.id) {
+                        thumb = `https://i.ytimg.com/vi/${e.id}/hqdefault.jpg`;
+                    }
+                    return {
+                        id: e.id,
+                        url: e.url || (e.id ? `https://www.youtube.com/watch?v=${e.id}` : null),
+                        title: e.title,
+                        thumbnail: thumb,
+                        duration: e.duration,
+                        uploader: e.uploader
+                    };
+                })
+            });
+        }
 
         // Deduplicate resolutions for simpler UI
         const resolutions = [...new Set(output.formats
@@ -57,6 +86,7 @@ exports.getVideoInfo = async (req, res) => {
             .sort((a, b) => b - a);
 
         res.json({
+            isPlaylist: false,
             title: output.title,
             thumbnail: output.thumbnail,
             duration: output.duration,
@@ -129,30 +159,33 @@ exports.downloadVideo = async (req, res) => {
             embedSubs,
             trimStart,
             trimEnd,
-            videoId: clientVideoId
+            videoId: clientVideoId,
+            playlistItems // comma-separated indices or "all"
         } = req.body;
 
         if (!url) return res.status(400).json({ error: 'URL manquante' });
 
-        // Récupérer le titre de la vidéo
+        // Récupérer le titre de la vidéo (ou playlist)
         let videoTitle = 'video';
         try {
             const info = await youtubedl(url, {
                 dumpSingleJson: true,
                 noCheckCertificates: true,
                 noWarnings: true,
-                addHeader: ['referer:youtube.com', 'user-agent:googlebot']
+                addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
+                flatPlaylist: true
             });
-            // Nettoyer le titre pour les noms de fichiers (supprimer caractères invalides)
+            // Nettoyer le titre
             videoTitle = info.title.replace(/[<>:"/\\|?*]/g, '').substring(0, 100);
-            req.body.thumbnailUrl = info.thumbnail; // Save for databank copy
+            req.body.thumbnailUrl = info.thumbnail || (info.entries && info.entries[0] ? info.entries[0].thumbnail : null);
         } catch (e) {
             console.log('Could not fetch video title, using default');
         }
 
         const videoId = clientVideoId || Date.now();
         const uploadsDir = path.join(__dirname, '../../uploads');
-        const outputTemplate = path.join(uploadsDir, `${videoId}.%(ext)s`);
+        // If it's a playlist with multiple items, we might want unique names for each
+        const outputTemplate = playlistItems ? path.join(uploadsDir, `${videoId}-%(playlist_index)s.%(ext)s`) : path.join(uploadsDir, `${videoId}.%(ext)s`);
 
         // Base options - disable thumbnail embedding on Windows (causes file locking issues)
         let options = {

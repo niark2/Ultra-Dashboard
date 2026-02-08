@@ -52,8 +52,21 @@ export class SettingsModule {
         this.envRembgUrl = document.getElementById('envRembgUrl');
         this.envWhisperUrl = document.getElementById('envWhisperUrl');
         this.envUpscaleUrl = document.getElementById('envUpscaleUrl');
+        this.envOllamaUrl = document.getElementById('envOllamaUrl');
+        this.envOllamaModel = document.getElementById('envOllamaModel');
+        this.aiProviderToggles = document.querySelectorAll('#settingsAiProviderToggle .toggle-btn');
+        this.openRouterSection = document.getElementById('settingsOpenRouterSection');
+        this.ollamaSection = document.getElementById('settingsOllamaSection');
         this.saveEnvSettingsBtn = document.getElementById('saveEnvSettingsBtn');
 
+        // Logs
+        this.refreshLogsBtn = document.getElementById('refreshLogsBtn');
+        this.clearLogsBtn = document.getElementById('clearLogsBtn');
+        this.settingsLogsContainer = document.getElementById('settingsLogsContainer');
+        this.logsRefreshInterval = null;
+
+        // Auto-save debounce
+        this.saveTimeout = null;
 
         this.init();
     }
@@ -139,9 +152,29 @@ export class SettingsModule {
             this.updatePasswordBtn.addEventListener('click', () => this.handlePasswordUpdate());
         }
 
-        // Env Settings Listener
-        if (this.saveEnvSettingsBtn) {
-            this.saveEnvSettingsBtn.addEventListener('click', () => this.saveEnvSettings());
+        // Env Tool Settings Listeners
+        this.setupToggleGroupListeners(this.aiProviderToggles, 'AI_PROVIDER', 'provider', (val) => this.updateAiProviderVisibility(val));
+
+        // Intelligence Auto-save listeners
+        const aiInputs = [
+            this.envOpenRouterKey, this.envOpenRouterModel, this.envSearxngUrl,
+            this.envRembgUrl, this.envWhisperUrl, this.envUpscaleUrl,
+            this.envOllamaUrl, this.envOllamaModel, this.plexusSourceCount,
+            this.plexusExtraInfo
+        ];
+
+        aiInputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', () => this.debouncedSaveIntelligence());
+            }
+        });
+
+        // Log Listeners
+        if (this.refreshLogsBtn) {
+            this.refreshLogsBtn.addEventListener('click', () => this.refreshServerLogs());
+        }
+        if (this.clearLogsBtn) {
+            this.clearLogsBtn.addEventListener('click', () => this.clearServerLogs());
         }
 
         // Initial update of pinned items in sidebar
@@ -234,6 +267,13 @@ export class SettingsModule {
         const accentColor = await Storage.get('ultra-accent-color', '#ffffff');
         this.applyAccentColor(accentColor);
 
+        // AI Provider
+        const aiProvider = await Storage.get('AI_PROVIDER', 'openrouter');
+        this.aiProviderToggles.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.provider === aiProvider);
+        });
+        this.updateAiProviderVisibility(aiProvider);
+
         // Update active dot
         this.accentDots.forEach(dot => {
             dot.classList.toggle('active', dot.dataset.color === accentColor);
@@ -262,7 +302,9 @@ export class SettingsModule {
             { id: 'envSearxngUrl', key: 'SEARXNG_URL' },
             { id: 'envRembgUrl', key: 'REMBG_URL' },
             { id: 'envWhisperUrl', key: 'WHISPER_URL' },
-            { id: 'envUpscaleUrl', key: 'UPSCALE_URL' }
+            { id: 'envUpscaleUrl', key: 'UPSCALE_URL' },
+            { id: 'envOllamaUrl', key: 'OLLAMA_URL' },
+            { id: 'envOllamaModel', key: 'OLLAMA_MODEL' }
         ];
 
         for (const item of envKeys) {
@@ -279,23 +321,39 @@ export class SettingsModule {
                 input.classList.remove('using-env-fallback');
             }
         }
+
+        // AI Provider
+        await this.loadToggleGroupState(this.aiProviderToggles, 'AI_PROVIDER', 'openrouter', 'provider');
     }
 
-    setupToggleGroupListeners(buttons, storageKey) {
+    setupToggleGroupListeners(buttons, storageKey, dataAttr = 'model', onSave = null) {
         buttons.forEach(btn => {
             btn.addEventListener('click', async () => {
                 buttons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const value = btn.dataset.model || btn.dataset.scale;
+                const value = btn.dataset[dataAttr] || btn.dataset.scale;
                 await Storage.set(storageKey, value);
+                if (onSave) onSave(value);
             });
         });
     }
 
-    async loadToggleGroupState(buttons, storageKey, defaultValue) {
+    updateAiProviderVisibility(provider) {
+        if (!this.openRouterSection || !this.ollamaSection) return;
+
+        if (provider === 'openrouter') {
+            this.openRouterSection.style.display = 'block';
+            this.ollamaSection.style.display = 'none';
+        } else if (provider === 'ollama') {
+            this.openRouterSection.style.display = 'none';
+            this.ollamaSection.style.display = 'block';
+        }
+    }
+
+    async loadToggleGroupState(buttons, storageKey, defaultValue, dataAttr = 'model') {
         const val = await Storage.get(storageKey, defaultValue);
         buttons.forEach(btn => {
-            const btnVal = btn.dataset.model || btn.dataset.scale;
+            const btnVal = btn.dataset[dataAttr] || btn.dataset.scale;
             btn.classList.toggle('active', btnVal === val.toString());
         });
     }
@@ -311,15 +369,28 @@ export class SettingsModule {
             pane.classList.toggle('active', pane.id === `settings-${tabId}`);
         });
 
-        if (tabId === 'status') {
+        // Combined logic for Maintenance tab (status + logs)
+        if (tabId === 'system') {
+            // Initial refresh
             this.refreshServerStatus();
+            this.refreshServerLogs();
+
+            // Set up intervals if not already active
             if (!this.statusRefreshInterval) {
                 this.statusRefreshInterval = setInterval(() => this.refreshServerStatus(), 5000);
             }
+            if (!this.logsRefreshInterval) {
+                this.logsRefreshInterval = setInterval(() => this.refreshServerLogs(), 3000);
+            }
         } else {
+            // Clear intervals when leaving Maintenance tab
             if (this.statusRefreshInterval) {
                 clearInterval(this.statusRefreshInterval);
                 this.statusRefreshInterval = null;
+            }
+            if (this.logsRefreshInterval) {
+                clearInterval(this.logsRefreshInterval);
+                this.logsRefreshInterval = null;
             }
         }
     }
@@ -448,12 +519,89 @@ export class SettingsModule {
         `;
     }
 
-    async savePlexusSettings() {
-        if (this.plexusSourceCount) {
-            await Storage.set('ultra-plexus-source-count', parseInt(this.plexusSourceCount.value) || 3);
+    async refreshServerLogs() {
+        try {
+            const res = await fetch('/api/status/logs');
+            if (res.ok) {
+                const data = await res.json();
+                this.renderServerLogs(data.logs);
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
         }
-        if (this.plexusExtraInfo) {
-            await Storage.set('ultra-plexus-extra-info', this.plexusExtraInfo.value);
+    }
+
+    renderServerLogs(logs) {
+        if (!this.settingsLogsContainer) return;
+
+        if (!logs || logs.length === 0) {
+            this.settingsLogsContainer.innerHTML = '<div class="log-placeholder">Aucun log disponible.</div>';
+            return;
+        }
+
+        const isAtBottom = this.settingsLogsContainer.scrollHeight - this.settingsLogsContainer.scrollTop <= this.settingsLogsContainer.clientHeight + 50;
+
+        this.settingsLogsContainer.innerHTML = logs.map(log => `
+            <div class="log-entry">
+                <span class="log-time">[${log.time}]</span>
+                <span class="log-type ${log.type}">${log.type}</span>
+                <span class="log-message">${this.escapeHtml(log.message)}</span>
+            </div>
+        `).join('');
+
+        // Auto-scroll to bottom if user was already at the bottom
+        if (isAtBottom) {
+            this.settingsLogsContainer.scrollTop = this.settingsLogsContainer.scrollHeight;
+        }
+    }
+
+    async clearServerLogs() {
+        if (!confirm('Voulez-vous vraiment effacer les logs du serveur ?')) return;
+
+        try {
+            const res = await fetch('/api/status/logs/clear', { method: 'POST' });
+            if (res.ok) {
+                this.renderServerLogs([]);
+            }
+        } catch (error) {
+            console.error('Error clearing logs:', error);
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    debouncedSaveIntelligence() {
+        if (this.saveTimeout) clearTimeout(this.saveTimeout);
+        this.saveTimeout = setTimeout(() => this.saveIntelligenceSettings(), 500);
+    }
+
+    async saveIntelligenceSettings() {
+        console.log('Auto-saving Intelligence settings...');
+        try {
+            const settings = {
+                'OPENROUTER_API_KEY': this.envOpenRouterKey?.value.trim(),
+                'OPENROUTER_MODEL': this.envOpenRouterModel?.value.trim(),
+                'SEARXNG_URL': this.envSearxngUrl?.value.trim(),
+                'REMBG_URL': this.envRembgUrl?.value.trim(),
+                'WHISPER_URL': this.envWhisperUrl?.value.trim(),
+                'UPSCALE_URL': this.envUpscaleUrl?.value.trim(),
+                'OLLAMA_URL': this.envOllamaUrl?.value.trim(),
+                'OLLAMA_MODEL': this.envOllamaModel?.value.trim(),
+                'ultra-plexus-source-count': parseInt(this.plexusSourceCount?.value) || 3,
+                'ultra-plexus-extra-info': this.plexusExtraInfo?.value
+            };
+
+            for (const [key, value] of Object.entries(settings)) {
+                if (value !== undefined) {
+                    await Storage.set(key, value);
+                }
+            }
+        } catch (error) {
+            console.error('Error auto-saving intelligence settings:', error);
         }
     }
 
@@ -631,48 +779,6 @@ export class SettingsModule {
         }
     }
 
-    async saveEnvSettings() {
-        if (!this.saveEnvSettingsBtn) return;
-
-        const originalText = this.saveEnvSettingsBtn.textContent;
-        this.saveEnvSettingsBtn.disabled = true;
-        this.saveEnvSettingsBtn.textContent = 'Enregistrement...';
-
-        try {
-            const key = this.envOpenRouterKey.value.trim();
-            const model = this.envOpenRouterModel.value.trim();
-            const url = this.envSearxngUrl.value.trim();
-            const rbUrl = this.envRembgUrl.value.trim();
-            const whUrl = this.envWhisperUrl.value.trim();
-            const upUrl = this.envUpscaleUrl.value.trim();
-
-            await Storage.set('OPENROUTER_API_KEY', key);
-            await Storage.set('OPENROUTER_MODEL', model);
-            await Storage.set('SEARXNG_URL', url);
-            await Storage.set('REMBG_URL', rbUrl);
-            await Storage.set('WHISPER_URL', whUrl);
-            await Storage.set('UPSCALE_URL', upUrl);
-
-            // Notify user
-            this.saveEnvSettingsBtn.textContent = '✅ Enregistré !';
-            this.saveEnvSettingsBtn.style.backgroundColor = 'var(--success)';
-
-            setTimeout(() => {
-                this.saveEnvSettingsBtn.disabled = false;
-                this.saveEnvSettingsBtn.textContent = originalText;
-                this.saveEnvSettingsBtn.style.backgroundColor = '';
-            }, 3000);
-
-        } catch (error) {
-            console.error('Error saving env settings:', error);
-            this.saveEnvSettingsBtn.textContent = '❌ Erreur';
-            this.saveEnvSettingsBtn.style.backgroundColor = 'var(--error)';
-            setTimeout(() => {
-                this.saveEnvSettingsBtn.disabled = false;
-                this.saveEnvSettingsBtn.textContent = originalText;
-                this.saveEnvSettingsBtn.style.backgroundColor = '';
-            }, 3000);
-        }
-    }
+    // saveEnvSettings has been replaced by automatic saveIntelligenceSettings
 }
 

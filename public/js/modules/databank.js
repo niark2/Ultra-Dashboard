@@ -4,6 +4,9 @@
 export class DatabankModule {
     constructor() {
         this.items = [];
+        this.folders = [];
+        this.currentFolderId = 'root';
+        this.breadcrumbs = [{ id: 'root', name: 'Racine' }];
         this.currentPage = 1;
         this.limit = 20;
         this.isLoading = false;
@@ -24,10 +27,38 @@ export class DatabankModule {
             previewBody: document.getElementById('previewBody'),
             previewTitle: document.getElementById('previewTitle'),
             previewDownloadBtn: document.getElementById('previewDownloadBtn'),
-            previewMeta: document.getElementById('previewMeta')
+            previewMeta: document.getElementById('previewMeta'),
+            // Folder UI
+            newFolderBtn: document.getElementById('databankNewFolderBtn'),
+            breadcrumbs: document.getElementById('databankBreadcrumbs'),
+            folderModal: document.getElementById('databankFolderModal'),
+            closeFolderModal: document.getElementById('closeFolderModal'),
+            confirmFolderBtn: document.getElementById('confirmFolderBtn'),
+            cancelFolderBtn: document.getElementById('cancelFolderBtn'),
+            folderNameInput: document.getElementById('folderName'),
+            // Move UI
+            moveModal: document.getElementById('databankMoveModal'),
+            closeMoveModal: document.getElementById('closeMoveModal'),
+            folderList: document.getElementById('folderList')
         };
 
         this.init();
+    }
+
+    escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    sanitizeUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('javascript:')) return '';
+        return this.escapeHtml(url);
     }
 
     init() {
@@ -42,13 +73,13 @@ export class DatabankModule {
             }
         });
 
-        // If databank is already active (rare but possible if default tab changed)
+        // If databank is already active
         const activeTab = document.querySelector('.tab-content.active');
         if (activeTab && activeTab.id === 'tab-databank') {
             this.onTabActivate();
         }
 
-        // Expose to window for tab management
+        // Expose to window for global access
         window.databankModule = this;
     }
 
@@ -64,10 +95,8 @@ export class DatabankModule {
 
     startAutoRefresh() {
         this.stopAutoRefresh();
-        // Refresh every 30 seconds while tab is active
         this.refreshInterval = setInterval(() => {
-            console.log('🔄 Databank Auto-refreshing...');
-            this.loadItems(null, true); // silent refresh
+            this.loadItems(null, true);
         }, 30000);
     }
 
@@ -93,15 +122,30 @@ export class DatabankModule {
             this.loadItems(this.currentPage + 1);
         });
 
-        // Modal
+        // Folder Modal
+        this.elements.newFolderBtn.addEventListener('click', () => {
+            this.elements.folderNameInput.value = '';
+            this.elements.folderModal.classList.add('active');
+            this.elements.folderNameInput.focus();
+        });
+
+        this.elements.closeFolderModal.addEventListener('click', () => this.elements.folderModal.classList.remove('active'));
+        this.elements.cancelFolderBtn.addEventListener('click', () => this.elements.folderModal.classList.remove('active'));
+        this.elements.confirmFolderBtn.addEventListener('click', () => this.createFolder());
+
+        // Preview Modal
         this.elements.closePreviewBtn.addEventListener('click', () => {
             this.elements.previewModal.classList.remove('active');
         });
 
-        this.elements.previewModal.addEventListener('click', (e) => {
-            if (e.target === this.elements.previewModal) {
-                this.elements.previewModal.classList.remove('active');
-            }
+        // Move Modal
+        this.elements.closeMoveModal.addEventListener('click', () => this.elements.moveModal.classList.remove('active'));
+
+        // Close modals on overlay click
+        [this.elements.previewModal, this.elements.folderModal, this.elements.moveModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
         });
     }
 
@@ -113,7 +157,7 @@ export class DatabankModule {
 
         const offset = (this.currentPage - 1) * this.limit;
         const type = this.elements.filterType.value !== 'all' ? this.elements.filterType.value : '';
-        const search = this.elements.search.value; // Search would need backend support, for now filtering client side or just ignore
+        const search = this.elements.search.value.trim();
 
         if (!silent) {
             this.elements.grid.innerHTML = `
@@ -125,34 +169,56 @@ export class DatabankModule {
         }
 
         try {
-            const url = new URL('/api/databank', window.location.origin);
-            url.searchParams.append('limit', this.limit);
-            url.searchParams.append('offset', offset);
-            if (type) url.searchParams.append('type', type);
+            // Fetch Items
+            const itemsUrl = new URL('/api/databank', window.location.origin);
+            itemsUrl.searchParams.append('limit', this.limit);
+            itemsUrl.searchParams.append('offset', offset);
+            if (type) itemsUrl.searchParams.append('type', type);
+            if (search) itemsUrl.searchParams.append('search', search);
 
-            const res = await fetch(url);
+            if (this.currentFolderId !== 'all') {
+                itemsUrl.searchParams.append('folderId', this.currentFolderId === 'root' ? 'root' : this.currentFolderId);
+            }
+
+            // Fetch Folders (only if viewing root or a specific folder)
+            let folders = [];
+            if (this.currentFolderId !== 'all') {
+                const foldersUrl = new URL('/api/databank/folders', window.location.origin);
+                if (search) foldersUrl.searchParams.append('search', search);
+
+                if (this.currentFolderId !== 'root' && !search) {
+                    foldersUrl.searchParams.append('parentId', this.currentFolderId);
+                }
+                const fRes = await fetch(foldersUrl);
+                if (fRes.ok) {
+                    const fData = await fRes.json();
+                    folders = fData.folders || [];
+                }
+            }
+
+            const res = await fetch(itemsUrl);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
             const data = await res.json();
             this.items = data.items || [];
+            this.folders = folders;
+
             this.renderItems();
+            this.renderBreadcrumbs();
             this.updatePagination(this.items.length);
 
         } catch (error) {
             console.error('Error loading databank:', error);
-            this.elements.grid.innerHTML = `
-                <div class="error-message">
-                    <p>Erreur lors du chargement des données</p>
-                    <button class="btn-secondary" onclick="window.databankModule.loadItems()">Réessayer</button>
-                </div>
-            `;
+            this.elements.grid.innerHTML = `<div class="error-message"><p>Erreur lors du chargement des données</p></div>`;
         } finally {
             this.isLoading = false;
         }
     }
 
     renderItems() {
-        if (!Array.isArray(this.items) || this.items.length === 0) {
+        this.elements.grid.innerHTML = '';
+
+        if (this.items.length === 0 && this.folders.length === 0) {
             this.elements.grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
                     <i data-lucide="database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
@@ -163,52 +229,52 @@ export class DatabankModule {
             return;
         }
 
-        this.elements.grid.innerHTML = '';
+        // Render Folders
+        this.folders.forEach(folder => {
+            const el = document.createElement('div');
+            el.className = 'databank-item folder-item';
+            el.innerHTML = `
+                <div class="databank-preview">
+                    <i data-lucide="folder"></i>
+                    <div class="databank-actions">
+                        <button class="action-btn" title="Supprimer" onclick="event.stopPropagation(); window.databankModule.deleteFolder(${folder.id})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="databank-info">
+                    <h4>${this.escapeHtml(folder.name)}</h4>
+                    <p>Dossier</p>
+                </div>
+            `;
+            el.addEventListener('click', () => this.navigateToFolder(folder.id, folder.name));
+            this.elements.grid.appendChild(el);
+        });
 
+        // Render Items
         this.items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'databank-item';
-            if (item.metadata.tool === 'plexus') {
-                el.classList.add('item-plexus');
-            }
+            if (item.metadata.tool === 'plexus') el.classList.add('item-plexus');
 
             let preview = '';
-            let icon = 'file';
-
             if (item.type === 'image') {
-                preview = `<img src="${item.content}" alt="Image" loading="lazy">`;
-                icon = 'image';
+                preview = `<img src="${this.sanitizeUrl(item.content)}" alt="Image" loading="lazy">`;
             } else if (item.type === 'audio') {
-                if (item.metadata.thumbnail) {
-                    preview = `<img src="${item.metadata.thumbnail}" alt="Thumbnail" loading="lazy">`;
-                } else {
-                    preview = `<i data-lucide="music"></i>`;
-                }
-                icon = 'music';
+                preview = item.metadata.thumbnail ? `<img src="${this.sanitizeUrl(item.metadata.thumbnail)}" alt="Thumb">` : `<i data-lucide="music"></i>`;
             } else if (item.type === 'video') {
-                if (item.metadata.thumbnail) {
-                    preview = `<img src="${item.metadata.thumbnail}" alt="Thumbnail" loading="lazy">`;
-                } else {
-                    preview = `<i data-lucide="video"></i>`;
-                }
-                icon = 'video';
+                preview = item.metadata.thumbnail ? `<img src="${this.sanitizeUrl(item.metadata.thumbnail)}" alt="Thumb">` : `<i data-lucide="video"></i>`;
             } else if (item.type === 'text') {
-                const snippet = item.content.length > 300 ? item.content.substring(0, 300) + '...' : item.content;
-                preview = `<div class="text-preview-snippet">${snippet}</div>`;
-                icon = 'file-text';
+                const rawContent = item.content;
+                const snippet = rawContent.length > 200 ? rawContent.substring(0, 200) + '...' : rawContent;
+                preview = `<div class="text-preview-snippet">${this.escapeHtml(snippet)}</div>`;
             } else {
                 preview = `<i data-lucide="file-text"></i>`;
-                icon = 'file-text';
             }
 
             const date = new Date(item.created_at).toLocaleString();
             let title = item.metadata.originalName || item.metadata.title;
-
-            // Generate title from content if missing for text items (like Plexus)
-            if (!title && item.type === 'text') {
-                title = item.content.split('\n')[0].substring(0, 50);
-                if (title.length >= 50) title += '...';
-            }
+            if (!title && item.type === 'text') title = item.content.split('\n')[0].substring(0, 50);
             if (!title) title = `Item #${item.id}`;
 
             const tool = item.metadata.tool || 'Unknown';
@@ -217,10 +283,13 @@ export class DatabankModule {
             el.innerHTML = `
                 <div class="databank-preview">
                     ${preview}
-                    <span class="databank-type-badge">${item.type}</span>
+                    <span class="databank-type-badge">${this.escapeHtml(item.type)}</span>
                     <div class="databank-actions">
                         <button class="action-btn" title="Télécharger" onclick="event.stopPropagation(); window.databankModule.downloadItem(${item.id})">
                             <i data-lucide="download"></i>
+                        </button>
+                        <button class="move-action" title="Déplacer" onclick="event.stopPropagation(); window.databankModule.openMoveModal(${item.id})">
+                            <i data-lucide="folder-output"></i>
                         </button>
                         <button class="action-btn" title="Supprimer" onclick="event.stopPropagation(); window.databankModule.deleteItem(${item.id})">
                             <i data-lucide="trash-2"></i>
@@ -228,11 +297,10 @@ export class DatabankModule {
                     </div>
                 </div>
                 <div class="databank-info">
-                    <h4>${title}</h4>
-                    <p><i data-lucide="${toolIcon}" style="width:12px; height:12px;"></i> ${tool} • ${date}</p>
+                    <h4>${this.escapeHtml(title)}</h4>
+                    <p><i data-lucide="${toolIcon}" style="width:12px; height:12px;"></i> ${this.escapeHtml(tool)} • ${date}</p>
                 </div>
             `;
-
 
             el.addEventListener('click', () => this.openPreview(item));
             this.elements.grid.appendChild(el);
@@ -241,128 +309,229 @@ export class DatabankModule {
         if (window.lucide) window.lucide.createIcons();
     }
 
-    updatePagination(count) {
-        this.elements.pagination.classList.remove('hidden');
-        this.elements.pageInfo.textContent = `Page ${this.currentPage}`;
+    renderBreadcrumbs() {
+        this.elements.breadcrumbs.innerHTML = '';
+        this.breadcrumbs.forEach((bc, index) => {
+            const el = document.createElement('span');
+            el.className = `breadcrumb-item ${index === this.breadcrumbs.length - 1 ? 'active' : ''}`;
+            el.innerHTML = bc.id === 'root' ? `<i data-lucide="home"></i> Racine` : bc.name;
+            el.addEventListener('click', () => this.navigateToBreadcrumb(index));
+            this.elements.breadcrumbs.appendChild(el);
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
 
+    navigateToFolder(id, name) {
+        this.currentFolderId = id;
+        this.breadcrumbs.push({ id, name });
+        this.currentPage = 1;
+        this.loadItems();
+    }
+
+    navigateToBreadcrumb(index) {
+        if (index === this.breadcrumbs.length - 1) return;
+        this.breadcrumbs = this.breadcrumbs.slice(0, index + 1);
+        this.currentFolderId = this.breadcrumbs[index].id;
+        this.currentPage = 1;
+        this.loadItems();
+    }
+
+    async createFolder() {
+        const name = this.elements.folderNameInput.value.trim();
+        if (!name) return;
+
+        try {
+            const res = await fetch('/api/databank/folders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    parentId: this.currentFolderId === 'root' ? null : this.currentFolderId
+                })
+            });
+
+            if (res.ok) {
+                this.elements.folderModal.classList.remove('active');
+                this.loadItems();
+            }
+        } catch (error) {
+            console.error('Error creating folder:', error);
+        }
+    }
+
+    async deleteFolder(id) {
+        if (!confirm('Voulez-vous supprimer ce dossier ? Les éléments qu\'il contient seront déplacés vers le parent.')) return;
+        try {
+            await fetch(`/api/databank/folders/${id}`, { method: 'DELETE' });
+            this.loadItems();
+        } catch (error) {
+            console.error('Error deleting folder:', error);
+        }
+    }
+
+    async openMoveModal(itemId) {
+        this.elements.folderList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        this.elements.moveModal.classList.add('active');
+
+        try {
+            // Get all folders for the move list (infinite depth or just flatten?)
+            // For now, let's just show folders in the current view or root
+            const res = await fetch('/api/databank/folders'); // Adjust API to get all maybe?
+            const data = await res.json();
+            const folders = data.folders || [];
+
+            this.elements.folderList.innerHTML = '';
+
+            // Option for Root
+            const rootEl = document.createElement('div');
+            rootEl.className = 'folder-select-item';
+            rootEl.innerHTML = `<i data-lucide="home"></i><span>Racine</span>`;
+            rootEl.onclick = () => this.moveItemToFolder(itemId, null);
+            this.elements.folderList.appendChild(rootEl);
+
+            folders.forEach(f => {
+                const fEl = document.createElement('div');
+                fEl.className = 'folder-select-item';
+                fEl.innerHTML = `<i data-lucide="folder"></i><span>${f.name}</span>`;
+                fEl.onclick = () => this.moveItemToFolder(itemId, f.id);
+                this.elements.folderList.appendChild(fEl);
+            });
+
+            if (window.lucide) window.lucide.createIcons();
+        } catch (error) {
+            console.error('Error loading move folders:', error);
+        }
+    }
+
+    async moveItemToFolder(itemId, folderId) {
+        try {
+            await fetch(`/api/databank/${itemId}/folder`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folderId })
+            });
+            this.elements.moveModal.classList.remove('active');
+            this.loadItems();
+        } catch (error) {
+            console.error('Error moving item:', error);
+        }
+    }
+
+    updatePagination(count) {
+        this.elements.pagination.classList.toggle('hidden', count < this.limit && this.currentPage === 1);
+        this.elements.pageInfo.textContent = `Page ${this.currentPage}`;
         this.elements.prevBtn.disabled = this.currentPage === 1;
         this.elements.nextBtn.disabled = count < this.limit;
     }
 
     openPreview(item) {
         this.elements.previewTitle.textContent = item.metadata.originalName || `Item #${item.id}`;
-
         if (item.type === 'image') {
-            this.elements.previewBody.innerHTML = `<img src="${item.content}" class="preview-image-full" alt="Preview">`;
+            this.elements.previewBody.innerHTML = `<img src="${this.sanitizeUrl(item.content)}" class="preview-image-full" alt="Preview">`;
         } else if (item.type === 'text') {
-            this.elements.previewBody.innerHTML = `<div class="preview-text-full">${item.content}</div>`;
+            const safeContent = this.escapeHtml(item.content);
+            this.elements.previewBody.innerHTML = `<div class="preview-text-full">${safeContent}</div>`;
         } else if (item.type === 'audio') {
-            let innerHTML = '';
-            if (item.metadata.thumbnail) {
-                innerHTML = `<img src="${item.metadata.thumbnail}" class="preview-image-full" alt="Thumbnail" style="max-width: 100%; max-height: 300px; object-fit: contain; margin-bottom: 20px; border-radius: 8px;">`;
-            }
-            innerHTML += `
-                <div style="padding: 20px;">
-                    <audio controls style="width: 100%; max-width: 600px; margin: 0 auto; display: block;">
-                        <source src="${item.content}" type="audio/mpeg">
-                        <source src="${item.content}" type="audio/mp4">
-                        <source src="${item.content}" type="audio/wav">
-                        <source src="${item.content}" type="audio/ogg">
-                        Votre navigateur ne supporte pas la lecture audio.
-                    </audio>
-                    ${item.metadata.title ? `<p style="margin-top: 15px; text-align: center; font-weight: 500;">${item.metadata.title}</p>` : ''}
-                </div>
-            `;
-            this.elements.previewBody.innerHTML = innerHTML;
+            let html = item.metadata.thumbnail ? `<img src="${this.sanitizeUrl(item.metadata.thumbnail)}" class="preview-image-full" style="max-height: 300px;">` : '';
+            html += `<div style="padding: 20px;"><audio controls style="width: 100%;"><source src="${this.sanitizeUrl(item.content)}"></audio></div>`;
+            this.elements.previewBody.innerHTML = html;
         } else if (item.type === 'video') {
-            this.elements.previewBody.innerHTML = `
-                <div style="padding: 20px;">
-                    <video controls style="width: 100%; max-width: 100%; max-height: 70vh; border-radius: 8px; display: block; margin: 0 auto;">
-                        <source src="${item.content}" type="video/mp4">
-                        <source src="${item.content}" type="video/webm">
-                        <source src="${item.content}" type="video/ogg">
-                        Votre navigateur ne supporte pas la lecture vidéo.
-                    </video>
-                    ${item.metadata.title ? `<p style="margin-top: 15px; text-align: center; font-weight: 500;">${item.metadata.title}</p>` : ''}
-                </div>
-            `;
+            this.elements.previewBody.innerHTML = `<div style="padding: 20px;"><video controls style="width: 100%; max-height: 70vh;"><source src="${this.sanitizeUrl(item.content)}"></video></div>`;
+        } else if (item.type === 'md') {
+            this.elements.previewBody.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Chargement du document...</p></div>';
+
+            // Normalize path for Windows: replace backslashes with forward slashes
+            let url = item.content.replace(/\\/g, '/');
+            if (!url.startsWith('/')) url = '/' + url;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Impossible de charger le fichier');
+                    return response.text();
+                })
+                .then(text => {
+                    if (window.marked && window.marked.parse) {
+                        try {
+                            const rawHtml = window.marked.parse(text);
+                            // Basic sanitizer for Markdown output since we don't have DOMPurify
+                            const safeHtml = rawHtml.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, "")
+                                .replace(/javascript:/gim, "")
+                                .replace(/on\w+=/gim, "data-blocked-event=");
+                            this.elements.previewBody.innerHTML = `<div class="markdown-preview" style="padding: 20px; max-height: 60vh; overflow-y: auto; background: var(--surface-secondary); border-radius: 8px;">${safeHtml}</div>`;
+                        } catch (e) {
+                            this.elements.previewBody.innerText = text;
+                        }
+                    } else {
+                        // Fallback plain text
+                        this.elements.previewBody.innerHTML = `<pre class="preview-text-full" style="white-space: pre-wrap;">${this.escapeHtml(text)}</pre>`;
+                    }
+                })
+                .catch(err => {
+                    this.elements.previewBody.innerHTML = `<div class="error-message" style="padding: 20px; color: var(--error);">Erreur: ${this.escapeHtml(err.message)}</div>`;
+                });
         } else {
-            // Fallback pour autres types
-            let innerHTML = '';
-            if (item.metadata.thumbnail) {
-                innerHTML = `<img src="${item.metadata.thumbnail}" class="preview-image-full" alt="Preview" style="max-height: 40vh; margin-bottom: 20px;">`;
-            }
-            innerHTML += `
-                <div style="text-align: center; padding: 20px;">
-                    <i data-lucide="file" style="font-size: 64px; margin-bottom: 20px;"></i>
-                    <p>Aperçu non disponible pour ce type de fichier.</p>
-                    <p style="font-size: 12px; color: var(--text-muted);">${item.metadata.title || ''}</p>
-                </div>
-            `;
-            this.elements.previewBody.innerHTML = innerHTML;
+            this.elements.previewBody.innerHTML = `<div style="text-align: center; padding: 40px;"><i data-lucide="file" style="font-size: 64px;"></i><p>Aperçu non disponible</p></div>`;
         }
 
-        if (window.lucide) window.lucide.createIcons();
+        const metaList = Object.entries(item.metadata).map(([k, v]) => `
+            <div class="preview-meta-item">
+                <strong>${this.escapeHtml(k)}</strong>
+                <span>${this.escapeHtml(String(v || 'N/A'))}</span>
+            </div>
+        `).join('');
 
-        // Meta info
-        const metaList = Object.entries(item.metadata).map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
         this.elements.previewMeta.innerHTML = `
-            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><strong>ID:</strong> ${item.id}</div>
-                <div><strong>Type:</strong> ${item.type}</div>
-                <div><strong>Date:</strong> ${new Date(item.created_at).toLocaleString()}</div>
+            <div class="preview-meta-grid">
+                <div class="preview-meta-item"><strong>ID</strong><span>#${item.id}</span></div>
+                <div class="preview-meta-item"><strong>Type</strong><span>${item.type}</span></div>
+                <div class="preview-meta-item"><strong>Date</strong><span>${new Date(item.created_at).toLocaleString()}</span></div>
                 ${metaList}
             </div>
         `;
 
         this.elements.previewDownloadBtn.onclick = () => this.downloadItem(item.id);
-
         this.elements.previewModal.classList.add('active');
+        if (window.lucide) window.lucide.createIcons();
     }
 
     async downloadItem(id) {
         const item = this.items.find(i => i.id === id);
         if (!item) return;
-
         const a = document.createElement('a');
         a.href = item.content;
-        a.download = item.metadata.originalName || `databank-item-${id}`;
-        document.body.appendChild(a);
+        a.download = item.metadata.originalName || `item-${id}`;
         a.click();
-        document.body.removeChild(a);
     }
 
     async deleteItem(id) {
-        if (!confirm('Voulez-vous vraiment supprimer cet élément ?')) return;
-
+        if (!confirm('Supprimer cet élément ?')) return;
         try {
             await fetch(`/api/databank/${id}`, { method: 'DELETE' });
             this.loadItems();
+
+            // Emit global event for other modules (like Notes)
+            const event = new CustomEvent('databank-item-deleted', { detail: { id: id } });
+            document.dispatchEvent(event);
+
         } catch (error) {
             console.error('Error deleting item:', error);
-            alert('Erreur lors de la suppression');
         }
     }
 
     async clearAll() {
-        if (!confirm('ATTENTION: Voulez-vous vraiment TOUT effacer ? Cette action est irréversible.')) return;
-
+        if (!confirm('TOUT effacer ? Cette action est irréversible.')) return;
         try {
             await fetch(`/api/databank/clear`, { method: 'POST' });
             this.loadItems();
         } catch (error) {
             console.error('Error clearing all:', error);
-            alert('Erreur lors du nettoyage');
         }
     }
 
     debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
+            const later = () => { clearTimeout(timeout); func(...args); };
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };

@@ -1,13 +1,14 @@
 <section class="tab-content" id="tab-downloader">
     <header class="content-header">
         <h1>Media Downloader</h1>
-        <p class="subtitle">Téléchargez des vidéos et musiques de YouTube, TikTok, Instagram, Twitter et plus</p>
+        <p class="subtitle">Téléchargez des vidéos et musiques de YouTube, TikTok, Instagram, Reddit, SoundCloud et plus
+        </p>
     </header>
 
     <div class="converter-container">
         <!-- URL Input -->
         <div class="input-group">
-            <input type="text" id="dlUrl" placeholder="Collez le lien (YouTube, TikTok, Instagram...) ici..."
+            <input type="text" id="dlUrl" placeholder="Collez le lien (YouTube, Reddit, SoundCloud...) ici..."
                 class="url-input">
             <button id="dlSearchBtn" class="btn-search"><i data-lucide="search"></i></button>
         </div>
@@ -39,6 +40,14 @@
                 <div class="platform-card">
                     <i data-lucide="twitch"></i>
                     <span>Twitch</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="message-circle"></i>
+                    <span>Reddit</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="music"></i>
+                    <span>SoundCloud</span>
                 </div>
             </div>
 
@@ -88,6 +97,17 @@
             <div class="yt-info">
                 <h3 id="dlTitle">Titre du média</h3>
                 <p id="dlChannel" class="yt-channel">Plateforme</p>
+
+                <!-- Playlist Section -->
+                <div id="dlPlaylistContainer" class="yt-playlist-container hidden">
+                    <div class="playlist-header">
+                        <span id="playlistCount">0 vidéos</span>
+                        <button id="btnPlaylistSelectAll" class="btn-text">Tout sélectionner</button>
+                    </div>
+                    <div id="dlPlaylistList" class="playlist-list">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
 
                 <!-- Options Grid -->
                 <div class="yt-options-grid">

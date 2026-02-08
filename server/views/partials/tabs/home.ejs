@@ -24,46 +24,113 @@
     <div class="widget-store-overlay" id="widgetStoreOverlay">
         <div class="widget-store-modal">
             <div class="store-header">
-                <h2>Widget Store</h2>
+                <div>
+                    <h2>Widget Store</h2>
+                    <p class="store-subtitle">Personnalisez votre dashboard</p>
+                </div>
                 <button class="btn-close-store" id="closeWidgetStore"><i data-lucide="x"></i></button>
             </div>
-            <div class="store-content">
-                <!-- Store Items -->
-                <div class="store-item" data-widget-type="clock">
-                    <div class="store-item-icon"><i data-lucide="clock"></i></div>
-                    <h4>Horloge</h4>
-                    <p>Affiche l'heure et la date</p>
-                </div>
-                <div class="store-item" data-widget-type="weather">
-                    <div class="store-item-icon"><i data-lucide="cloud-sun"></i></div>
-                    <h4>Météo</h4>
-                    <p>Prévisions locales</p>
-                </div>
-                <div class="store-item" data-widget-type="quick-actions">
-                    <div class="store-item-icon"><i data-lucide="zap"></i></div>
-                    <h4>Actions</h4>
-                    <p>Raccourcis rapides</p>
-                </div>
-                <div class="store-item" data-widget-type="system">
-                    <div class="store-item-icon"><i data-lucide="cpu"></i></div>
-                    <h4>Système</h4>
-                    <p>Status du PC</p>
-                </div>
-                <div class="store-item" data-widget-type="note">
-                    <div class="store-item-icon"><i data-lucide="sticky-note"></i></div>
-                    <h4>Notes</h4>
-                    <p>Bloc-notes rapide</p>
-                </div>
-                <div class="store-item" data-widget-type="downloads">
-                    <div class="store-item-icon"><i data-lucide="download"></i></div>
-                    <h4>Statut Téléchargements</h4>
-                    <p>Progrès YouTube/Torrent</p>
-                </div>
-                <div class="store-item" data-widget-type="news">
-                    <div class="store-item-icon"><i data-lucide="newspaper"></i></div>
-                    <h4>Actualités</h4>
-                    <p>France Info en direct</p>
-                </div>
+
+            <div class="store-body">
+                <!-- Sidebar Navigation -->
+                <aside class="store-sidebar">
+                    <nav class="store-nav">
+                        <button class="store-nav-item active" data-category="all">
+                            <i data-lucide="grid"></i>
+                            <span>Tous les widgets</span>
+                            <span class="nav-count">8</span>
+                        </button>
+                        <button class="store-nav-item" data-category="essentials">
+                            <i data-lucide="star"></i>
+                            <span>Essentiels</span>
+                            <span class="nav-count">3</span>
+                        </button>
+                        <button class="store-nav-item" data-category="productivity">
+                            <i data-lucide="briefcase"></i>
+                            <span>Productivité</span>
+                            <span class="nav-count">2</span>
+                        </button>
+                        <button class="store-nav-item" data-category="information">
+                            <i data-lucide="info"></i>
+                            <span>Information</span>
+                            <span class="nav-count">2</span>
+                        </button>
+                        <button class="store-nav-item" data-category="system">
+                            <i data-lucide="cpu"></i>
+                            <span>Système</span>
+                            <span class="nav-count">1</span>
+                        </button>
+                    </nav>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="store-main">
+                    <div class="store-content" id="storeContent">
+                        <!-- All Widgets -->
+                        <div class="category-section" data-category="all">
+                            <div class="category-grid">
+                                <div class="store-item" data-widget-type="clock" data-categories="essentials">
+                                    <div class="store-item-icon"><i data-lucide="clock"></i></div>
+                                    <h4>Horloge</h4>
+                                    <p>Affiche l'heure et la date</p>
+                                </div>
+                                <div class="store-item" data-widget-type="weather" data-categories="essentials">
+                                    <div class="store-item-icon"><i data-lucide="cloud-sun"></i></div>
+                                    <h4>Météo</h4>
+                                    <p>Prévisions locales</p>
+                                </div>
+                                <div class="store-item" data-widget-type="quick-actions" data-categories="essentials">
+                                    <div class="store-item-icon"><i data-lucide="zap"></i></div>
+                                    <h4>Actions</h4>
+                                    <p>Raccourcis rapides</p>
+                                    <span class="config-badge"><i data-lucide="settings"></i></span>
+                                </div>
+                                <div class="store-item" data-widget-type="note" data-categories="productivity">
+                                    <div class="store-item-icon"><i data-lucide="sticky-note"></i></div>
+                                    <h4>Notes</h4>
+                                    <p>Bloc-notes rapide</p>
+                                </div>
+                                <div class="store-item" data-widget-type="downloads" data-categories="productivity">
+                                    <div class="store-item-icon"><i data-lucide="download"></i></div>
+                                    <h4>Téléchargements</h4>
+                                    <p>Progrès YouTube/Torrent</p>
+                                </div>
+                                <div class="store-item" data-widget-type="news" data-categories="information">
+                                    <div class="store-item-icon"><i data-lucide="newspaper"></i></div>
+                                    <h4>Actualités</h4>
+                                    <p>Flux RSS personnalisable</p>
+                                    <span class="config-badge"><i data-lucide="settings"></i></span>
+                                </div>
+                                <div class="store-item" data-widget-type="notifications" data-categories="information">
+                                    <div class="store-item-icon"><i data-lucide="bell"></i></div>
+                                    <h4>Notifications</h4>
+                                    <p>Alertes système</p>
+                                </div>
+                                <div class="store-item" data-widget-type="system" data-categories="system">
+                                    <div class="store-item-icon"><i data-lucide="cpu"></i></div>
+                                    <h4>Système</h4>
+                                    <p>Status du PC</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Settings Modal -->
+    <div class="widget-store-overlay" id="widgetSettingsOverlay">
+        <div class="widget-store-modal">
+            <div class="store-header">
+                <h2>Configuration du Widget</h2>
+                <button class="btn-close-store" id="closeWidgetSettings"><i data-lucide="x"></i></button>
+            </div>
+            <div class="store-content" id="widgetSettingsContent">
+                <!-- Settings will be dynamically injected here -->
+            </div>
+            <div class="store-footer">
+                <button class="btn-primary" id="saveWidgetSettings">Enregistrer</button>
             </div>
         </div>
     </div>

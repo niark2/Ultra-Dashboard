@@ -16,12 +16,23 @@
                 <option value="text">Texte</option>
                 <option value="video">Vidéo</option>
             </select>
+            <button class="btn-primary" id="databankNewFolderBtn">
+                <i data-lucide="folder-plus"></i> Nouveau dossier
+            </button>
             <button class="btn-icon-large" id="databankRefreshBtn" title="Actualiser">
                 <i data-lucide="refresh-cw"></i>
             </button>
             <button class="btn-danger" id="databankClearBtn">
                 <i data-lucide="trash-2"></i> Tout effacer
             </button>
+        </div>
+    </div>
+
+    <div class="databank-navigation">
+        <div class="breadcrumbs" id="databankBreadcrumbs">
+            <span class="breadcrumb-item active" data-folder-id="root">
+                <i data-lucide="home"></i> Racine
+            </span>
         </div>
     </div>
 
@@ -54,6 +65,47 @@
             <div class="modal-footer">
                 <div class="preview-meta" id="previewMeta"></div>
                 <button class="btn-primary" id="previewDownloadBtn"><i data-lucide="download"></i> Télécharger</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Folder Modal -->
+    <div class="modal-overlay" id="databankFolderModal">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <div class="header-with-icon">
+                    <i data-lucide="folder-plus" class="modal-icon text-primary"></i>
+                    <h3>Nouveau dossier</h3>
+                </div>
+                <button class="modal-close" id="closeFolderModal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group-modern">
+                    <label for="folderName" class="label-modern">Nom du dossier</label>
+                    <div class="input-with-icon-modern">
+                        <i data-lucide="folder"></i>
+                        <input type="text" id="folderName" class="input-modern" placeholder="Nommez votre dossier...">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelFolderBtn">Annuler</button>
+                <button class="btn-primary" id="confirmFolderBtn">Créer le dossier</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move To Folder Modal -->
+    <div class="modal-overlay" id="databankMoveModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Déplacer vers</h3>
+                <button class="modal-close" id="closeMoveModal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="folderList" class="folder-selection-grid">
+                    <!-- Folders loaded via JS -->
+                </div>
             </div>
         </div>
     </div>

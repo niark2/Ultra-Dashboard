@@ -3,8 +3,16 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../lib/db');
 
+const rateLimit = require('express-rate-limit');
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // 5 attempts per 15 min
+    message: 'Trop de tentatives de connexion, veuillez réessayer plus tard.'
+});
+
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Identifiants requis' });
 
@@ -39,7 +47,11 @@ router.get('/status', (req, res) => {
 });
 
 // Register new user
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
+    // Security: Disable public registration if users exist
+    if (db.countUsers() > 0 && !req.session.user) {
+        return res.status(403).json({ error: 'L\'inscription publique est désactivée. Demandez à un administrateur de vous créer un compte.' });
+    }
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Pseudo et mot de passe requis' });
 

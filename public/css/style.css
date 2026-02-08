@@ -37,11 +37,12 @@
 @import url('./modules/_image-ai.css');
 @import url('./modules/_stt.css');
 @import url('./modules/_toolbox.css');
-@import url('./modules/_metadata.css');
+
 @import url('./modules/_localdrop.css');
 @import url('./modules/_settings.css');
 @import url('./modules/_databank.css');
 @import url('./modules/_notifications.css');
+@import url('./modules/_notes.css');
 
 /* Utils */
 @import url('./utils/_states.css');

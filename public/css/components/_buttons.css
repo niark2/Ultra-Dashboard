@@ -148,6 +148,10 @@
     border-radius: var(--radius-md);
 }
 
+.toggle-group.wrap {
+    flex-wrap: wrap;
+}
+
 .toggle-btn {
     padding: 8px 20px;
     border: none;
