@@ -47,9 +47,6 @@ exports.upscaleImage = async (req, res) => {
         }
     };
 
-    // ... (imports)
-
-    // ...
 
     try {
         console.log(`🔄 Upscale: Traitement de ${req.file.originalname} (x${scale}, model=${model}, denoise=${denoise})...`);

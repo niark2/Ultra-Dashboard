@@ -12,8 +12,8 @@ Ultra Dashboard est une plateforme modulaire et élégante conçue pour centrali
 - **Plexus (Deep Research)** : Un moteur de recherche IA avancé (clone Perplexity) qui synthétise le web en temps réel avec des sources citées.
 - **AI Chat** : Assistant intelligent avec support de lecture de documents PDF pour une analyse contextuelle.
 - **Remove BG** : Détourage automatique d'images via des modèles Python locaux (U2NET, ISNET, etc.).
-- **AI Upscaler** : Agrandissement et amélioration de la résolution d'image par deep learning.
-- **Speech-to-Text (STT)** : Transcription audio précise utilisant les modèles Whisper de OpenAI.
+- **AI Upscaler** : Agrandissement et amélioration de la résolution d'image utilisant le modèle **PAN** (optimisé CPU) par défaut.
+- **Speech-to-Text (STT)** : Transcription audio précise via Whisper (modèle `base` pré-chargé).
 
 ### 🎬 Outils Média & Téléchargement
 - **YouTube Hub** : Téléchargement et conversion de vidéos/audio YouTube via `yt-dlp`.
@@ -39,12 +39,26 @@ Ultra Dashboard est une plateforme modulaire et élégante conçue pour centrali
 
 ## 📦 Installation Rapide
 
-### 🐳 Via Docker (Recommandé)
-Le moyen le plus simple de tout lancer (Node, Python, FFmpeg, Nginx) en une commande :
+### 🐳 Via Docker (Totalement Plug & Play)
+Le moyen recommandé pour tout lancer (Dashboard, IA, SearXNG, FFmpeg, Nginx) sans rien installer sur votre machine :
+
 ```bash
+# 1. Cloner le projet
+git clone https://github.com/niark2/Niark-Dashboard.git
+cd Niark-Dashboard
+
+# 2. Lancer la magie
 docker-compose up -d --build
 ```
-L'application sera disponible sur `http://localhost`.
+
+### 2. Accès & Avantages
+- **Dashboard** : `http://localhost` (via Nginx).
+- **SearXNG** : `http://localhost/searxng` (intégré et pré-configuré).
+- **Persistence** : Vos réglages, vos modèles IA et vos fichiers sont sauvegardés dans les dossiers `data/`, `models/` et `uploads/` de votre machine.
+- **Santé des services** : Le Dashboard attend que les services IA soient totalement opérationnels (modèles chargés) avant de s'ouvrir grâce aux *healthchecks* Docker.
+- **Aucun fichier .env à créer manuellement** : tout est pré-configuré pour un démarrage instantané.
+- **IA Locale** : Les modèles sont téléchargés automatiquement au premier lancement (PAN, Whisper, Rembg).
+- **Moteur de recherche** : Une instance **SearXNG** dédiée est automatiquement déployée et connectée.
 
 ### 💻 Installation Locale
 1. **Node.js** : `npm install`

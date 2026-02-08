@@ -6,6 +6,18 @@ import os
 import sys
 import io
 
+# === MODELS DIRECTORY CONFIGURATION ===
+# Store models in project's models/ folder instead of user's home directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models", "huggingface")
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+# Set HF_HOME to redirect HuggingFace/transformers cache to project folder
+os.environ['HF_HOME'] = MODELS_DIR
+os.environ['TRANSFORMERS_CACHE'] = MODELS_DIR
+os.environ['HUGGINGFACE_HUB_CACHE'] = MODELS_DIR
+# === END MODELS CONFIGURATION ===
+
 # Force UTF-8 for Windows console
 if sys.platform == 'win32':
     import codecs
@@ -22,9 +34,17 @@ os.environ['CUDA_VISIBLE_DEVICES'] = ''
 os.environ['ORT_DISABLE_ALL_CUDA'] = '1'
 
 import torch
-# Optimize CPU threads
+# Optimize CPU threads - allow override via env
 num_cores = os.cpu_count() or 4
-torch.set_num_threads(num_cores)
+env_threads = os.environ.get('AI_THREADS')
+if env_threads:
+    try:
+        torch.set_num_threads(int(env_threads))
+        print(f"🧵 Thread count set from AI_THREADS: {env_threads}")
+    except ValueError:
+        torch.set_num_threads(num_cores)
+else:
+    torch.set_num_threads(num_cores)
 
 app = Flask(__name__)
 CORS(app)
@@ -39,14 +59,14 @@ MODEL_MAPPING = {
     'drln': 'eugenesiow/drln'
 }
 
-def get_model(model_name='edsr', scale=4):
+def get_model(model_name='pan', scale=4):
     """Load super-image model based on name and scale"""
     global models
     
     # Normalize model name
     model_key = model_name.lower()
     if model_key not in MODEL_MAPPING:
-        model_key = 'edsr'
+        model_key = 'pan'
         
     cache_key = (model_key, scale)
     
@@ -58,6 +78,7 @@ def get_model(model_name='edsr', scale=4):
             print(f"Loading {model_key} model for x{scale}...")
             
             if model_key == 'edsr':
+                from super_image import EdsrModel
                 models[cache_key] = EdsrModel.from_pretrained(pretrained_id, scale=scale)
             elif model_key == 'msrn':
                 from super_image import MsrnModel
@@ -89,8 +110,8 @@ def health_check():
 def get_info():
     return jsonify({
         'models': [
+            {'id': 'pan', 'name': 'PAN (Pixel Attention)', 'description': 'Très rapide, idéal pour CPU (Fait par défaut)', 'speed': 'Rapide'},
             {'id': 'edsr', 'name': 'EDSR (Base)', 'description': 'Équilibré et robuste', 'speed': 'Médium'},
-            {'id': 'pan', 'name': 'PAN (Pixel Attention)', 'description': 'Très rapide, idéal pour CPU', 'speed': 'Rapide'},
             {'id': 'msrn', 'name': 'MSRN', 'description': 'Multi-échelle, bons détails', 'speed': 'Médium'},
         ],
         'scales': [2, 3, 4]
@@ -103,7 +124,7 @@ def upscale_image():
 
     file = request.files['file']
     scale = int(request.form.get('scale', 4))
-    model_name = request.form.get('model', 'edsr')
+    model_name = request.form.get('model', 'pan')
     denoise = request.form.get('denoise', 'false').lower() == 'true'
 
     if file.filename == '':
@@ -111,33 +132,57 @@ def upscale_image():
 
     mdl = get_model(model_name, scale)
     if mdl is None:
-        # Fallback to EDSR x4 if requested combination fails
-        mdl = get_model('edsr', 4)
+        # Fallback to PAN x4 if requested combination fails
+        mdl = get_model('pan', 4)
         if mdl is None:
             return jsonify({'error': 'Modèle non disponible'}), 500
 
+    import time
+    start_time = time.time()
+    
     try:
         from super_image import ImageLoader
         import cv2
         
         # Load image
+        load_start = time.time()
         img = Image.open(file.stream).convert('RGB')
+        w, h = img.size
+        pixels = w * h
+        print(f"🖼️ Image chargée: {w}x{h} ({pixels/1e6:.1f}MP) - Fichier: {file.filename}")
+        
+        if pixels > 12000000: # > 12MP is massive for CPU upscale
+            print(f"⚠️ ATTENTION: Image très grande ({pixels/1e6:.1f}MP). Le traitement sur CPU sera TRÈS LENT.")
+        
+        load_end = time.time()
         
         # Apply denoising if requested (before upscaling to save time)
         if denoise:
+            denoise_start = time.time()
+            print("✨ Début du débruitage (Denoise)...")
             img_array = np.array(img)
             # Denoising on smaller image is much faster
-            denoised = cv2.fastNlMeansDenoisingColored(img_array, None, 10, 10, 7, 21)
+            # Reduced searchWindowSize from 21 to 7 for massive CPU speedup
+            denoised = cv2.fastNlMeansDenoisingColored(img_array, None, 10, 10, 7, 7)
             img = Image.fromarray(denoised)
+            denoise_end = time.time()
+            print(f"✨ Débruité en {denoise_end - denoise_start:.2f}s")
         
         # Prepare for model
+        prep_start = time.time()
         inputs = ImageLoader.load_image(img)
+        prep_end = time.time()
         
         # Run inference
+        print(f"🚀 Début de l'agrandissement x{scale} avec {model_name}...")
+        inf_start = time.time()
         with torch.no_grad():
             preds = mdl(inputs)
+        inf_end = time.time()
+        print(f"🚀 Agrandissement terminé en {inf_end - inf_start:.2f}s")
         
         # Convert tensor output to PIL Image
+        save_start = time.time()
         output_tensor = preds.squeeze(0).permute(1, 2, 0).clamp(0, 1).cpu().numpy()
         output_array = (output_tensor * 255).astype(np.uint8)
         output_img = Image.fromarray(output_array)
@@ -146,6 +191,10 @@ def upscale_image():
         output_buffer = io.BytesIO()
         output_img.save(output_buffer, format='PNG')
         output_buffer.seek(0)
+        save_end = time.time()
+        
+        total_time = time.time() - start_time
+        print(f"🏁 Traitement total: {total_time:.2f}s")
         
         return send_file(
             output_buffer,
@@ -162,7 +211,7 @@ def upscale_image():
 
 if __name__ == '__main__':
     print(f"AI Upscale Server starting on http://localhost:5300 (CPU Mode, {torch.get_num_threads()} threads)")
-    # Pre-load default model
-    get_model('edsr', 4)
+    # Pre-load only PAN model to be light and fast
+    get_model('pan', 4)
     app.run(host='0.0.0.0', port=5300, debug=False)
 

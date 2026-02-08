@@ -1,0 +1,22 @@
+# SearXNG settings
+
+use_default_settings: true
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "ultradashboard_secret_key" # À changer idéalement
+  limiter: false # Désactivé pour l'usage local simplifié
+  image_proxy: true
+
+search:
+  safe_search: 0
+  autocomplete: "google"
+
+enabled_engines:
+  - google
+  - bing
+  - duckduckgo
+  - wikipedia
+  - wikimedia
+  - creativecommons

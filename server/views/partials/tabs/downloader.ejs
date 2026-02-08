@@ -1,0 +1,194 @@
+<section class="tab-content" id="tab-downloader">
+    <header class="content-header">
+        <h1>Media Downloader</h1>
+        <p class="subtitle">Téléchargez des vidéos et musiques de YouTube, TikTok, Instagram, Twitter et plus</p>
+    </header>
+
+    <div class="converter-container">
+        <!-- URL Input -->
+        <div class="input-group">
+            <input type="text" id="dlUrl" placeholder="Collez le lien (YouTube, TikTok, Instagram...) ici..."
+                class="url-input">
+            <button id="dlSearchBtn" class="btn-search"><i data-lucide="search"></i></button>
+        </div>
+
+        <!-- Empty State (Shown by default) -->
+        <div id="dlEmptyState" class="empty-state-container">
+            <!-- Platform Grid -->
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <i data-lucide="youtube"></i>
+                    <span>YouTube</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="video"></i>
+                    <span>TikTok</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="instagram"></i>
+                    <span>Instagram</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="twitter"></i>
+                    <span>Twitter / X</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="facebook"></i>
+                    <span>Facebook</span>
+                </div>
+                <div class="platform-card">
+                    <i data-lucide="twitch"></i>
+                    <span>Twitch</span>
+                </div>
+            </div>
+
+            <!-- Features Row -->
+            <div class="features-row">
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="zap"></i></div>
+                    <div class="feature-text">
+                        <h4>Multi-Plateforme</h4>
+                        <p>Supporte plus de 1000 sites web.</p>
+                    </div>
+                </div>
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="music"></i></div>
+                    <div class="feature-text">
+                        <h4>Audio HQ</h4>
+                        <p>Extraction MP3 haute fidélité (320kbps).</p>
+                    </div>
+                </div>
+                <div class="feature-badge">
+                    <div class="feature-icon-wrapper"><i data-lucide="scissors"></i></div>
+                    <div class="feature-text">
+                        <h4>Trim & Crop</h4>
+                        <p>Découpez vos séquences facilement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>Téléchargements Récents</h3>
+                    <button id="btnClearDlHistory" class="btn-clear-history">Effacer</button>
+                </div>
+                <div id="dlHistoryList" class="history-list">
+                    <p class="empty-history-text">Aucun téléchargement récent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Preview -->
+        <div id="dlPreview" class="yt-preview hidden">
+            <div class="yt-thumbnail-container">
+                <img id="dlThumbnail" src="" alt="Thumbnail">
+                <div class="yt-duration" id="dlDuration">00:00</div>
+            </div>
+            <div class="yt-info">
+                <h3 id="dlTitle">Titre du média</h3>
+                <p id="dlChannel" class="yt-channel">Plateforme</p>
+
+                <!-- Options Grid -->
+                <div class="yt-options-grid">
+                    <div class="option-group">
+                        <label>Mode</label>
+                        <div class="toggle-group dl-mode-toggle">
+                            <button class="toggle-btn active" data-mode="video">Vidéo <i data-lucide="video"
+                                    class="inline-icon"></i></button>
+                            <button class="toggle-btn" data-mode="audio">Audio <i data-lucide="music"
+                                    class="inline-icon"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Qualité</label>
+                        <select id="dlQuality" class="yt-select">
+                            <option value="best">Auto (Max)</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label>Format</label>
+                        <select id="dlFormat" class="yt-select">
+                            <!-- Will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Advanced Toggle -->
+                <div style="margin: 20px 0;">
+                    <button id="dlAdvancedBtn" class="btn-text"
+                        style="color: var(--text-muted); background: none; border: none; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
+                        <i data-lucide="settings-2" style="width: 14px; height: 14px;"></i> Options avancées
+                    </button>
+                </div>
+
+                <!-- Advanced Panel -->
+                <div id="dlAdvancedOptions" class="yt-advanced-panel hidden">
+                    <div class="checkbox-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="chkDlMetadata" checked>
+                            <span class="checkmark"></span>
+                            Métadonnées
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="chkDlThumbnail" checked>
+                            <span class="checkmark"></span>
+                            Miniature
+                        </label>
+                        <label class="custom-checkbox" id="containerDlSubtitles">
+                            <input type="checkbox" id="chkDlSubs">
+                            <span class="checkmark"></span>
+                            Sous-titres
+                        </label>
+                    </div>
+
+                    <div class="trim-group" style="margin-top: 15px;">
+                        <label
+                            style="display:block; margin-bottom:8px; font-size:12px; color:var(--text-secondary); text-transform: uppercase; font-weight: 600;">Découpage
+                            (Optionnel)</label>
+                        <div style="display:flex; gap:10px; align-items: center;">
+                            <input type="text" id="trimDlStart" placeholder="00:00" class="time-input"
+                                style="width: 70px; padding: 6px; text-align: center;">
+                            <span style="color: var(--text-muted); font-size: 12px;">➜</span>
+                            <input type="text" id="trimDlEnd" placeholder="00:00" class="time-input"
+                                style="width: 70px; padding: 6px; text-align: center;">
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Format: MM:SS
+                            ou HH:MM:SS</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons-container" style="display: flex; gap: 10px; margin-top: 24px;">
+                    <button id="dlDownloadBtn" class="btn-convert" style="flex: 1; margin-top: 0;">
+                        <span class="btn-text">Télécharger</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                    <a id="dlSaveBtn" class="btn-convert hidden"
+                        style="flex: 1; margin-top: 0; text-decoration: none; display: flex; align-items: center; justify-content: center; background: #10b981;"
+                        download>
+                        <i data-lucide="download" style="margin-right: 8px;"></i> Sauvegarder
+                    </a>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="dlProgressContainer" class="yt-progress-container hidden">
+                    <div class="yt-progress-bar">
+                        <div id="dlProgressFill" class="yt-progress-fill"></div>
+                    </div>
+                    <div class="yt-progress-info">
+                        <span id="dlProgressStatus">Initialisation...</span>
+                        <span id="dlProgressPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="dlLoading" class="yt-loading-container hidden">
+            <div class="loader-spinner"></div>
+            <p style="color: var(--text-secondary); font-size: 15px;">Analyse en cours...</p>
+        </div>
+    </div>
+</section>

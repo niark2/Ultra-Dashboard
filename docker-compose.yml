@@ -9,6 +9,7 @@ services:
       - REMBG_URL=http://rembg:5100
       - WHISPER_URL=http://whisper:5200
       - UPSCALE_URL=http://upscale:5300
+      - SEARXNG_URL=http://searxng:8080
     volumes:
       - ./uploads:/app/uploads
       - ./data:/app/data
@@ -17,33 +18,73 @@ services:
     expose:
       - "3000"
     depends_on:
-      - rembg
-      - whisper
-      - upscale
+      rembg:
+        condition: service_healthy
+      whisper:
+        condition: service_healthy
+      upscale:
+        condition: service_healthy
+      searxng:
+        condition: service_started
 
   rembg:
     build: .
     container_name: ultra_rembg
     command: python server/python/rembg_server.py
+    volumes:
+      - ./models/u2net:/app/models/u2net
     restart: unless-stopped
     expose:
       - "5100"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5100/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   whisper:
     build: .
     container_name: ultra_whisper
     command: python server/python/whisper_server.py
+    volumes:
+      - ./models/whisper:/app/models/whisper
     restart: unless-stopped
     expose:
       - "5200"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5200/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   upscale:
     build: .
     container_name: ultra_upscale
     command: python server/python/upscale_server.py
+    volumes:
+      - ./models/huggingface:/app/models/huggingface
     restart: unless-stopped
     expose:
       - "5300"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5300/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  searxng:
+    container_name: ultra_searxng
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    expose:
+      - "8080"
+    environment:
+      - SEARXNG_BASE_URL=http://localhost/searxng/
 
   nginx:
     image: nginx:alpine

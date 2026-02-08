@@ -1,34 +1,46 @@
 import { formatDuration, refreshIcons } from '../utils/formatters.js';
+import { I18n } from '../utils/i18n.js';
 
-export class SocialModule {
+export class DownloaderModule {
     constructor() {
+        // ... (constructor remains same)
         this.elements = {
-            urlInput: document.getElementById('socialUrl'),
-            searchBtn: document.getElementById('socialSearchBtn'),
-            preview: document.getElementById('socialPreview'),
-            loading: document.getElementById('socialLoading'),
-            thumbnail: document.getElementById('socialThumbnail'),
-            title: document.getElementById('socialTitle'),
-            channel: document.getElementById('socialChannel'),
-            duration: document.getElementById('socialDuration'),
-            downloadBtn: document.getElementById('socialDownloadBtn'),
-            saveBtn: document.getElementById('socialSaveBtn'),
+            urlInput: document.getElementById('dlUrl'),
+            searchBtn: document.getElementById('dlSearchBtn'),
+            preview: document.getElementById('dlPreview'),
+            loading: document.getElementById('dlLoading'),
+            thumbnail: document.getElementById('dlThumbnail'),
+            title: document.getElementById('dlTitle'),
+            channel: document.getElementById('dlChannel'),
+            duration: document.getElementById('dlDuration'),
+            downloadBtn: document.getElementById('dlDownloadBtn'),
+            saveBtn: document.getElementById('dlSaveBtn'),
 
-            // Controls
-            modeToggles: document.querySelectorAll('.social-mode-toggle .toggle-btn'),
-            qualitySelect: document.getElementById('socialQuality'),
-            formatSelect: document.getElementById('socialFormat'),
+            // Advanced Controls
+            modeToggles: document.querySelectorAll('.dl-mode-toggle .toggle-btn'),
+            qualitySelect: document.getElementById('dlQuality'),
+            formatSelect: document.getElementById('dlFormat'),
+            advancedBtn: document.getElementById('dlAdvancedBtn'),
+            advancedPanel: document.getElementById('dlAdvancedOptions'),
+
+            // Options
+            chkMetadata: document.getElementById('chkDlMetadata'),
+            chkThumbnail: document.getElementById('chkDlThumbnail'),
+            chkSubs: document.getElementById('chkDlSubs'),
+            trimStart: document.getElementById('trimDlStart'),
+            trimEnd: document.getElementById('trimDlEnd'),
+            containerSubtitles: document.getElementById('containerDlSubtitles'),
 
             // Progress
-            progressContainer: document.getElementById('socialProgressContainer'),
-            progressFill: document.getElementById('socialProgressFill'),
-            progressStatus: document.getElementById('socialProgressStatus'),
-            progressPercent: document.getElementById('socialProgressPercent'),
+            progressContainer: document.getElementById('dlProgressContainer'),
+            progressFill: document.getElementById('dlProgressFill'),
+            progressStatus: document.getElementById('dlProgressStatus'),
+            progressPercent: document.getElementById('dlProgressPercent'),
 
             // Empty State
-            emptyState: document.getElementById('socialEmptyState'),
-            historyList: document.getElementById('socialHistoryList'),
-            clearHistoryBtn: document.getElementById('btnClearSocialHistory')
+            emptyState: document.getElementById('dlEmptyState'),
+            historyList: document.getElementById('dlHistoryList'),
+            clearHistoryBtn: document.getElementById('btnClearDlHistory')
         };
 
         this.currentMode = 'video';
@@ -39,6 +51,8 @@ export class SocialModule {
             this.init();
         }
     }
+
+    // ... (init, isYoutube, setMode, fetchInfo, updatePreview, addToHistory, getHistory, loadHistory remain mostly same)
 
     init() {
         // Search
@@ -56,6 +70,13 @@ export class SocialModule {
             };
         });
 
+        // Advanced Toggle
+        if (this.elements.advancedBtn) {
+            this.elements.advancedBtn.onclick = () => {
+                this.elements.advancedPanel.classList.toggle('hidden');
+            };
+        }
+
         // Download
         this.elements.downloadBtn.onclick = () => this.download();
 
@@ -65,6 +86,10 @@ export class SocialModule {
 
         // Initial format population
         this.setMode('video');
+    }
+
+    isYoutube(url) {
+        return url.includes('youtube.com') || url.includes('youtu.be');
     }
 
     setMode(mode) {
@@ -77,11 +102,18 @@ export class SocialModule {
                 formatSelect.add(new Option(fmt.toUpperCase(), fmt));
             });
             this.elements.qualitySelect.disabled = false;
+            if (this.elements.chkSubs) this.elements.chkSubs.disabled = false;
+            if (this.elements.containerSubtitles) this.elements.containerSubtitles.style.opacity = '1';
         } else {
-            ['mp3', 'm4a', 'wav', 'opus'].forEach(fmt => {
+            ['mp3', 'm4a', 'wav', 'flac', 'opus'].forEach(fmt => {
                 formatSelect.add(new Option(fmt.toUpperCase(), fmt));
             });
             this.elements.qualitySelect.disabled = true;
+            if (this.elements.chkSubs) {
+                this.elements.chkSubs.disabled = true;
+                this.elements.chkSubs.checked = false;
+            }
+            if (this.elements.containerSubtitles) this.elements.containerSubtitles.style.opacity = '0.5';
         }
 
         if (this.mediaInfo && mode === 'video') {
@@ -97,11 +129,14 @@ export class SocialModule {
         this.showLoading(true);
         this.elements.preview.classList.add('hidden');
         this.elements.emptyState.classList.add('hidden');
-        if (this.elements.saveBtn) this.elements.saveBtn.classList.add('hidden');
+        this.elements.saveBtn.classList.add('hidden');
         this.elements.downloadBtn.classList.remove('hidden');
 
+        const isYt = this.isYoutube(url);
+        const endpoint = isYt ? '/api/youtube/info' : '/api/social/info';
+
         try {
-            const res = await fetch(`/api/social/info?url=${encodeURIComponent(url)}`);
+            const res = await fetch(`${endpoint}?url=${encodeURIComponent(url)}`);
             const data = await res.json();
 
             if (data.error) throw new Error(data.error);
@@ -109,7 +144,7 @@ export class SocialModule {
             this.mediaInfo = data;
             this.updatePreview(data);
         } catch (error) {
-            alert('Erreur: ' + error.message);
+            alert(I18n.t('Erreur') + ': ' + error.message);
         } finally {
             this.showLoading(false);
         }
@@ -118,11 +153,14 @@ export class SocialModule {
     updatePreview(data) {
         this.elements.thumbnail.src = data.thumbnail || '/img/social-placeholder.png';
         this.elements.title.textContent = data.title;
-        this.elements.channel.textContent = data.platform.toUpperCase() + (data.channel ? ` • ${data.channel}` : '');
+
+        let platformLabel = data.platform ? data.platform.toUpperCase() : 'YOUTUBE';
+        this.elements.channel.textContent = platformLabel + (data.channel ? ` • ${data.channel}` : '');
         this.elements.duration.textContent = formatDuration(data.duration);
 
         this.populateQualities(data.resolutions);
         this.setMode(this.currentMode);
+
         this.elements.preview.classList.remove('hidden');
         this.elements.emptyState.classList.add('hidden');
     }
@@ -133,22 +171,38 @@ export class SocialModule {
             id: Date.now(),
             title: data.title,
             thumbnail: data.thumbnail,
-            platform: data.platform,
+            platform: data.platform || 'YouTube',
             timestamp: new Date().toISOString()
         };
 
-        // Remove duplicates (same title/platform)
+        // Remove duplicates
         history = history.filter(item => item.title !== data.title);
         history.unshift(newItem);
-        history = history.slice(0, 10); // Keep last 10
+        history = history.slice(0, 10);
 
-        await localStorage.setItem('ultra-social-history', JSON.stringify(history));
+        localStorage.setItem('ultra-dl-history', JSON.stringify(history));
         this.renderHistory(history);
     }
 
     async getHistory() {
-        const history = localStorage.getItem('ultra-social-history');
-        return history ? JSON.parse(history) : [];
+        const history = localStorage.getItem('ultra-dl-history');
+        if (!history) {
+            // Try to migration from old histories
+            const ytHistory = localStorage.getItem('ultra-yt-history');
+            const socialHistory = localStorage.getItem('ultra-social-history');
+            if (ytHistory || socialHistory) {
+                let combined = [];
+                if (ytHistory) combined = combined.concat(JSON.parse(ytHistory));
+                if (socialHistory) combined = combined.concat(JSON.parse(socialHistory));
+                combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                combined = combined.slice(0, 10);
+                localStorage.setItem('ultra-dl-history', JSON.stringify(combined));
+                // Optionally clear old ones
+                return combined;
+            }
+            return [];
+        }
+        return JSON.parse(history);
     }
 
     async loadHistory() {
@@ -159,7 +213,7 @@ export class SocialModule {
     renderHistory(history) {
         const list = this.elements.historyList;
         if (!history || history.length === 0) {
-            list.innerHTML = '<p class="empty-history-text">Aucun téléchargement récent</p>';
+            list.innerHTML = `<p class="empty-history-text">${I18n.t('Aucun téléchargement récent')}</p>`;
             return;
         }
 
@@ -176,6 +230,8 @@ export class SocialModule {
     }
 
     clearHistory() {
+        localStorage.removeItem('ultra-dl-history');
+        localStorage.removeItem('ultra-yt-history');
         localStorage.removeItem('ultra-social-history');
         this.renderHistory([]);
     }
@@ -187,7 +243,8 @@ export class SocialModule {
         if (resolutions && resolutions.length) {
             resolutions.forEach(res => {
                 const label = res >= 2160 ? '4K/2160p' :
-                    res >= 1080 ? '1080p' : `${res}p`;
+                    res >= 1440 ? '2K/1440p' :
+                        res >= 1080 ? '1080p' : `${res}p`;
                 select.add(new Option(label, res));
             });
         }
@@ -200,17 +257,21 @@ export class SocialModule {
         const downloadId = Date.now().toString();
 
         btn.disabled = true;
-        btnText.textContent = 'Initialisation...';
+        btnText.textContent = I18n.t('Initialisation...');
         btnLoader.classList.remove('hidden');
 
         if (this.elements.progressContainer) {
             this.elements.progressContainer.classList.remove('hidden');
             this.elements.progressFill.style.width = '0%';
-            this.elements.progressStatus.textContent = 'Démarrage...';
+            this.elements.progressStatus.textContent = I18n.t('Démarrage...');
             this.elements.progressPercent.textContent = '0%';
         }
 
-        const eventSource = new EventSource(`/api/social/progress/${downloadId}`);
+        const isYt = this.isYoutube(this.currentUrl);
+        const progressEndpoint = isYt ? `/api/youtube/progress/${downloadId}` : `/api/social/progress/${downloadId}`;
+        const downloadEndpoint = isYt ? '/api/youtube/download' : '/api/social/download';
+
+        const eventSource = new EventSource(progressEndpoint);
 
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -222,8 +283,8 @@ export class SocialModule {
             } else if (data.type === 'complete') {
                 if (this.elements.progressFill) this.elements.progressFill.style.width = '100%';
                 if (this.elements.progressPercent) this.elements.progressPercent.textContent = '100%';
-                if (this.elements.progressStatus) this.elements.progressStatus.textContent = 'Prêt !';
-                btnText.textContent = 'Téléchargement...';
+                if (this.elements.progressStatus) this.elements.progressStatus.textContent = I18n.t('Prêt !');
+                btnText.textContent = I18n.t('Téléchargement...');
                 this.addToHistory(this.mediaInfo);
             }
         };
@@ -231,13 +292,24 @@ export class SocialModule {
         try {
             const body = {
                 url: this.currentUrl,
-                downloadId: downloadId,
                 mode: this.currentMode,
                 quality: this.elements.qualitySelect.value,
-                format: this.elements.formatSelect.value
+                format: this.elements.formatSelect.value,
             };
 
-            const res = await fetch('/api/social/download', {
+            // Add specific fields for YouTube controller
+            if (isYt) {
+                body.videoId = downloadId;
+                body.embedMetadata = this.elements.chkMetadata.checked;
+                body.embedThumbnail = this.elements.chkThumbnail.checked;
+                body.embedSubs = this.elements.chkSubs.checked;
+                body.trimStart = this.elements.trimStart.value;
+                body.trimEnd = this.elements.trimEnd.value;
+            } else {
+                body.downloadId = downloadId;
+            }
+
+            const res = await fetch(downloadEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -245,37 +317,35 @@ export class SocialModule {
 
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(err.error || 'Erreur inconnue');
+                throw new Error(err.error || I18n.t('Erreur inconnue'));
             }
 
             eventSource.close();
-
             const data = await res.json();
 
             document.dispatchEvent(new CustomEvent('app-notification', {
                 detail: {
-                    title: 'Téléchargement terminé',
-                    message: `Le média "${this.mediaInfo.title}" de ${this.mediaInfo.platform} est prêt.`,
+                    title: I18n.t('Téléchargement terminé'),
+                    message: `${I18n.t('Le média')} "${this.mediaInfo.title}" ${I18n.t('est prêt.')}`,
                     type: 'success',
-                    icon: 'share-2'
+                    icon: 'download'
                 }
             }));
 
-            // Show Save Button
-            if (data.fileName && this.elements.saveBtn) {
+            if (data.fileName) {
                 this.elements.saveBtn.href = `/databank/${data.fileName}`;
                 this.elements.saveBtn.download = data.prettyName || data.fileName;
                 this.elements.saveBtn.classList.remove('hidden');
                 this.elements.downloadBtn.classList.add('hidden');
-                if (this.elements.progressStatus) this.elements.progressStatus.textContent = 'Enregistré dans la Databank !';
+                if (this.elements.progressStatus) this.elements.progressStatus.textContent = I18n.t('Enregistré dans la Databank !');
             }
 
         } catch (error) {
             eventSource.close();
-            alert('Erreur: ' + error.message);
+            alert(I18n.t('Erreur') + ': ' + error.message);
         } finally {
             btn.disabled = false;
-            btnText.textContent = 'Télécharger';
+            btnText.textContent = I18n.t('Télécharger');
             btnLoader.classList.add('hidden');
             setTimeout(() => {
                 if (this.elements.progressContainer) this.elements.progressContainer.classList.add('hidden');
@@ -288,7 +358,6 @@ export class SocialModule {
             this.elements.loading.classList.remove('hidden');
         } else {
             this.elements.loading.classList.add('hidden');
-            // If no preview is shown, restore empty state
             if (this.elements.preview.classList.contains('hidden')) {
                 this.elements.emptyState.classList.remove('hidden');
             }

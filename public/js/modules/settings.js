@@ -1,10 +1,12 @@
 import { Storage } from '../utils/storage.js';
+import { I18n } from '../utils/i18n.js';
 
 export class SettingsModule {
     constructor() {
         this.themeToggle = document.getElementById('themeToggle');
         this.reduceMotionToggle = document.getElementById('reduceMotionToggle');
         this.compactSidebarToggle = document.getElementById('compactSidebarToggle');
+        this.sidebarSectionsToggle = document.getElementById('sidebarSectionsToggle');
         this.soundToggle = document.getElementById('soundToggle');
         this.clearCacheBtn = document.getElementById('clearCacheBtn');
         this.accentPicker = document.getElementById('accentPicker');
@@ -24,6 +26,7 @@ export class SettingsModule {
         this.upscaleModelToggles = document.querySelectorAll('#settingsUpscaleModelToggle .toggle-btn');
         this.upscaleScaleToggles = document.querySelectorAll('#settingsUpscaleScaleToggle .toggle-btn');
         this.whisperModelToggles = document.querySelectorAll('#settingsWhisperModelToggle .toggle-btn');
+        this.languageToggles = document.querySelectorAll('#languageToggle .toggle-btn');
 
         // Pin Items
         this.pinItemBtns = document.querySelectorAll('.pin-item-btn');
@@ -39,6 +42,7 @@ export class SettingsModule {
         // Status
         this.servicesStatusContainer = document.getElementById('servicesStatusContainer');
         this.systemMetricsContainer = document.getElementById('systemMetricsContainer');
+        this.downloadedModelsContainer = document.getElementById('downloadedModelsContainer');
         this.statusRefreshInterval = null;
 
         // Env Variables
@@ -72,6 +76,10 @@ export class SettingsModule {
 
         if (this.compactSidebarToggle) {
             this.compactSidebarToggle.addEventListener('change', () => this.toggleCompactSidebar());
+        }
+
+        if (this.sidebarSectionsToggle) {
+            this.sidebarSectionsToggle.addEventListener('change', () => this.toggleSidebarSections());
         }
 
         if (this.clearCacheBtn) {
@@ -111,6 +119,13 @@ export class SettingsModule {
         this.setupToggleGroupListeners(this.upscaleModelToggles, 'ultra-upscale-default-model');
         this.setupToggleGroupListeners(this.upscaleScaleToggles, 'ultra-upscale-default-scale');
         this.setupToggleGroupListeners(this.whisperModelToggles, 'ultra-whisper-default-model');
+
+        // Language toggle listener (special case for reload)
+        if (this.languageToggles) {
+            this.languageToggles.forEach(btn => {
+                btn.addEventListener('click', () => I18n.setLanguage(btn.dataset.lang));
+            });
+        }
 
         // Pin Item Listeners
         if (this.pinItemBtns) {
@@ -202,6 +217,13 @@ export class SettingsModule {
             this.compactSidebarToggle.checked = compactSidebar;
         }
 
+        // Sidebar Sections
+        const useSections = await Storage.get('ultra-sidebar-sections', true);
+        document.body.classList.toggle('no-sidebar-sections', !useSections);
+        if (this.sidebarSectionsToggle) {
+            this.sidebarSectionsToggle.checked = useSections;
+        }
+
         // Sound
         const soundEnabled = await Storage.get('ultra-sound', true);
         if (this.soundToggle) {
@@ -231,6 +253,7 @@ export class SettingsModule {
         this.loadToggleGroupState(this.upscaleModelToggles, 'ultra-upscale-default-model', 'edsr');
         this.loadToggleGroupState(this.upscaleScaleToggles, 'ultra-upscale-default-scale', '4');
         this.loadToggleGroupState(this.whisperModelToggles, 'ultra-whisper-default-model', 'base');
+        this.loadToggleGroupState(this.languageToggles, 'ultra-language', 'en');
 
         // Load Env Variables
         const envKeys = [
@@ -249,10 +272,8 @@ export class SettingsModule {
             const config = await Storage.getFull(item.key);
 
             if (config.source === 'env') {
-                input.value = '';
-                input.placeholder = 'Utilise la config serveur (.env)';
+                input.value = config.effectiveValue || '';
                 input.classList.add('using-env-fallback');
-                // Optionnel: ajouter un petit badge ou texte à côté
             } else if (config.value) {
                 input.value = config.value;
                 input.classList.remove('using-env-fallback');
@@ -305,16 +326,70 @@ export class SettingsModule {
 
     async refreshServerStatus() {
         try {
-            const res = await fetch('/api/status/health');
-            const data = await res.json();
-            this.renderServerStatus(data);
+            // Fetch health status
+            const healthRes = await fetch('/api/status/health');
+            if (healthRes.ok) {
+                const healthData = await healthRes.json();
+                this.renderServerStatus(healthData);
+            }
+
+            // Fetch models info
+            const modelsRes = await fetch('/api/status/models');
+            if (modelsRes.ok) {
+                const modelsData = await modelsRes.json();
+                this.renderDownloadedModels(modelsData.models);
+            }
         } catch (error) {
             console.error('Error fetching health status:', error);
         }
     }
 
+    renderDownloadedModels(models) {
+        if (!this.downloadedModelsContainer) return;
+
+        if (!models || models.length === 0) {
+            this.downloadedModelsContainer.innerHTML = `
+                <div class="status-loading">
+                    <i data-lucide="info" style="width: 24px; height: 24px; color: var(--text-muted);"></i>
+                    Aucun modèle téléchargé trouvé.
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+            return;
+        }
+
+        this.downloadedModelsContainer.innerHTML = `
+            <div class="models-table-wrapper">
+                <table class="models-table">
+                    <thead>
+                        <tr>
+                            <th>Modèle</th>
+                            <th>Type</th>
+                            <th>Taille</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${models.map(m => `
+                            <tr>
+                                <td class="model-name-cell">
+                                    <i data-lucide="file-code" class="model-icon"></i>
+                                    <span>${m.name}</span>
+                                </td>
+                                <td><span class="model-tag">${m.type}</span></td>
+                                <td class="model-size">${m.size}</td>
+                                <td class="model-date">${new Date(m.date).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+    }
+
     renderServerStatus(data) {
-        if (!this.servicesStatusContainer || !this.systemMetricsContainer) return;
+        if (!this.servicesStatusContainer || !this.systemMetricsContainer || !data || !data.services) return;
 
         // Render Services
         this.servicesStatusContainer.innerHTML = data.services.map(s => `
@@ -327,11 +402,11 @@ export class SettingsModule {
                     ${s.status === 'online' ? `
                         <div class="detail-row">
                             <span class="detail-label">Service</span>
-                            <span class="detail-value">${s.details.service || 'N/A'}</span>
+                            <span class="detail-value">${s.details?.service || 'N/A'}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Status</span>
-                            <span class="detail-value">${s.details.status || 'OK'}</span>
+                            <span class="detail-value">${s.details?.status || 'OK'}</span>
                         </div>
                     ` : `
                         <div class="detail-row">
@@ -344,6 +419,11 @@ export class SettingsModule {
         `).join('');
 
         // Render System Metrics
+        if (!data.system || !data.system.memory) {
+            this.systemMetricsContainer.innerHTML = '<div class="status-loading">Metrics non disponibles</div>';
+            return;
+        }
+
         const memMb = Math.round(data.system.memory.rss / 1024 / 1024);
         const uptimeH = Math.floor(data.system.uptime / 3600);
         const uptimeM = Math.floor((data.system.uptime % 3600) / 60);
@@ -359,11 +439,11 @@ export class SettingsModule {
             </div>
             <div class="metric-box">
                 <span class="metric-label">Platform</span>
-                <span class="metric-value">${data.system.platform}</span>
+                <span class="metric-value">${data.system.platform || 'N/A'}</span>
             </div>
             <div class="metric-box">
                 <span class="metric-label">Node JS</span>
-                <span class="metric-value">${data.system.nodeVersion}</span>
+                <span class="metric-value">${data.system.nodeVersion || 'N/A'}</span>
             </div>
         `;
     }
@@ -516,6 +596,12 @@ export class SettingsModule {
         const compact = this.compactSidebarToggle.checked;
         document.body.classList.toggle('compact-sidebar', compact);
         await Storage.set('ultra-compact-sidebar', compact);
+    }
+
+    async toggleSidebarSections() {
+        const useSections = this.sidebarSectionsToggle.checked;
+        document.body.classList.toggle('no-sidebar-sections', !useSections);
+        await Storage.set('ultra-sidebar-sections', useSections);
     }
 
     async setAccentColor(color, dotElement) {

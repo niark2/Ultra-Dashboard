@@ -2,29 +2,30 @@
     <div class="auth-card">
         <div class="auth-header">
             <h1 id="authTitle">ULTRA <span>DASHBOARD</span></h1>
-            <p id="authSubtitle">Authentification requise</p>
+            <p id="authSubtitle" data-i18n="Authentification requise">Authentification requise</p>
         </div>
 
         <form id="authForm" class="auth-form">
             <div id="setupNotice" class="auth-notice hidden">
                 <i data-lucide="sparkles"></i>
-                <span>Configuration initiale : créez votre compte.</span>
+                <span data-i18n="Configuration initiale : créez votre compte.">Configuration initiale : créez votre
+                    compte.</span>
             </div>
 
             <div class="auth-field">
-                <label>Nom d'utilisateur</label>
+                <label data-i18n="Nom d'utilisateur">Nom d'utilisateur</label>
                 <div class="auth-input-wrapper">
-                    <input type="text" id="authUsername" placeholder="Votre pseudonyme" required
-                        autocomplete="username">
+                    <input type="text" id="authUsername" data-i18n-placeholder="Votre pseudonyme"
+                        placeholder="Votre pseudonyme" required autocomplete="username">
                     <i data-lucide="user" class="input-icon"></i>
                 </div>
             </div>
 
             <div class="auth-field">
-                <label>Mot de passe</label>
+                <label data-i18n="Mot de passe">Mot de passe</label>
                 <div class="auth-input-wrapper">
-                    <input type="password" id="authPassword" placeholder="••••••••" required
-                        autocomplete="current-password">
+                    <input type="password" id="authPassword" data-i18n-placeholder="••••••••" placeholder="••••••••"
+                        required autocomplete="current-password">
                     <i data-lucide="lock" class="input-icon"></i>
                 </div>
             </div>
@@ -32,15 +33,15 @@
             <div id="authError" class="auth-error hidden"></div>
 
             <button type="submit" id="authSubmit" class="auth-btn">
-                <span class="btn-text">Se connecter</span>
+                <span class="btn-text" data-i18n="Se connecter">Se connecter</span>
                 <i data-lucide="chevron-right"></i>
             </button>
         </form>
 
         <div class="auth-footer">
             <p class="auth-toggle-wrapper">
-                <span id="authToggleText">Pas de compte ?</span>
-                <a href="#" id="authToggleBtn">Créer un compte</a>
+                <span id="authToggleText" data-i18n="Pas de compte ?">Pas de compte ?</span>
+                <a href="#" id="authToggleBtn" data-i18n="Créer un compte">Créer un compte</a>
             </p>
             <p>© 2026 Ultra Dashboard</p>
         </div>

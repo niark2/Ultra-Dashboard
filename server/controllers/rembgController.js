@@ -67,9 +67,6 @@ exports.removeBackground = async (req, res) => {
         }
     };
 
-    // ... (imports)
-
-    // ...
 
     try {
         console.log(`🔄 REMBG: Traitement de ${req.file.originalname} avec le modele ${model}...`);

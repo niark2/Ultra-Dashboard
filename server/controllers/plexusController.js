@@ -114,8 +114,12 @@ async function generateAIResponse(query, context, userId, extraInfo = '', isDeep
     const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
     const model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-flash-lite-preview-02-05:free');
 
-    if (!apiKey) {
-        throw new Error("Clé API OpenRouter manquante");
+    console.log(`[Plexus] Appel OpenRouter avec modèle: ${model}`);
+    console.log(`[Plexus] API Key présente: ${!!apiKey} (Length: ${apiKey ? apiKey.length : 0})`);
+
+    if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
+        console.error("[Plexus] Erreur: Clé API OpenRouter non configurée ou placeholder détecté");
+        throw new Error("Clé API OpenRouter manquante ou non valide. Veuillez la configurer dans les réglages.");
     }
 
     let systemPrompt;
@@ -329,12 +333,12 @@ const plexusController = {
 
             res.json({
                 searxng: response.ok ? 'connected' : 'error',
-                url: SEARXNG_URL
+                url: baseUrl
             });
         } catch (error) {
             res.json({
                 searxng: 'disconnected',
-                url: SEARXNG_URL,
+                url: baseUrl,
                 error: error.message
             });
         }

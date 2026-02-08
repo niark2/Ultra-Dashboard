@@ -2,11 +2,21 @@
 Whisper STT Server - Speech-to-Text API
 """
 import os
+
+# === MODELS DIRECTORY CONFIGURATION ===
+# Store models in project's models/ folder instead of user's home directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models", "whisper")
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+# Set XDG_CACHE_HOME to redirect whisper cache to project folder
+os.environ['XDG_CACHE_HOME'] = os.path.dirname(MODELS_DIR)
+# === END MODELS CONFIGURATION ===
+
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
 import io
 import sys
 import tempfile
@@ -196,6 +206,19 @@ def get_info():
         'status': 'ready'
     })
 
+
+import torch
+# Optimize CPU threads - allow override via env
+num_cores = os.cpu_count() or 4
+env_threads = os.environ.get('AI_THREADS')
+if env_threads:
+    try:
+        torch.set_num_threads(int(env_threads))
+        print(f"🧵 Thread count set from AI_THREADS: {env_threads}")
+    except ValueError:
+        torch.set_num_threads(num_cores)
+else:
+    torch.set_num_threads(num_cores)
 
 if __name__ == '__main__':
     print("Whisper STT Server starting on http://localhost:5200")

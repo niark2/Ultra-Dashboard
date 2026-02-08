@@ -282,7 +282,7 @@ export class ImageAIModule {
                 return;
             }
 
-            if (file.size > 10 * 1024 * 1024) {
+            if (file.size > 30 * 1024 * 1024) {
                 console.warn(`Fichier trop volumineux: ${file.name}`);
                 return;
             }

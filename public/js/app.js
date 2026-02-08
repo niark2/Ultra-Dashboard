@@ -1,7 +1,6 @@
 import { TabManager } from './core/tabs.js';
 import { ConverterModule } from './modules/converter.js';
-import { YoutubeModule } from './modules/youtube.js';
-import { SocialModule } from './modules/social.js';
+import { DownloaderModule } from './modules/downloader.js';
 import { ImageAIModule } from './modules/image-ai.js';
 import { STTModule } from './modules/stt.js';
 import { SettingsModule } from './modules/settings.js';
@@ -15,9 +14,13 @@ import { DatabankModule } from './modules/databank.js';
 import { NotificationModule } from './modules/notifications.js';
 import { initPlexus } from './modules/plexus.js';
 import { Auth } from './utils/auth.js';
+import { I18n } from './utils/i18n.js';
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialise Translations
+    await I18n.init();
+
     // Initialise Auth
     await Auth.init();
 
@@ -27,8 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialise Modules
     new NotificationModule();
     new ConverterModule();
-    new YoutubeModule();
-    new SocialModule();
+    new DownloaderModule();
     new ImageAIModule();
     new STTModule();
     new SettingsModule();

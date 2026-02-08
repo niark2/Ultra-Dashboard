@@ -35,12 +35,13 @@
 
             <!-- Appearance Section -->
             <div class="settings-group">
-                <div class="settings-group-title">Apparence</div>
+                <div class="settings-group-title" data-i18n="Apparence">Apparence</div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Thème Sombre</div>
-                        <div class="setting-description">Basculez entre le mode sombre et le mode clair</div>
+                        <div class="setting-title" data-i18n="Thème Sombre">Thème Sombre</div>
+                        <div class="setting-description" data-i18n="Basculez entre le mode sombre et le mode clair">
+                            Basculez entre le mode sombre et le mode clair</div>
                     </div>
                     <div class="setting-action">
                         <label class="switch">
@@ -52,8 +53,9 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Couleur d'accentuation</div>
-                        <div class="setting-description">Choisissez la couleur principale de l'interface</div>
+                        <div class="setting-title" data-i18n="Couleur d'accentuation">Couleur d'accentuation</div>
+                        <div class="setting-description" data-i18n="Choisissez la couleur principale de l'interface">
+                            Choisissez la couleur principale de l'interface</div>
                     </div>
                     <div class="setting-action">
                         <div class="accent-picker" id="accentPicker">
@@ -71,12 +73,14 @@
 
             <!-- Interface Section -->
             <div class="settings-group">
-                <div class="settings-group-title">Interface</div>
+                <div class="settings-group-title" data-i18n="Interface">Interface</div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Animations réduites</div>
-                        <div class="setting-description">Désactive les animations pour plus de fluidité sur les
+                        <div class="setting-title" data-i18n="Animations réduites">Animations réduites</div>
+                        <div class="setting-description"
+                            data-i18n="Désactive les animations pour plus de fluidité sur les vieux PC">Désactive les
+                            animations pour plus de fluidité sur les
                             vieux PC</div>
                     </div>
                     <div class="setting-action">
@@ -89,8 +93,10 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Barre latérale réduite</div>
-                        <div class="setting-description">Affiche uniquement les icônes dans la barre latérale
+                        <div class="setting-title" data-i18n="Barre latérale réduite">Barre latérale réduite</div>
+                        <div class="setting-description"
+                            data-i18n="Affiche uniquement les icônes dans la barre latérale">Affiche uniquement les
+                            icônes dans la barre latérale
                         </div>
                     </div>
                     <div class="setting-action">
@@ -100,16 +106,31 @@
                         </label>
                     </div>
                 </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="Langue">Langue</div>
+                        <div class="setting-description" data-i18n="Choisissez la langue de l'interface">Choisissez la
+                            langue de l'interface</div>
+                    </div>
+                    <div class="setting-action">
+                        <div class="toggle-group" id="languageToggle">
+                            <button class="toggle-btn" data-lang="en">English</button>
+                            <button class="toggle-btn" data-lang="fr">Français</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- System Section -->
             <div class="settings-group">
-                <div class="settings-group-title">Système</div>
+                <div class="settings-group-title" data-i18n="Système">Système</div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Notification de fin</div>
-                        <div class="setting-description">Émettre un son quand une conversion est terminée</div>
+                        <div class="setting-title" data-i18n="Notification de fin">Notification de fin</div>
+                        <div class="setting-description" data-i18n="Émettre un son quand une conversion est terminée">
+                            Émettre un son quand une conversion est terminée</div>
                     </div>
                     <div class="setting-action">
                         <label class="switch">
@@ -121,11 +142,13 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Cache local</div>
-                        <div class="setting-description">Vider le cache des fichiers temporaires</div>
+                        <div class="setting-title" data-i18n="Cache local">Cache local</div>
+                        <div class="setting-description" data-i18n="Vider le cache des fichiers temporaires">Vider le
+                            cache des fichiers temporaires</div>
                     </div>
                     <div class="setting-action">
-                        <button class="btn-secondary" id="clearCacheBtn">Vider le cache</button>
+                        <button class="btn-secondary" id="clearCacheBtn" data-i18n="Vider le cache">Vider le
+                            cache</button>
                     </div>
                 </div>
             </div>
@@ -134,9 +157,27 @@
         <!-- Tab: Sidebar Items -->
         <div class="settings-tab-pane" id="settings-sidebar">
             <div class="settings-group">
-                <div class="settings-group-title">Éléments de la barre latérale</div>
+                <div class="settings-group-title" data-i18n="Éléments de la barre latérale">Éléments de la barre
+                    latérale</div>
                 <div class="sidebar-items-description">
                     Choisissez les outils à afficher dans la barre latérale
+                </div>
+
+                <div class="setting-item" style="border-bottom: 1px solid var(--border); margin-bottom: 0;">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="Utiliser les regroupements">Utiliser les regroupements
+                        </div>
+                        <div class="setting-description"
+                            data-i18n="Affiche les éléments par catégories (sections) ou tout en vrac.">Affiche les
+                            éléments par catégories (sections) ou tout en vrac.
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" id="sidebarSectionsToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="sidebar-items-grid">
@@ -160,7 +201,8 @@
                             <span class="item-label">Convertisseur</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="convert" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="convert" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -168,13 +210,14 @@
 
                     <div class="sidebar-item-row">
                         <label class="sidebar-item-checkbox">
-                            <input type="checkbox" data-sidebar-item="youtube" checked>
+                            <input type="checkbox" data-sidebar-item="downloader" checked>
                             <span class="checkbox-custom"></span>
-                            <span class="item-icon"><i data-lucide="youtube"></i></span>
-                            <span class="item-label">YouTube</span>
+                            <span class="item-icon"><i data-lucide="download-cloud"></i></span>
+                            <span class="item-label">Downloader</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="youtube" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="downloader"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -182,13 +225,14 @@
 
                     <div class="sidebar-item-row">
                         <label class="sidebar-item-checkbox">
-                            <input type="checkbox" data-sidebar-item="removebg" checked>
+                            <input type="checkbox" data-sidebar-item="image-ai" checked>
                             <span class="checkbox-custom"></span>
-                            <span class="item-icon"><i data-lucide="scissors"></i></span>
-                            <span class="item-label">Remove BG</span>
+                            <span class="item-icon"><i data-lucide="image"></i></span>
+                            <span class="item-label">Image AI</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="removebg" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="image-ai"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -202,21 +246,8 @@
                             <span class="item-label">Speech-to-Text</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="stt" title="Épingler sous Accueil">
-                                <i data-lucide="pin"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-item-row">
-                        <label class="sidebar-item-checkbox">
-                            <input type="checkbox" data-sidebar-item="upscale" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="item-icon"><i data-lucide="image"></i></span>
-                            <span class="item-label">AI Upscaler</span>
-                        </label>
-                        <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="upscale" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="stt" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -230,7 +261,8 @@
                             <span class="item-label">AI Chat</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="chat" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="chat" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -244,7 +276,8 @@
                             <span class="item-label">Plexus</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="plexus" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="plexus" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -258,7 +291,8 @@
                             <span class="item-label">Metadata Editor</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="metadata" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="metadata"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -272,7 +306,8 @@
                             <span class="item-label">Torrents</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="torrent" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="torrent" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -286,7 +321,8 @@
                             <span class="item-label">LocalDrop</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="localdrop" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="localdrop"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -300,7 +336,38 @@
                             <span class="item-label">Toolbox</span>
                         </label>
                         <div class="item-actions">
-                            <button class="pin-item-btn" data-pin-item="toolbox" title="Épingler sous Accueil">
+                            <button class="pin-item-btn" data-pin-item="toolbox" data-i18n-title="Épingler sous Accueil"
+                                title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="databank" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="database"></i></span>
+                            <span class="item-label" data-i18n="Databank (Fichiers)">Databank (Fichiers)</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="databank"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
+                                <i data-lucide="pin"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-item-row">
+                        <label class="sidebar-item-checkbox">
+                            <input type="checkbox" data-sidebar-item="notifications" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="item-icon"><i data-lucide="bell"></i></span>
+                            <span class="item-label">Notifications</span>
+                        </label>
+                        <div class="item-actions">
+                            <button class="pin-item-btn" data-pin-item="notifications"
+                                data-i18n-title="Épingler sous Accueil" title="Épingler sous Accueil">
                                 <i data-lucide="pin"></i>
                             </button>
                         </div>
@@ -312,12 +379,14 @@
         <!-- Tab: Outils & IA Settings -->
         <div class="settings-tab-pane" id="settings-plexus">
             <div class="settings-group">
-                <div class="settings-group-title">Configuration Plexus AI</div>
+                <div class="settings-group-title" data-i18n="Configuration Plexus AI">Configuration Plexus AI</div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Nombre de sources</div>
-                        <div class="setting-description">Nombre maximum de sources à utiliser pour les recherches</div>
+                        <div class="setting-title" data-i18n="Nombre de sources">Nombre de sources</div>
+                        <div class="setting-description"
+                            data-i18n="Nombre maximum de sources à utiliser pour les recherches">Nombre maximum de
+                            sources à utiliser pour les recherches</div>
                     </div>
                     <div class="setting-action">
                         <div class="number-input-group">
@@ -328,11 +397,15 @@
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">Informations complémentaires</div>
-                        <div class="setting-description">Context ou instructions spécifiques pour l'IA</div>
+                        <div class="setting-title" data-i18n="Informations complémentaires">Informations complémentaires
+                        </div>
+                        <div class="setting-description" data-i18n="Context ou instructions spécifiques pour l'IA">
+                            Context ou instructions spécifiques pour l'IA</div>
                     </div>
                     <div class="setting-action full-width">
-                        <textarea id="plexusExtraInfo" placeholder="Ex: Toujours répondre en français, être concis..."
+                        <textarea id="plexusExtraInfo"
+                            data-i18n-placeholder="Ex: Toujours répondre en français, être concis..."
+                            placeholder="Ex: Toujours répondre en français, être concis..."
                             class="textarea-modern"></textarea>
                     </div>
                 </div>
@@ -340,11 +413,13 @@
 
             <!-- Remove BG Settings -->
             <div class="settings-group">
-                <div class="settings-group-title">Configuration Remove BG</div>
+                <div class="settings-group-title" data-i18n="Configuration Remove BG">Configuration Remove BG</div>
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Modèle par défaut</div>
-                        <div class="setting-description">Choisissez le modèle de détourage utilisé par défaut</div>
+                        <div class="setting-title" data-i18n="Modèle par défaut">Modèle par défaut</div>
+                        <div class="setting-description"
+                            data-i18n="Choisissez le modèle de détourage utilisé par défaut">Choisissez le modèle de
+                            détourage utilisé par défaut</div>
                     </div>
                     <div class="setting-action">
                         <div class="toggle-group wrap" id="settingsRembgModelToggle">
@@ -360,11 +435,12 @@
 
             <!-- Upscale Settings -->
             <div class="settings-group">
-                <div class="settings-group-title">Configuration AI Upscaler</div>
+                <div class="settings-group-title" data-i18n="Configuration AI Upscaler">Configuration AI Upscaler</div>
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Modèle préféré</div>
-                        <div class="setting-description">Modèle utilisé par défaut pour l'agrandissement</div>
+                        <div class="setting-title" data-i18n="Modèle préféré">Modèle préféré</div>
+                        <div class="setting-description" data-i18n="Modèle utilisé par défaut pour l'agrandissement">
+                            Modèle utilisé par défaut pour l'agrandissement</div>
                     </div>
                     <div class="setting-action">
                         <div class="toggle-group" id="settingsUpscaleModelToggle">
@@ -376,8 +452,9 @@
                 </div>
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Facteur par défaut</div>
-                        <div class="setting-description">Facteur d'agrandissement initial</div>
+                        <div class="setting-title" data-i18n="Facteur par défaut">Facteur par défaut</div>
+                        <div class="setting-description" data-i18n="Facteur d'agrandissement initial">Facteur
+                            d'agrandissement initial</div>
                     </div>
                     <div class="setting-action">
                         <div class="toggle-group" id="settingsUpscaleScaleToggle">
@@ -391,11 +468,13 @@
 
             <!-- STT Settings -->
             <div class="settings-group">
-                <div class="settings-group-title">Speech-to-Text (STT)</div>
+                <div class="settings-group-title" data-i18n="Speech-to-Text (STT)">Speech-to-Text (STT)</div>
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Modèle Whisper</div>
-                        <div class="setting-description">Taille du modèle pour la transcription (tiny à large)</div>
+                        <div class="setting-title" data-i18n="Modèle Whisper">Modèle Whisper</div>
+                        <div class="setting-description"
+                            data-i18n="Taille du modèle pour la transcription (tiny à large)">Taille du modèle pour la
+                            transcription (tiny à large)</div>
                     </div>
                     <div class="setting-action">
                         <div class="toggle-group wrap" id="settingsWhisperModelToggle">
@@ -413,7 +492,7 @@
         <!-- Tab: Server Status -->
         <div class="settings-tab-pane" id="settings-status">
             <div class="settings-group">
-                <div class="settings-group-title">État des Services AI</div>
+                <div class="settings-group-title" data-i18n="État des Services AI">État des Services AI</div>
                 <div id="servicesStatusContainer" class="status-grid">
                     <div class="status-loading">
                         <div class="spinner"></div>
@@ -423,18 +502,29 @@
             </div>
 
             <div class="settings-group">
-                <div class="settings-group-title">Métriques Système</div>
+                <div class="settings-group-title" data-i18n="Métriques Système">Métriques Système</div>
                 <div class="metrics-container" id="systemMetricsContainer">
                     <!-- Dynamic system metrics here -->
                 </div>
             </div>
 
             <div class="settings-group">
-                <div class="settings-group-title">Maintenance</div>
+                <div class="settings-group-title" data-i18n="Modèles IA Téléchargés">Modèles IA Téléchargés</div>
+                <div class="models-container" id="downloadedModelsContainer">
+                    <div class="status-loading">
+                        <div class="spinner"></div>
+                        Recherche des modèles...
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-group-title" data-i18n="Maintenance">Maintenance</div>
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-title">Logs Serveur</div>
-                        <div class="setting-description">Voir les journaux d'activité en temps réel</div>
+                        <div class="setting-title" data-i18n="Logs Serveur">Logs Serveur</div>
+                        <div class="setting-description" data-i18n="Voir les journaux d'activité en temps réel">Voir les
+                            journaux d'activité en temps réel</div>
                     </div>
                     <div class="setting-action">
                         <button class="btn-secondary" onclick="window.location.reload()"><i data-lucide="refresh-cw"
@@ -447,42 +537,50 @@
         <!-- Tab: Security Settings -->
         <div class="settings-tab-pane" id="settings-security">
             <div class="settings-group">
-                <div class="settings-group-title">Changement de mot de passe</div>
+                <div class="settings-group-title" data-i18n="Changement de mot de passe">Changement de mot de passe
+                </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">Nom d'utilisateur</div>
-                        <div class="setting-description">Confirmez votre nom d'utilisateur</div>
+                        <div class="setting-title" data-i18n="Nom d'utilisateur">Nom d'utilisateur</div>
+                        <div class="setting-description" data-i18n="Confirmez votre nom d'utilisateur">Confirmez votre
+                            nom d'utilisateur</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="text" id="secUsername" placeholder="Votre nom d'utilisateur" class="input-modern">
+                        <input type="text" id="secUsername" data-i18n-placeholder="Votre nom d'utilisateur"
+                            placeholder="Votre nom d'utilisateur" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">Mot de passe actuel</div>
-                        <div class="setting-description">Saisissez votre mot de passe actuel pour vérification</div>
+                        <div class="setting-title" data-i18n="Mot de passe actuel">Mot de passe actuel</div>
+                        <div class="setting-description"
+                            data-i18n="Saisissez votre mot de passe actuel pour vérification">Saisissez votre mot de
+                            passe actuel pour vérification</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="password" id="secCurrentPassword" placeholder="••••••••" class="input-modern">
+                        <input type="password" id="secCurrentPassword" data-i18n-placeholder="••••••••"
+                            placeholder="••••••••" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">Nouveau mot de passe</div>
-                        <div class="setting-description">Choisissez un nouveau mot de passe fort</div>
+                        <div class="setting-title" data-i18n="Nouveau mot de passe">Nouveau mot de passe</div>
+                        <div class="setting-description" data-i18n="Choisissez un nouveau mot de passe fort">Choisissez
+                            un nouveau mot de passe fort</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="password" id="secNewPassword" placeholder="••••••••" class="input-modern">
+                        <input type="password" id="secNewPassword" data-i18n-placeholder="••••••••"
+                            placeholder="••••••••" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-action full-width" style="flex-direction: column; gap: 10px;">
-                        <button id="updatePasswordBtn" class="btn-primary"
-                            style="width: 100%; justify-content: center;">Mettre à jour le mot de passe</button>
+                        <button id="updatePasswordBtn" class="btn-primary" style="width: 100%; justify-content: center;"
+                            data-i18n="Mettre à jour le mot de passe">Mettre à jour le mot de passe</button>
                         <div id="passwordUpdateMsg" style="font-size: 13px; text-align: center; display: none;"></div>
                     </div>
                 </div>
@@ -492,15 +590,17 @@
         <!-- Tab: Environment Variables -->
         <div class="settings-tab-pane" id="settings-env">
             <div class="settings-group">
-                <div class="settings-group-title">Configuration des API & Services</div>
+                <div class="settings-group-title" data-i18n="Configuration des API & Services">Configuration des API &
+                    Services</div>
                 <div class="sidebar-items-description">
                     Ces réglages surchargent les valeurs par défaut du fichier .env pour votre compte.
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">OpenRouter API Key</div>
-                        <div class="setting-description">Clé API utilisée pour AI Chat et Plexus</div>
+                        <div class="setting-title" data-i18n="OpenRouter API Key">OpenRouter API Key</div>
+                        <div class="setting-description" data-i18n="Clé API utilisée pour AI Chat et Plexus">Clé API
+                            utilisée pour AI Chat et Plexus</div>
                     </div>
                     <div class="setting-action full-width">
                         <input type="password" id="envOpenRouterKey" placeholder="sk-or-v1-..." class="input-modern">
@@ -509,8 +609,10 @@
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">Modèle OpenRouter</div>
-                        <div class="setting-description">Modèle par défaut (ex: google/gemini-2.0-pro-exp-02-05:free)
+                        <div class="setting-title" data-i18n="Modèle OpenRouter">Modèle OpenRouter</div>
+                        <div class="setting-description"
+                            data-i18n="Modèle par défaut (ex: google/gemini-2.0-pro-exp-02-05:free)">Modèle par défaut
+                            (ex: google/gemini-2.0-pro-exp-02-05:free)
                         </div>
                     </div>
                     <div class="setting-action full-width">
@@ -521,45 +623,46 @@
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">URL SearXNG</div>
-                        <div class="setting-description">URL de votre instance SearXNG (utilisée par Plexus)</div>
+                        <div class="setting-title" data-i18n="URL SearXNG">URL SearXNG</div>
+                        <div class="setting-description"
+                            data-i18n="URL de votre instance SearXNG (utilisée par Plexus)">URL de votre instance
+                            SearXNG (utilisée par Plexus)</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="text" id="envSearxngUrl" value="http://localhost:8080"
-                            placeholder="http://localhost:8080" class="input-modern">
+                        <input type="text" id="envSearxngUrl" placeholder="http://localhost:8080" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">URL REMBG</div>
-                        <div class="setting-description">URL du service Python RemoveBG</div>
+                        <div class="setting-title" data-i18n="URL REMBG">URL REMBG</div>
+                        <div class="setting-description" data-i18n="URL du service Python RemoveBG">URL du service
+                            Python RemoveBG</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="text" id="envRembgUrl" value="http://localhost:5100"
-                            placeholder="http://localhost:5100" class="input-modern">
+                        <input type="text" id="envRembgUrl" placeholder="http://localhost:5100" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">URL Whisper</div>
-                        <div class="setting-description">URL du service Python Speech-to-Text</div>
+                        <div class="setting-title" data-i18n="URL Whisper">URL Whisper</div>
+                        <div class="setting-description" data-i18n="URL du service Python Speech-to-Text">URL du service
+                            Python Speech-to-Text</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="text" id="envWhisperUrl" value="http://localhost:5200"
-                            placeholder="http://localhost:5200" class="input-modern">
+                        <input type="text" id="envWhisperUrl" placeholder="http://localhost:5200" class="input-modern">
                     </div>
                 </div>
 
                 <div class="setting-item vertical">
                     <div class="setting-info">
-                        <div class="setting-title">URL Upscale</div>
-                        <div class="setting-description">URL du service Python AI Upscaler</div>
+                        <div class="setting-title" data-i18n="URL Upscale">URL Upscale</div>
+                        <div class="setting-description" data-i18n="URL du service Python AI Upscaler">URL du service
+                            Python AI Upscaler</div>
                     </div>
                     <div class="setting-action full-width">
-                        <input type="text" id="envUpscaleUrl" value="http://localhost:5300"
-                            placeholder="http://localhost:5300" class="input-modern">
+                        <input type="text" id="envUpscaleUrl" placeholder="http://localhost:5300" class="input-modern">
                     </div>
                 </div>
 
@@ -567,7 +670,8 @@
                     <div class="setting-action full-width">
                         <button id="saveEnvSettingsBtn" class="btn-primary"
                             style="width: 100%; justify-content: center;">
-                            Enregistrer les variables d'environnement
+                            <span data-i18n="Enregistrer les variables d'environnement"></span>Enregistrer les variables
+                            d'environnement</span>
                         </button>
                     </div>
                 </div>
@@ -584,11 +688,12 @@
                     </div>
                     <div class="about-content">
                         <h3>Ultra Dashboard Pro v1.0.0</h3>
-                        <p>Un outil tout-en-un conçu pour la performance et le style.</p>
+                        <p data-i18n="Un outil tout-en-un conçu pour la performance et le style.">Un outil tout-en-un
+                            conçu pour la performance et le style.</p>
                         <div class="about-links">
-                            <a href="#">Documentation</a>
-                            <a href="#">Support</a>
-                            <a href="#">GitHub</a>
+                            <a href="#" data-i18n="Documentation">Documentation</a>
+                            <a href="#" data-i18n="Support">Support</a>
+                            <a href="#" data-i18n="GitHub">GitHub</a>
                         </div>
                     </div>
                 </div>

@@ -30,3 +30,6 @@ public/databank/*.mp3
 
 # Agent folder
 .agent/
+
+# AI Models (too large for Git - downloaded on first run)
+models/

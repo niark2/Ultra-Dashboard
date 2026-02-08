@@ -1,4 +1,5 @@
 import { Storage } from '../utils/storage.js';
+import { I18n } from '../utils/i18n.js';
 
 /**
  * Plexus Module - AI Search Interface (Perplexity Clone)
@@ -65,7 +66,7 @@ export const initPlexus = () => {
         thinkingSteps.innerHTML = `
             <div class="thinking-step active">
                 <i data-lucide="${isDeepResearch ? 'microscope' : 'search'}"></i>
-                <span>${isDeepResearch ? 'Deep Research: Exploration approfondie...' : 'Recherche sur le web...'}</span>
+                <span>${isDeepResearch ? I18n.t('Deep Research: Exploration approfondie...') : I18n.t('Recherche sur le web...')}</span>
             </div>
         `;
 
@@ -83,13 +84,13 @@ export const initPlexus = () => {
                 done: [`
                     <div class="thinking-step done">
                         <i data-lucide="check"></i>
-                        <span>Sources trouvées</span>
+                        <span>${I18n.t('Sources trouvées')}</span>
                     </div>
                 `],
                 active: `
                     <div class="thinking-step active">
                         <i data-lucide="brain"></i>
-                        <span>Analyse et synthèse...</span>
+                        <span>${I18n.t('Analyse et synthèse...')}</span>
                     </div>
                 `
             },
@@ -97,17 +98,17 @@ export const initPlexus = () => {
                 done: [`
                     <div class="thinking-step done">
                         <i data-lucide="check"></i>
-                        <span>Sources trouvées</span>
+                        <span>${I18n.t('Sources trouvées')}</span>
                     </div>`,
-                    `<div class="thinking-step done">
+                `<div class="thinking-step done">
                         <i data-lucide="check"></i>
-                        <span>Analyse terminée</span>
+                        <span>${I18n.t('Analyse terminée')}</span>
                     </div>
                 `],
                 active: `
                     <div class="thinking-step active">
                         <i data-lucide="sparkles"></i>
-                        <span>Rédaction de la réponse...</span>
+                        <span>${I18n.t('Rédaction de la réponse...')}</span>
                     </div>
                 `
             }
@@ -136,7 +137,7 @@ export const initPlexus = () => {
         if (!sources || sources.length === 0) {
             sourcesList.innerHTML = `
                 <div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">
-                    Aucune source trouvée
+                    ${I18n.t('Aucune source trouvée')}
                 </div>
             `;
             return;
@@ -402,7 +403,7 @@ export const initPlexus = () => {
             hideThinking();
             answerEl.innerHTML = `
                 <div style="color: var(--error); padding: 20px; text-align: center;">
-                    <p><strong>Erreur lors de la recherche</strong></p>
+                    <p><strong>${I18n.t('Erreur lors de la recherche')}</strong></p>
                     <p style="font-size: 13px; margin-top: 8px;">${escapeHtml(error.message)}</p>
                 </div>
             `;

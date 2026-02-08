@@ -1,7 +1,9 @@
 import { formatSize, refreshIcons } from '../utils/formatters.js';
+import { I18n } from '../utils/i18n.js';
 
 export class ConverterModule {
     constructor() {
+        // ... (existing constructor code)
         this.selectedFile = null;
         this.selectedFormat = null;
         this.supportedFormats = null;
@@ -25,69 +27,122 @@ export class ConverterModule {
         this.init();
     }
 
-    async init() {
-        this.setupEventListeners();
-        await this.loadFormats();
-    }
+    init() {
+        // Load available formats
+        this.loadFormats();
 
-    setupEventListeners() {
-        this.elements.dropZone.onclick = () => this.elements.fileInput.click();
-        this.elements.fileInput.onchange = (e) => e.target.files[0] && this.handleFile(e.target.files[0]);
-        document.getElementById('removeFile').onclick = () => this.reset();
-        this.elements.convertBtn.onclick = () => this.processFile();
+        // Drop zone click
+        this.elements.dropZone.addEventListener('click', () => {
+            this.elements.fileInput.click();
+        });
 
-        this.elements.dropZone.ondragover = (e) => { e.preventDefault(); this.elements.dropZone.classList.add('drag-over'); };
-        this.elements.dropZone.ondragleave = () => this.elements.dropZone.classList.remove('drag-over');
-        this.elements.dropZone.ondrop = (e) => {
+        // Drag & Drop
+        this.elements.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.dropZone.classList.add('drag-over');
+        });
+
+        this.elements.dropZone.addEventListener('dragleave', () => {
+            this.elements.dropZone.classList.remove('drag-over');
+        });
+
+        this.elements.dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             this.elements.dropZone.classList.remove('drag-over');
-            if (e.dataTransfer.files.length) this.handleFile(e.dataTransfer.files[0]);
-        };
+            const file = e.dataTransfer.files[0];
+            if (file) this.handleFile(file);
+        });
 
-        this.elements.compressToggle.onchange = (e) => {
-            this.compressEnabled = e.target.checked;
-            this.updateButtonState();
-        };
+        // File input change
+        this.elements.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) this.handleFile(file);
+        });
+
+        // Remove file button
+        const removeBtn = document.getElementById('removeFile');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => this.reset());
+        }
+
+        // Compress toggle
+        if (this.elements.compressToggle) {
+            this.elements.compressToggle.addEventListener('change', (e) => {
+                this.compressEnabled = e.target.checked;
+                this.updateButtonState();
+            });
+        }
+
+        // Convert button
+        if (this.elements.convertBtn) {
+            this.elements.convertBtn.addEventListener('click', () => this.processFile());
+        }
     }
 
     handleFile(file) {
         this.selectedFile = file;
+        this.selectedFormat = null;
+
+        // Update UI
         this.elements.dropZone.classList.add('hidden');
         this.elements.fileInfo.classList.remove('hidden');
         this.elements.formatSection.classList.remove('hidden');
         this.elements.convertOptions.classList.remove('hidden');
         this.elements.successMessage.classList.add('hidden');
-        if (this.elements.saveBtn) this.elements.saveBtn.classList.add('hidden');
+        this.elements.saveBtn.classList.add('hidden');
 
+        // Display file info
         this.elements.fileName.textContent = file.name;
         this.elements.fileSize.textContent = formatSize(file.size);
-        const ext = file.name.split('.').pop().toLowerCase();
 
-        // UI Preview
-        const imgPre = document.getElementById('imagePreview');
-        const icoPre = document.getElementById('fileIconLarge');
-        if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'tiff'].includes(ext)) {
-            imgPre.src = URL.createObjectURL(file);
-            imgPre.classList.remove('hidden');
-            icoPre.classList.add('hidden');
+        // Show image preview if applicable
+        const imagePreview = document.getElementById('imagePreview');
+        const fileIconLarge = document.getElementById('fileIconLarge');
+
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                fileIconLarge.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
         } else {
-            imgPre.classList.add('hidden');
-            icoPre.classList.remove('hidden');
-            const iconName = this.getIcon(ext);
-            icoPre.innerHTML = `<i data-lucide="${iconName}"></i>`;
-            refreshIcons();
+            imagePreview.classList.add('hidden');
+            fileIconLarge.classList.remove('hidden');
         }
 
-        this.generateButtons(ext);
-        this.updateButtonState();
+        // Generate format buttons
+        this.generateFormatButtons(file);
     }
 
-    getIcon(ext) {
-        if (['pdf', 'docx', 'odt', 'rtf', 'epub', 'txt', 'md', 'html'].includes(ext)) return 'file-text';
-        if (['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac'].includes(ext)) return 'music';
-        if (['mp4', 'mov', 'avi', 'webm', 'mkv'].includes(ext)) return 'video';
-        return 'package';
+    generateFormatButtons(file) {
+        const grid = this.elements.formatGrid;
+        grid.innerHTML = '';
+
+        if (!this.supportedFormats) return;
+
+        const fileType = file.type.split('/')[0]; // 'image', 'audio', 'video'
+        const formats = this.supportedFormats[fileType] || [];
+
+        formats.forEach(fmt => {
+            const btn = document.createElement('button');
+            btn.className = 'format-btn';
+            btn.textContent = fmt.toUpperCase();
+            btn.addEventListener('click', () => {
+                // Toggle selection
+                grid.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.selectedFormat = fmt;
+                this.updateButtonState();
+            });
+            grid.appendChild(btn);
+        });
+
+        refreshIcons();
     }
+
+    // ... (rest of methods until updateButtonState)
 
     async loadFormats() {
         try {
@@ -98,44 +153,7 @@ export class ConverterModule {
         }
     }
 
-    generateButtons(ext) {
-        const grid = this.elements.formatGrid;
-        grid.innerHTML = '';
-        let targets = [];
-        const f = this.supportedFormats;
-        if (!f) return;
-
-        // Logique de sélection des cibles
-        if (f.image.includes(ext)) targets = f.image;
-        else if (f.audio.includes(ext)) targets = f.audio;
-        else if (f.video.includes(ext)) targets = f.video;
-        else if (f.document.includes(ext)) targets = f.document;
-        else {
-            // Par défaut si inconnu, on propose les formats documents Pandoc
-            targets = f.document;
-        }
-
-        // On ajoute toujours PDF et DOCX pour les documents/images si pertinent
-        if (f.document.includes(ext) || f.image.includes(ext)) {
-            if (!targets.includes('pdf')) targets.push('pdf');
-            if (!targets.includes('docx')) targets.push('docx');
-            if (!targets.includes('md')) targets.push('md');
-            if (!targets.includes('txt')) targets.push('txt');
-        }
-
-        targets.filter(t => t !== ext).sort().forEach(t => {
-            const btn = document.createElement('button');
-            btn.className = 'format-btn';
-            btn.textContent = t.toUpperCase();
-            btn.onclick = () => {
-                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                this.selectedFormat = t;
-                this.updateButtonState();
-            };
-            grid.appendChild(btn);
-        });
-    }
+    // ... (generateButtons)
 
     updateButtonState() {
         // Show button if either format is selected OR compress is enabled
@@ -145,11 +163,11 @@ export class ConverterModule {
         // Update button text based on action
         const btnText = this.elements.convertBtn.querySelector('.btn-text');
         if (this.selectedFormat && this.compressEnabled) {
-            btnText.innerHTML = '<i data-lucide="refresh-cw" class="inline-icon"></i> Convertir & Compresser';
+            btnText.innerHTML = `<i data-lucide="refresh-cw" class="inline-icon"></i> ${I18n.t('Convertir')} & ${I18n.t('Compresser')}`;
         } else if (this.compressEnabled) {
-            btnText.innerHTML = '<i data-lucide="package" class="inline-icon"></i> Compresser';
+            btnText.innerHTML = `<i data-lucide="package" class="inline-icon"></i> ${I18n.t('Compresser')}`;
         } else {
-            btnText.innerHTML = '<i data-lucide="refresh-cw" class="inline-icon"></i> Convertir';
+            btnText.innerHTML = `<i data-lucide="refresh-cw" class="inline-icon"></i> ${I18n.t('Convertir')}`;
         }
         refreshIcons();
     }
@@ -159,7 +177,7 @@ export class ConverterModule {
         this.elements.progressContainer.classList.remove('hidden');
         const btnText = this.elements.convertBtn.querySelector('.btn-text');
         const originalText = btnText.textContent;
-        btnText.textContent = 'Traitement en cours...';
+        btnText.textContent = I18n.t('Traitement en cours...');
 
         const fd = new FormData();
         fd.append('file', this.selectedFile);
@@ -177,7 +195,7 @@ export class ConverterModule {
             const res = await fetch('/api/convert', { method: 'POST', body: fd });
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.error || 'Erreur lors du traitement');
+                throw new Error(errorData.error || I18n.t('Erreur lors du traitement'));
             }
 
             const data = await res.json();
@@ -185,8 +203,8 @@ export class ConverterModule {
 
             document.dispatchEvent(new CustomEvent('app-notification', {
                 detail: {
-                    title: 'Conversion terminée',
-                    message: `Le fichier ${this.selectedFile.name} a été traité avec succès.`,
+                    title: I18n.t('Conversion terminée'),
+                    message: `${I18n.t('Le fichier')} ${this.selectedFile.name} ${I18n.t('a été traité avec succès.')}`,
                     type: 'success',
                     icon: 'refresh-cw'
                 }

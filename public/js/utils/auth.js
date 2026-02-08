@@ -3,6 +3,8 @@
  * Handles login, logout and authentication status
  */
 
+import { I18n } from './i18n.js';
+
 export class Auth {
     static async check() {
         try {
@@ -66,8 +68,8 @@ export class Auth {
             if (data.needsSetup) {
                 isSetupMode = true;
                 setupNotice.classList.remove('hidden');
-                authSubtitle.textContent = 'Configuration initiale';
-                btnTextEl.textContent = 'Créer le compte';
+                authSubtitle.textContent = I18n.t('Configuration initiale');
+                btnTextEl.textContent = I18n.t('Créer le compte');
                 // Hide toggle in setup mode
                 if (authToggleBtn) authToggleBtn.parentElement.style.display = 'none';
             }
@@ -80,15 +82,15 @@ export class Auth {
                 isRegisterMode = !isRegisterMode;
 
                 if (isRegisterMode) {
-                    authSubtitle.textContent = 'Création de compte';
-                    btnTextEl.textContent = 'S\'inscrire';
-                    authToggleText.textContent = 'Déjà un compte ?';
-                    authToggleBtn.textContent = 'Se connecter';
+                    authSubtitle.textContent = I18n.t('Création de compte');
+                    btnTextEl.textContent = I18n.t("S'inscrire");
+                    authToggleText.textContent = I18n.t('Déjà un compte ?');
+                    authToggleBtn.textContent = I18n.t('Se connecter');
                 } else {
-                    authSubtitle.textContent = 'Authentification requise';
-                    btnTextEl.textContent = 'Se connecter';
-                    authToggleText.textContent = 'Pas de compte ?';
-                    authToggleBtn.textContent = 'Créer un compte';
+                    authSubtitle.textContent = I18n.t('Authentification requise');
+                    btnTextEl.textContent = I18n.t('Se connecter');
+                    authToggleText.textContent = I18n.t('Pas de compte ?');
+                    authToggleBtn.textContent = I18n.t('Créer un compte');
                 }
             });
         }
@@ -101,7 +103,7 @@ export class Auth {
 
             errorEl.classList.add('hidden');
             submitBtn.disabled = true;
-            btnTextEl.textContent = 'Traitement...';
+            btnTextEl.textContent = I18n.t('Traitement...');
 
             try {
                 let endpoint = '/api/auth/login';
@@ -125,22 +127,22 @@ export class Auth {
                         window.location.reload();
                     }
                 } else {
-                    errorEl.textContent = data.error || 'Erreur de connexion';
+                    errorEl.textContent = data.error || I18n.t('Erreur de connexion');
                     errorEl.classList.remove('hidden');
                     submitBtn.disabled = false;
 
-                    if (isSetupMode) btnTextEl.textContent = 'Créer le compte';
-                    else if (isRegisterMode) btnTextEl.textContent = 'S\'inscrire';
-                    else btnTextEl.textContent = 'Se connecter';
+                    if (isSetupMode) btnTextEl.textContent = I18n.t('Créer le compte');
+                    else if (isRegisterMode) btnTextEl.textContent = I18n.t("S'inscrire");
+                    else btnTextEl.textContent = I18n.t('Se connecter');
                 }
             } catch (error) {
-                errorEl.textContent = 'Erreur serveur';
+                errorEl.textContent = I18n.t('Erreur serveur');
                 errorEl.classList.remove('hidden');
                 submitBtn.disabled = false;
 
-                if (isSetupMode) btnTextEl.textContent = 'Créer le compte';
-                else if (isRegisterMode) btnTextEl.textContent = 'S\'inscrire';
-                else btnTextEl.textContent = 'Se connecter';
+                if (isSetupMode) btnTextEl.textContent = I18n.t('Créer le compte');
+                else if (isRegisterMode) btnTextEl.textContent = I18n.t("S'inscrire");
+                else btnTextEl.textContent = I18n.t('Se connecter');
             }
         });
 

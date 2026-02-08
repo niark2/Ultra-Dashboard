@@ -1,4 +1,5 @@
 import { Storage } from '../utils/storage.js';
+import { I18n } from '../utils/i18n.js';
 
 export class NotificationModule {
     constructor() {
@@ -114,8 +115,8 @@ export class NotificationModule {
                     <div class="empty-icon">
                         <i data-lucide="bell-off"></i>
                     </div>
-                    <h3>Aucune notification</h3>
-                    <p>Vos nouvelles notifications apparaîtront ici.</p>
+                    <h3>${I18n.t('Aucune notification')}</h3>
+                    <p>${I18n.t('Vos nouvelles notifications apparaîtront ici.')}</p>
                 </div>
             `;
         } else {
@@ -151,10 +152,15 @@ export class NotificationModule {
         const date = new Date(isoString);
         const now = new Date();
         const diff = now - date;
+        const lang = document.documentElement.getAttribute('lang') || 'en';
 
-        if (diff < 60000) return 'À l\'instant';
-        if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
-        if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)} h`;
-        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        if (diff < 60000) return I18n.t("À l'instant");
+
+        const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+
+        if (diff < 3600000) return rtf.format(-Math.floor(diff / 60000), 'minute');
+        if (diff < 86400000) return rtf.format(-Math.floor(diff / 3600000), 'hour');
+
+        return date.toLocaleDateString(lang, { day: 'numeric', month: 'short' });
     }
 }

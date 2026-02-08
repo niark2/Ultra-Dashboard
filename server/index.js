@@ -81,18 +81,23 @@ function startPythonServer(name, scriptName) {
 
     const proc = spawn(PYTHON_CMD, [pythonScript], {
         cwd: path.join(__dirname, 'python'),
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: { ...process.env, AI_THREADS: process.env.AI_THREADS || Math.floor(os.cpus().length / 2).toString() }
     });
 
     let isReady = false;
     proc.stdout.on('data', (data) => {
-        if (!isReady && data.toString().includes('http://localhost')) {
+        const output = data.toString().trim();
+        if (output) console.log(`[${name} STDOUT] ${output}`);
+
+        if (!isReady && output.includes('http://localhost')) {
             console.log(`✅ ${name} service is ready`);
             isReady = true;
         }
     });
     proc.stderr.on('data', (data) => {
-        console.error(`[${name} STDERR] ${data.toString().trim()}`);
+        const error = data.toString().trim();
+        if (error) console.error(`[${name} STDERR] ${error}`);
     });
     proc.on('close', () => pythonProcesses.delete(name));
 
@@ -164,14 +169,23 @@ app.get('/api/status/health', requireAuth, async (req, res) => {
         try {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), 2000);
-            const response = await fetch(`${s.url}/health`, { signal: controller.signal });
+
+            // SearXNG usually uses /healthz and returns "OK" text, other services use /health and JSON
+            const healthEndpoint = s.name === 'SearXNG' ? '/healthz' : '/health';
+            const response = await fetch(`${s.url}${healthEndpoint}`, { signal: controller.signal });
             clearTimeout(id);
 
             if (response.ok) {
-                const data = await response.json();
+                let data;
+                if (s.name === 'SearXNG') {
+                    const text = await response.text();
+                    data = { status: text.trim().toLowerCase() || 'ok', service: 'searxng' };
+                } else {
+                    data = await response.json();
+                }
                 return { name: s.name, status: 'online', details: data };
             }
-            return { name: s.name, status: 'error', error: 'Response not OK' };
+            return { name: s.name, status: 'error', error: `Response not OK (${response.status})` };
         } catch (err) {
             return { name: s.name, status: 'offline', error: err.message };
         }
@@ -186,6 +200,86 @@ app.get('/api/status/health', requireAuth, async (req, res) => {
             memory: process.memoryUsage()
         }
     });
+});
+
+// Scan models directory for downloaded models
+app.get('/api/status/models', requireAuth, (req, res) => {
+    const modelsDir = path.join(__dirname, '../models');
+    if (!fs.existsSync(modelsDir)) return res.json({ models: [] });
+
+    const results = [];
+
+    // Helper to format bytes
+    const formatBytes = (bytes, decimals = 2) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    };
+
+    // Helper to get recursive size
+    const getDirSize = (dir) => {
+        let totalSize = 0;
+        const items = fs.readdirSync(dir, { withFileTypes: true });
+        for (const item of items) {
+            const fullPath = path.join(dir, item.name);
+            if (item.isDirectory()) {
+                totalSize += getDirSize(fullPath);
+            } else {
+                totalSize += fs.statSync(fullPath).size;
+            }
+        }
+        return totalSize;
+    };
+
+    const scanDir = (dir, type = '') => {
+        const items = fs.readdirSync(dir, { withFileTypes: true });
+        for (const item of items) {
+            const fullPath = path.join(dir, item.name);
+            if (item.isDirectory()) {
+                if (item.name.startsWith('models--')) {
+                    const stats = fs.statSync(fullPath);
+                    const size = getDirSize(fullPath);
+                    results.push({
+                        name: item.name.replace('models--', '').replace(/--/g, '/'),
+                        type: 'Upscale Model (HF)',
+                        size: formatBytes(size),
+                        date: stats.mtime,
+                        status: 'Downloaded'
+                    });
+                } else if (['.locks', 'xet', 'blobs', 'refs', 'snapshots'].includes(item.name)) {
+                    continue;
+                } else {
+                    scanDir(fullPath, item.name);
+                }
+            } else {
+                if (item.name.startsWith('.')) continue;
+
+                const stats = fs.statSync(fullPath);
+                let modelType = type || 'Unknown';
+                if (type === 'whisper') modelType = 'Whisper Model';
+                if (type === 'u2net') modelType = 'RemoveBG Model';
+
+                results.push({
+                    name: item.name,
+                    type: modelType,
+                    size: formatBytes(stats.size),
+                    date: stats.mtime,
+                    status: 'Downloaded'
+                });
+            }
+        }
+    };
+
+    try {
+        scanDir(modelsDir);
+        res.json({ models: results });
+    } catch (err) {
+        console.error('Error scanning models:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/', (req, res) => res.render('index'));
@@ -239,3 +333,6 @@ server.listen(PORT, () => {
     startPythonServer('Whisper', 'whisper_server.py');
     startPythonServer('Upscale', 'upscale_server.py');
 });
+
+// Augmenter le timeout pour les traitements IA lourds (10 minutes)
+server.setTimeout(10 * 60 * 1000);

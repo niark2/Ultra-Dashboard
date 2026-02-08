@@ -2,6 +2,17 @@
 REMBG Server - Background Removal API (CPU Mode)
 """
 import os
+
+# === MODELS DIRECTORY CONFIGURATION ===
+# Store models in project's models/ folder instead of user's home directory (~/.u2net)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models", "u2net")
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+# Set U2NET_HOME to redirect model downloads to project folder
+os.environ['U2NET_HOME'] = MODELS_DIR
+# === END MODELS CONFIGURATION ===
+
 # Force CPU mode - disable CUDA before importing anything else
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 os.environ['ORT_DISABLE_ALL_CUDA'] = '1'
@@ -24,6 +35,19 @@ except ImportError as e:
     print(f"Erreur import: {e}")
     print("Installez: pip install rembg flask flask-cors pillow")
     sys.exit(1)
+
+import torch
+# Optimize CPU threads - allow override via env
+num_cores = os.cpu_count() or 4
+env_threads = os.environ.get('AI_THREADS')
+if env_threads:
+    try:
+        torch.set_num_threads(int(env_threads))
+        print(f"🧵 Thread count set from AI_THREADS: {env_threads}")
+    except ValueError:
+        torch.set_num_threads(num_cores)
+else:
+    torch.set_num_threads(num_cores)
 
 app = Flask(__name__)
 CORS(app)
@@ -116,4 +140,6 @@ def get_info():
 
 if __name__ == '__main__':
     print("REMBG Server (CPU) starting on http://localhost:5100")
+    # Pre-load default model for instant use
+    get_session('u2net')
     app.run(host='0.0.0.0', port=5100, debug=False)

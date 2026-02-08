@@ -131,11 +131,12 @@ export class DatabankModule {
             if (type) url.searchParams.append('type', type);
 
             const res = await fetch(url);
-            const data = await res.json();
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-            this.items = data.items;
+            const data = await res.json();
+            this.items = data.items || [];
             this.renderItems();
-            this.updatePagination(data.items.length);
+            this.updatePagination(this.items.length);
 
         } catch (error) {
             console.error('Error loading databank:', error);
@@ -151,7 +152,7 @@ export class DatabankModule {
     }
 
     renderItems() {
-        if (this.items.length === 0) {
+        if (!Array.isArray(this.items) || this.items.length === 0) {
             this.elements.grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
                     <i data-lucide="database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>

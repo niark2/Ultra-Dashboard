@@ -1,3 +1,5 @@
+import { I18n } from '../utils/i18n.js';
+
 export class MetadataModule {
     constructor() {
         this.dirPathInput = document.getElementById('metaDirPath');
@@ -43,7 +45,7 @@ export class MetadataModule {
             // So we'll process files directly instead
 
             const folderName = files[0].webkitRelativePath.split('/')[0];
-            this.dirPathInput.value = `Dossier sélectionné: ${folderName} (${files.length} fichiers)`;
+            this.dirPathInput.value = `${I18n.t('Dossier sélectionné')}: ${folderName} (${files.length} ${I18n.t('fichiers')})`;
 
             // Process files directly from browser
             this.processFilesFromBrowser(files);
@@ -179,7 +181,7 @@ export class MetadataModule {
     updateToolbar() {
         const modifiedCount = this.modifiedIndices.size;
         this.statusText = document.getElementById('metaStatusText');
-        this.statusText.innerText = `${this.files.length} fichiers chargés | ${modifiedCount} modifiés`;
+        this.statusText.innerText = `${this.files.length} ${I18n.t('fichiers chargés')} | ${modifiedCount} ${I18n.t('modifiés')}`;
 
         if (modifiedCount > 0) {
             this.applyAllBtn.classList.remove('hidden');
@@ -223,7 +225,7 @@ export class MetadataModule {
     async applyAllChanges() {
         if (this.modifiedIndices.size === 0) return;
 
-        const confirmMsg = `Voulez-vous appliquer les modifications à ${this.modifiedIndices.size} fichiers ?`;
+        const confirmMsg = `${I18n.t('Voulez-vous appliquer les modifications à')} ${this.modifiedIndices.size} ${I18n.t('fichiers')} ?`;
         if (!confirm(confirmMsg)) return;
 
         this.setApplyLoading(true);
@@ -260,7 +262,7 @@ export class MetadataModule {
         }
 
         this.setApplyLoading(false);
-        alert(`${successCount} fichiers mis à jour avec succès !`);
+        alert(`${successCount} ${I18n.t('fichiers')} ${I18n.t('mis à jour avec succès !')}`);
 
         // Refresh to show clean state
         this.modifiedIndices.clear();
@@ -281,11 +283,11 @@ export class MetadataModule {
         const btnLoader = this.applyAllBtn.querySelector('.btn-loader');
 
         if (isLoading) {
-            btnText.innerText = 'Application...';
+            btnText.innerText = I18n.t('Application...');
             btnLoader.classList.remove('hidden');
             this.applyAllBtn.disabled = true;
         } else {
-            btnText.innerHTML = '<i data-lucide="save" class="inline-icon"></i> Appliquer les modifications';
+            btnText.innerHTML = `<i data-lucide="save" class="inline-icon"></i> ${I18n.t('Appliquer les modifications')}`;
             btnLoader.classList.add('hidden');
             this.applyAllBtn.disabled = false;
         }

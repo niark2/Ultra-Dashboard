@@ -283,3 +283,33 @@ body.compact-sidebar .nav-section-icon-main svg {
 body.compact-sidebar .sidebar-footer {
     padding: 24px 0;
 }
+
+/* ============================================
+   NO SECTIONS MODE (FLAT LIST)
+   ============================================ */
+body.no-sidebar-sections .nav-section-header {
+    display: none;
+}
+
+body.no-sidebar-sections .nav-section {
+    margin-top: 0;
+    gap: 2px;
+}
+
+body.no-sidebar-sections .nav-section-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    margin-top: 0 !important;
+    pointer-events: auto !important;
+    gap: 2px;
+}
+
+body.no-sidebar-sections .nav-section-content .nav-item {
+    padding-left: 16px !important;
+}
+
+body.no-sidebar-sections .nav-section.collapsed .nav-section-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}

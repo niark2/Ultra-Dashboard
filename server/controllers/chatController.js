@@ -19,8 +19,8 @@ const chatController = {
             const apiKey = db.getConfigValue('OPENROUTER_API_KEY', userId);
             const model = db.getConfigValue('OPENROUTER_MODEL', userId, 'google/gemini-2.0-pro-exp-02-05:free');
 
-            if (!apiKey) {
-                return res.status(500).json({ error: "Clé API OpenRouter manquante dans le fichier .env" });
+            if (!apiKey || apiKey.includes('YOUR_OPENROUTER_KEY_HERE')) {
+                return res.status(401).json({ error: "Clé API OpenRouter manquante ou non valide (placeholder détecté). Veuillez la configurer dans les réglages." });
             }
 
             const messages = [

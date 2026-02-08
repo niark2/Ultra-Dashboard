@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     ffmpeg \
     libgl1 \
+    curl \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && rm -rf /var/lib/apt/lists/*
 
