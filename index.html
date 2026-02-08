@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Dashboard - Self-Hosted Services Hub</title>
+    <title>Ultra Dashboard - SaaS Premium Tool Hub</title>
 
-    <!-- Fonts -->
+    <!-- Design System Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
 
-    <!-- Icons -->
+    <!-- Shared Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Styles -->
+    <!-- Link to updated design spec stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -27,71 +27,122 @@
                 <i data-lucide="layout-dashboard"></i>
                 ULTRA DASHBOARD
             </a>
-            <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-outline">
-                <i data-lucide="github"></i> GitHub
-            </a>
+            <nav style="display: flex; gap: 2rem; align-items: center;">
+                <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-secondary">
+                    <i data-lucide="github"></i> Repository
+                </a>
+            </nav>
         </header>
 
         <main>
             <section class="hero">
-                <span class="badge">V1.0.0 Stable</span>
-                <h1>Plus qu'un dashboard.<br>Votre centre de contrôle.</h1>
-                <p>Regroupez vos outils d'IA, de téléchargement et de gestion de fichiers dans une interface sobre,
-                    rapide et auto-hébergée.</p>
-                <div style="display: flex; gap: 12px; justify-content: center;">
-                    <a href="#features" class="btn btn-primary">Découvrir les outils</a>
-                    <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-outline">Installation</a>
+                <div class="hero-badge">
+                    <i data-lucide="zap" style="width: 12px; height: 12px;"></i>
+                    v1.0.0-STABLE
+                </div>
+                <h1>Votre Dashboard <span>SaaS</span> Personnel</h1>
+                <p>Une interface unifiée pour l'IA, le traitement de médias et la gestion de fichiers. Design premium,
+                    vitesse extrême, auto-hébergé avec Docker.</p>
+                <div class="hero-actions">
+                    <a href="#features" class="btn btn-primary">Explorer les modules</a>
+                    <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-secondary">Documentation</a>
                 </div>
             </section>
 
-            <section id="features" class="features-grid">
-                <!-- AI Section -->
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="brain-circuit"></i></div>
-                    <h3>Intelligence Artificielle</h3>
-                    <p>Des modèles de pointe accessibles localement pour vos tâches quotidiennes.</p>
-                    <ul class="feature-list">
-                        <li><i data-lucide="check"></i> <b>Assistant Chat</b> : Interface conversationnelle fluide.</li>
-                        <li><i data-lucide="check"></i> <b>RemBG</b> : Suppression d'arrière-plan instantanée.</li>
-                        <li><i data-lucide="check"></i> <b>AI Upscale</b> : Amélioration de la résolution d'image.</li>
-                        <li><i data-lucide="check"></i> <b>Whisper STT</b> : Transcription audio vers texte.</li>
-                    </ul>
+            <section id="features" class="features">
+                <div class="section-header">
+                    <h2>Modules Intégrés</h2>
                 </div>
 
-                <!-- Media Section -->
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="download"></i></div>
-                    <h3>Gestion Médias</h3>
-                    <p>Outils de téléchargement et de traitement pour tous vos contenus.</p>
-                    <ul class="feature-list">
-                        <li><i data-lucide="check"></i> <b>Downloader</b> : YouTube, FB, Instagram, TikTok.</li>
-                        <li><i data-lucide="check"></i> <b>Converter</b> : Conversion de formats vidéo et audio.</li>
-                        <li><i data-lucide="check"></i> <b>Metadata</b> : Édition complète des tags de fichiers.</li>
-                        <li><i data-lucide="check"></i> <b>Torrents</b> : Client de téléchargement intégré.</li>
-                    </ul>
+                <div class="features-grid">
+                    <!-- IA Module -->
+                    <div class="feature-card glass-effect">
+                        <div class="feature-icon"><i data-lucide="brain-circuit"></i></div>
+                        <h3>Intelligence Artificielle</h3>
+                        <p>Exploitez la puissance des modèles locaux pour simplifier vos workflows créatifs.</p>
+                        <ul class="feature-tags">
+                            <li class="feature-tag">OpenRouter</li>
+                            <li class="feature-tag">RemBG</li>
+                            <li class="feature-tag">Upscale</li>
+                            <li class="feature-tag">Whisper</li>
+                        </ul>
+                    </div>
+
+                    <!-- Media Module -->
+                    <div class="feature-card glass-effect">
+                        <div class="feature-icon"><i data-lucide="play-circle"></i></div>
+                        <h3>Traitement Médias</h3>
+                        <p>Téléchargement, conversion et édition de métadonnées en un temps record.</p>
+                        <ul class="feature-tags">
+                            <li class="feature-tag">YT-DLP</li>
+                            <li class="feature-tag">FFmpeg</li>
+                            <li class="feature-tag">Metadata</li>
+                            <li class="feature-tag">Torrents</li>
+                        </ul>
+                    </div>
+
+                    <!-- System Module -->
+                    <div class="feature-card glass-effect">
+                        <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                        <h3>Système & Partage</h3>
+                        <p>Gestion sécurisée des fichiers et transfert P2P sur votre réseau local (LocalDrop).</p>
+                        <ul class="feature-tags">
+                            <li class="feature-tag">LocalDrop</li>
+                            <li class="feature-tag">Plexus Nodes</li>
+                            <li class="feature-tag">Databank</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="preview-section">
+                <div class="section-header">
+                    <h2>Expérience Premium</h2>
+                    <p style="color: var(--text-secondary);">Une gestion granulaire avec des patterns visuels
+                        professionnels.</p>
                 </div>
 
-                <!-- Shared Section -->
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="share-2"></i></div>
-                    <h3>Partage & Système</h3>
-                    <p>Sécurité et transfert de fichiers simplifiés au sein de votre réseau.</p>
-                    <ul class="feature-list">
-                        <li><i data-lucide="check"></i> <b>LocalDrop</b> : Partage de fichiers P2P ultra-rapide.</li>
-                        <li><i data-lucide="check"></i> <b>Databank</b> : Explorateur et gestionnaire de fichiers.</li>
-                        <li><i data-lucide="check"></i> <b>Plexus</b> : Gestion de nœuds et services distants.</li>
-                        <li><i data-lucide="check"></i> <b>Toolbox</b> : Suite d'utilitaires système essentiels.</li>
-                    </ul>
+                <div class="app-mockup glass-effect">
+                    <div class="mock-sidebar">
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px;">
+                            </div>
+                            <div
+                                style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px; opacity: 0.5;">
+                            </div>
+                            <div
+                                style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px; opacity: 0.5;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mock-main">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="width: 200px; height: 32px; background: var(--bg-element); border-radius: 4px;">
+                            </div>
+                            <div style="width: 80px; height: 32px; background: var(--primary); border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div class="mock-card">
+                            <h3 style="font-size: 1rem; margin-bottom: 20px;">Traitement en cours...</h3>
+                            <div class="mock-checkerboard"></div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
 
         <footer>
-            <p>&copy; 2024 Ultra Dashboard par Niark2. Sous licence MIT.</p>
+            <div class="logo footer-logo" style="justify-content: center;">
+                <i data-lucide="layout-dashboard"></i>
+                ULTRA DASHBOARD
+            </div>
+            <p class="copyright">Développé par Niark2. Design Tokens basés sur la v1.0.</p>
         </footer>
     </div>
 
     <script>
+        // Init Lucide
         lucide.createIcons();
     </script>
 </body>
