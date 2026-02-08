@@ -4,145 +4,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Dashboard - SaaS Premium Tool Hub</title>
+    <title>Ultra Dashboard - Your Personal Productivity Space</title>
 
     <!-- Design System Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- Shared Icons -->
+    <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Link to updated design spec stylesheet -->
+    <!-- Custom Style based on App Screenshots -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="container">
         <header>
-            <a href="#" class="logo">
-                <i data-lucide="layout-dashboard"></i>
-                ULTRA DASHBOARD
+            <a href="#" class="brand">
+                <i data-lucide="zap"></i>
+                <span>ULTRA</span>
             </a>
-            <nav style="display: flex; gap: 2rem; align-items: center;">
-                <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-secondary">
-                    <i data-lucide="github"></i> Repository
-                </a>
-            </nav>
+            <div class="nav-links">
+                <a href="#features">Fonctionnalités</a>
+                <a href="https://github.com/niark2/Ultra-Dashboard">GitHub</a>
+                <a href="#" class="btn btn-outline" style="padding: 8px 16px; margin: 0;">Login</a>
+            </div>
         </header>
 
         <main>
             <section class="hero">
-                <div class="hero-badge">
-                    <i data-lucide="zap" style="width: 12px; height: 12px;"></i>
-                    v1.0.0-STABLE
-                </div>
-                <h1>Votre Dashboard <span>SaaS</span> Personnel</h1>
-                <p>Une interface unifiée pour l'IA, le traitement de médias et la gestion de fichiers. Design premium,
-                    vitesse extrême, auto-hébergé avec Docker.</p>
-                <div class="hero-actions">
-                    <a href="#features" class="btn btn-primary">Explorer les modules</a>
-                    <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-secondary">Documentation</a>
-                </div>
-            </section>
+                <h1>Welcome to Ultra Dashboard</h1>
+                <p>Your personal productivity space. All your tools in one place.</p>
 
-            <section id="features" class="features">
-                <div class="section-header">
-                    <h2>Modules Intégrés</h2>
-                </div>
-
-                <div class="features-grid">
-                    <!-- IA Module -->
-                    <div class="feature-card glass-effect">
-                        <div class="feature-icon"><i data-lucide="brain-circuit"></i></div>
-                        <h3>Intelligence Artificielle</h3>
-                        <p>Exploitez la puissance des modèles locaux pour simplifier vos workflows créatifs.</p>
-                        <ul class="feature-tags">
-                            <li class="feature-tag">OpenRouter</li>
-                            <li class="feature-tag">RemBG</li>
-                            <li class="feature-tag">Upscale</li>
-                            <li class="feature-tag">Whisper</li>
-                        </ul>
-                    </div>
-
-                    <!-- Media Module -->
-                    <div class="feature-card glass-effect">
-                        <div class="feature-icon"><i data-lucide="play-circle"></i></div>
-                        <h3>Traitement Médias</h3>
-                        <p>Téléchargement, conversion et édition de métadonnées en un temps record.</p>
-                        <ul class="feature-tags">
-                            <li class="feature-tag">YT-DLP</li>
-                            <li class="feature-tag">FFmpeg</li>
-                            <li class="feature-tag">Metadata</li>
-                            <li class="feature-tag">Torrents</li>
-                        </ul>
-                    </div>
-
-                    <!-- System Module -->
-                    <div class="feature-card glass-effect">
-                        <div class="feature-icon"><i data-lucide="shield-check"></i></div>
-                        <h3>Système & Partage</h3>
-                        <p>Gestion sécurisée des fichiers et transfert P2P sur votre réseau local (LocalDrop).</p>
-                        <ul class="feature-tags">
-                            <li class="feature-tag">LocalDrop</li>
-                            <li class="feature-tag">Plexus Nodes</li>
-                            <li class="feature-tag">Databank</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <section class="preview-section">
-                <div class="section-header">
-                    <h2>Expérience Premium</h2>
-                    <p style="color: var(--text-secondary);">Une gestion granulaire avec des patterns visuels
-                        professionnels.</p>
-                </div>
-
-                <div class="app-mockup glass-effect">
-                    <div class="mock-sidebar">
-                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px;">
-                            </div>
-                            <div
-                                style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px; opacity: 0.5;">
-                            </div>
-                            <div
-                                style="width: 100%; height: 32px; background: var(--bg-surface); border-radius: 6px; opacity: 0.5;">
+                <div class="dashboard-grid">
+                    <!-- Feature: Downloader -->
+                    <div class="widget large accent-orange">
+                        <div class="widget-header">
+                            <i data-lucide="download"></i>
+                            Media Downloader
+                        </div>
+                        <div class="widget-content">
+                            <h3>Download everything.</h3>
+                            <p>YouTube, TikTok, Instagram, Twitter/X, Facebook, Twitch and 1000+ more sites supported in
+                                high quality.</p>
+                            <div class="mock-input-container">
+                                <span class="mock-input-text">Paste link (YouTube, TikTok, Instagram...) here...</span>
+                                <div class="mock-input-btn"><i data-lucide="search" style="width: 14px;"></i></div>
                             </div>
                         </div>
                     </div>
-                    <div class="mock-main">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="width: 200px; height: 32px; background: var(--bg-element); border-radius: 4px;">
-                            </div>
-                            <div style="width: 80px; height: 32px; background: var(--primary); border-radius: 6px;">
-                            </div>
+
+                    <!-- Feature: AI -->
+                    <div class="widget accent-blue">
+                        <div class="widget-header">
+                            <i data-lucide="brain-circuit"></i>
+                            Image AI
                         </div>
-                        <div class="mock-card">
-                            <h3 style="font-size: 1rem; margin-bottom: 20px;">Traitement en cours...</h3>
-                            <div class="mock-checkerboard"></div>
+                        <div class="widget-content">
+                            <h3>AI Powered.</h3>
+                            <p>Remove backgrounds, upscale images to 4K, and generate art using local or cloud models.
+                            </p>
                         </div>
+                    </div>
+
+                    <!-- Feature: Convert -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <i data-lucide="refresh-cw"></i>
+                            Converter
+                        </div>
+                        <div class="widget-content">
+                            <h3>Fast Conversion.</h3>
+                            <p>Convert videos, audio and images between hundreds of formats with FFmpeg power.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature: STT -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <i data-lucide="mic"></i>
+                            Speech-to-Text
+                        </div>
+                        <div class="widget-content" style="display: flex; flex-direction: column; height: 100%;">
+                            <h3 style="font-size: 2.2rem; margin-top: auto;">04:12</h3>
+                            <p>Transcription ultra-précise via Whisper.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature: Databank -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <i data-lucide="database"></i>
+                            Databank
+                        </div>
+                        <div class="widget-content">
+                            <h3>Cloud File Manager.</h3>
+                            <p>Manage your files, explore your storage, and share links securely.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-banner">
+                    <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 24px;">Setup your own
+                        instance today.</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 40px; font-size: 1.1rem;">Self-hosted,
+                        Docker-ready, privacy-focused.</p>
+                    <div class="cta-actions">
+                        <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-primary">
+                            <i data-lucide="github"></i>
+                            Get Started
+                        </a>
+                        <a href="#" class="btn btn-outline">Documentation</a>
                     </div>
                 </div>
             </section>
         </main>
 
         <footer>
-            <div class="logo footer-logo" style="justify-content: center;">
-                <i data-lucide="layout-dashboard"></i>
-                ULTRA DASHBOARD
-            </div>
-            <p class="copyright">Développé par Niark2. Design Tokens basés sur la v1.0.</p>
+            <p>&copy; 2024 Ultra Dashboard. Built by Niark2. Inspired by minimalist productivity.</p>
         </footer>
     </div>
 
     <script>
-        // Init Lucide
         lucide.createIcons();
     </script>
 </body>
