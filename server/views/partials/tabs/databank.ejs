@@ -2,28 +2,30 @@
     <div class="content-header">
         <div class="header-title">
             <h2><i data-lucide="database"></i> Databank</h2>
-            <p>Historique et stockage centralisé de toutes vos générations</p>
+            <p data-i18n="Historique et stockage centralisé de toutes vos générations">Historique et stockage centralisé
+                de toutes vos générations</p>
         </div>
         <div class="header-actions">
             <div class="search-bar">
                 <i data-lucide="search"></i>
-                <input type="text" id="databankSearch" placeholder="Rechercher...">
+                <input type="text" id="databankSearch" data-i18n-placeholder="Rechercher..."
+                    placeholder="Rechercher...">
             </div>
             <select id="databankFilterType" class="select-input">
-                <option value="all">Tous les types</option>
-                <option value="image">Images</option>
-                <option value="audio">Audio</option>
-                <option value="text">Texte</option>
-                <option value="video">Vidéo</option>
+                <option value="all" data-i18n="Tous les types">Tous les types</option>
+                <option value="image" data-i18n="Images">Images</option>
+                <option value="audio" data-i18n="Audio">Audio</option>
+                <option value="text" data-i18n="Texte">Texte</option>
+                <option value="video" data-i18n="Vidéo">Vidéo</option>
             </select>
             <button class="btn-primary" id="databankNewFolderBtn">
-                <i data-lucide="folder-plus"></i> Nouveau dossier
+                <i data-lucide="folder-plus"></i> <span data-i18n="Nouveau dossier">Nouveau dossier</span>
             </button>
-            <button class="btn-icon-large" id="databankRefreshBtn" title="Actualiser">
+            <button class="btn-icon-large" id="databankRefreshBtn" data-i18n-title="Actualiser" title="Actualiser">
                 <i data-lucide="refresh-cw"></i>
             </button>
             <button class="btn-danger" id="databankClearBtn">
-                <i data-lucide="trash-2"></i> Tout effacer
+                <i data-lucide="trash-2"></i> <span data-i18n="Tout effacer">Tout effacer</span>
             </button>
         </div>
     </div>
@@ -31,7 +33,7 @@
     <div class="databank-navigation">
         <div class="breadcrumbs" id="databankBreadcrumbs">
             <span class="breadcrumb-item active" data-folder-id="root">
-                <i data-lucide="home"></i> Racine
+                <i data-lucide="home"></i> <span data-i18n="Racine">Racine</span>
             </span>
         </div>
     </div>
@@ -41,14 +43,16 @@
             <!-- Items loaded via JS -->
             <div class="loading-spinner">
                 <div class="spinner"></div>
-                <p>Chargement des données...</p>
+                <p data-i18n="Chargement des données...">Chargement des données...</p>
             </div>
         </div>
 
         <div class="pagination-controls hidden" id="databankPagination">
-            <button id="databankPrevBtn" disabled><i data-lucide="chevron-left"></i> Précédent</button>
-            <span id="databankPageInfo">Page 1</span>
-            <button id="databankNextBtn">Suivant <i data-lucide="chevron-right"></i></button>
+            <button id="databankPrevBtn" disabled><i data-lucide="chevron-left"></i> <span
+                    data-i18n="Précédent">Précédent</span></button>
+            <span id="databankPageInfo"><span data-i18n="Page">Page</span> 1</span>
+            <button id="databankNextBtn"><span data-i18n="Suivant">Suivant</span> <i
+                    data-lucide="chevron-right"></i></button>
         </div>
     </div>
 
@@ -56,7 +60,7 @@
     <div class="modal-overlay" id="databankPreviewModal">
         <div class="modal-content preview-modal-content">
             <div class="modal-header">
-                <h3 id="previewTitle">Aperçu</h3>
+                <h3 id="previewTitle" data-i18n="Aperçu">Aperçu</h3>
                 <button class="modal-close" id="closePreviewModal"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="previewBody">
@@ -64,7 +68,8 @@
             </div>
             <div class="modal-footer">
                 <div class="preview-meta" id="previewMeta"></div>
-                <button class="btn-primary" id="previewDownloadBtn"><i data-lucide="download"></i> Télécharger</button>
+                <button class="btn-primary" id="previewDownloadBtn"><i data-lucide="download"></i> <span
+                        data-i18n="Télécharger">Télécharger</span></button>
             </div>
         </div>
     </div>
@@ -75,22 +80,23 @@
             <div class="modal-header">
                 <div class="header-with-icon">
                     <i data-lucide="folder-plus" class="modal-icon text-primary"></i>
-                    <h3>Nouveau dossier</h3>
+                    <h3 data-i18n="Nouveau dossier">Nouveau dossier</h3>
                 </div>
                 <button class="modal-close" id="closeFolderModal"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group-modern">
-                    <label for="folderName" class="label-modern">Nom du dossier</label>
+                    <label for="folderName" class="label-modern" data-i18n="Nom du dossier">Nom du dossier</label>
                     <div class="input-with-icon-modern">
                         <i data-lucide="folder"></i>
-                        <input type="text" id="folderName" class="input-modern" placeholder="Nommez votre dossier...">
+                        <input type="text" id="folderName" class="input-modern"
+                            data-i18n-placeholder="Nommez votre dossier..." placeholder="Nommez votre dossier...">
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" id="cancelFolderBtn">Annuler</button>
-                <button class="btn-primary" id="confirmFolderBtn">Créer le dossier</button>
+                <button class="btn-secondary" id="cancelFolderBtn" data-i18n="Annuler">Annuler</button>
+                <button class="btn-primary" id="confirmFolderBtn" data-i18n="Ajouter">Ajouter</button>
             </div>
         </div>
     </div>
@@ -99,7 +105,7 @@
     <div class="modal-overlay" id="databankMoveModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Déplacer vers</h3>
+                <h3 data-i18n="Déplacer vers">Déplacer vers</h3>
                 <button class="modal-close" id="closeMoveModal"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">

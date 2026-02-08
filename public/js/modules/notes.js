@@ -1,4 +1,6 @@
 
+import { I18n } from '../utils/i18n.js';
+
 // ============================================
 // NOTES MODULE
 // ============================================
@@ -90,7 +92,7 @@ export class NotesModule {
     createNewNote() {
         const newNote = {
             id: Date.now().toString(),
-            title: 'Nouvelle note',
+            title: I18n.t('Nouvelle note'),
             content: '',
             tags: [],
             createdAt: new Date().toISOString(),
@@ -134,7 +136,7 @@ export class NotesModule {
         const note = this.notes.find(n => n.id === this.currentNoteId);
         if (!note) return;
 
-        note.title = document.getElementById('noteTitleInput').value || 'Sans titre';
+        note.title = document.getElementById('noteTitleInput').value || I18n.t('Sans titre');
         note.content = document.getElementById('noteContentEditor').value;
         note.tags = document.getElementById('noteTagsInput').value
             .split(',')
@@ -156,7 +158,7 @@ export class NotesModule {
     async deleteCurrentNote() {
         if (!this.currentNoteId) return;
 
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) return;
+        if (!confirm(I18n.t('Êtes-vous sûr de vouloir supprimer cette note ?'))) return;
 
         const note = this.notes.find(n => n.id === this.currentNoteId);
 
@@ -179,7 +181,7 @@ export class NotesModule {
         document.getElementById('notesWelcome').style.display = 'flex';
         document.getElementById('notesEditorContainer').style.display = 'none';
 
-        this.showNotification('Note supprimée', 'success');
+        this.showNotification(I18n.t('Note supprimée'), 'success');
     }
 
     // ============================================
@@ -194,8 +196,8 @@ export class NotesModule {
             container.innerHTML = `
                 <div class="notes-empty">
                     <i data-lucide="file-text" class="notes-empty-icon"></i>
-                    <p>Aucune note</p>
-                    <p class="notes-empty-hint">Créez votre première note</p>
+                    <p>${I18n.t('Aucune note')}</p>
+                    <p class="notes-empty-hint">${I18n.t('Créez votre première note')}</p>
                 </div>
             `;
             if (window.lucide) window.lucide.createIcons();
@@ -273,56 +275,56 @@ export class NotesModule {
 
         switch (action) {
             case 'bold':
-                newText = `**${selectedText || 'texte en gras'}**`;
+                newText = `**${selectedText || I18n.t('texte en gras')}**`;
                 cursorOffset = selectedText ? newText.length : 2;
                 break;
             case 'italic':
-                newText = `*${selectedText || 'texte en italique'}*`;
+                newText = `*${selectedText || I18n.t('texte en italique')}*`;
                 cursorOffset = selectedText ? newText.length : 1;
                 break;
             case 'strikethrough':
-                newText = `~~${selectedText || 'texte barré'}~~`;
+                newText = `~~${selectedText || I18n.t('texte barré')}~~`;
                 cursorOffset = selectedText ? newText.length : 2;
                 break;
             case 'heading':
-                newText = `## ${selectedText || 'Titre'}`;
+                newText = `## ${selectedText || I18n.t('Titre')}`;
                 cursorOffset = newText.length;
                 break;
             case 'quote':
-                newText = `> ${selectedText || 'Citation'}`;
+                newText = `> ${selectedText || I18n.t('Citation')}`;
                 cursorOffset = newText.length;
                 break;
             case 'code':
                 if (selectedText.includes('\n')) {
-                    newText = `\`\`\`\n${selectedText || 'code'}\n\`\`\``;
+                    newText = `\`\`\`\n${selectedText || I18n.t('code')}\n\`\`\``;
                     cursorOffset = selectedText ? newText.length - 4 : 4;
                 } else {
-                    newText = `\`${selectedText || 'code'}\``;
+                    newText = `\`${selectedText || I18n.t('code')}\``;
                     cursorOffset = selectedText ? newText.length : 1;
                 }
                 break;
             case 'list-ul':
-                newText = `- ${selectedText || 'Élément de liste'}`;
+                newText = `- ${selectedText || I18n.t('Élément de liste')}`;
                 cursorOffset = newText.length;
                 break;
             case 'list-ol':
-                newText = `1. ${selectedText || 'Élément de liste'}`;
+                newText = `1. ${selectedText || I18n.t('Élément de liste')}`;
                 cursorOffset = newText.length;
                 break;
             case 'checkbox':
-                newText = `- [ ] ${selectedText || 'Tâche'}`;
+                newText = `- [ ] ${selectedText || I18n.t('Tâche')}`;
                 cursorOffset = newText.length;
                 break;
             case 'link':
-                newText = `[${selectedText || 'texte du lien'}](url)`;
+                newText = `[${selectedText || I18n.t('texte du lien')}](url)`;
                 cursorOffset = selectedText ? newText.length - 5 : newText.length - 4;
                 break;
             case 'image':
-                newText = `![${selectedText || 'description'}](url)`;
+                newText = `![${selectedText || I18n.t('description')}](url)`;
                 cursorOffset = selectedText ? newText.length - 5 : newText.length - 4;
                 break;
             case 'table':
-                newText = `| Colonne 1 | Colonne 2 |\n|-----------|-----------|  \n| A         | B         |`;
+                newText = `| ${I18n.t('Colonnes')} 1 | ${I18n.t('Colonnes')} 2 |\n|-----------|-----------|  \n| A         | B         |`;
                 cursorOffset = newText.length;
                 break;
             default:
@@ -473,15 +475,15 @@ export class NotesModule {
         switch (status) {
             case 'saving':
                 statusEl.classList.add('saving');
-                statusEl.innerHTML = '<i data-lucide="loader"></i><span>Sauvegarde...</span>';
+                statusEl.innerHTML = `<i data-lucide="loader"></i><span>${I18n.t('Sauvegarde...')}</span>`;
                 break;
             case 'saved':
-                statusEl.innerHTML = '<i data-lucide="check-circle"></i><span>Sauvegardé</span>';
+                statusEl.innerHTML = `<i data-lucide="check-circle"></i><span>${I18n.t('Sauvegardé')}</span>`;
                 this.updateLastSavedTime();
                 break;
             case 'error':
                 statusEl.classList.add('error');
-                statusEl.innerHTML = '<i data-lucide="alert-circle"></i><span>Erreur</span>';
+                statusEl.innerHTML = `<i data-lucide="alert-circle"></i><span>${I18n.t('Erreur')}</span>`;
                 break;
         }
 
@@ -497,14 +499,14 @@ export class NotesModule {
         const words = content.trim() ? content.trim().split(/\s+/).length : 0;
         const chars = content.length;
 
-        document.getElementById('noteWordCount').textContent = `${words} mot${words > 1 ? 's' : ''}`;
-        document.getElementById('noteCharCount').textContent = `${chars} caractère${chars > 1 ? 's' : ''}`;
+        document.getElementById('noteWordCount').textContent = `${words} ${words > 1 ? I18n.t('mots') : I18n.t('mot')}`;
+        document.getElementById('noteCharCount').textContent = `${chars} ${chars > 1 ? I18n.t('caractères') : I18n.t('caractère')}`;
     }
 
     updateLastSavedTime() {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('noteLastSaved').textContent = `Sauvegardé à ${timeStr}`;
+        const timeStr = now.toLocaleTimeString(document.documentElement.lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('noteLastSaved').textContent = `${I18n.t('Sauvegardé à')} ${timeStr}`;
     }
 
     // ============================================
@@ -592,42 +594,14 @@ export class NotesModule {
                 const data = await response.json();
                 note.databankId = data.id; // Save the new ID
                 this.saveNotesToStorage(); // Persist metadata
-                if (!silent) this.showNotification('Note synchronisée avec la Databank', 'success');
+                if (!silent) this.showNotification(I18n.t('Note synchronisée avec la Databank'), 'success');
             } else {
-                throw new Error('Erreur lors de l\'export');
+                throw new Error(I18n.t('Erreur lors de l\'export'));
             }
         } catch (error) {
             console.error('Export error:', error);
             this.showNotification(error.message, 'error');
         }
-    }
-
-    // Modification de deleteCurrentNote pour supprimer aussi de la databank
-    async deleteCurrentNote() {
-        if (!this.currentNoteId) return;
-
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) return;
-
-        const note = this.notes.find(n => n.id === this.currentNoteId);
-
-        if (note && note.databankId) {
-            try {
-                await fetch(`/api/databank/${note.databankId}`, { method: 'DELETE' });
-            } catch (e) {
-                console.error("Erreur suppression databank", e);
-            }
-        }
-
-        this.notes = this.notes.filter(n => n.id !== this.currentNoteId);
-        this.saveNotesToStorage();
-        this.renderNotesList();
-
-        // Retour au welcome screen
-        this.currentNoteId = null;
-        document.getElementById('notesWelcome').style.display = 'flex';
-        document.getElementById('notesEditorContainer').style.display = 'none';
-
-        this.showNotification('Note supprimée', 'success');
     }
 
     // ============================================
@@ -671,7 +645,7 @@ export class NotesModule {
                 if (changed) {
                     this.saveNotesToStorage();
                     this.renderNotesList();
-                    this.showNotification('Notes synchronisées avec la Databank (suppressions détectées)', 'info');
+                    this.showNotification(I18n.t('Notes synchronisées avec la Databank (suppressions détectées)'), 'info');
                 }
             }
         } catch (error) {
@@ -694,7 +668,7 @@ export class NotesModule {
 
             this.saveNotesToStorage();
             this.renderNotesList();
-            this.showNotification('Note supprimée car l\'élément Databank correspondant a été effacé.', 'info');
+            this.showNotification(I18n.t('Note supprimée car l\'élément Databank correspondant a été effacé.'), 'info');
         }
     }
 
@@ -714,22 +688,22 @@ export class NotesModule {
             const hours = Math.floor(diff / (1000 * 60 * 60));
             if (hours === 0) {
                 const minutes = Math.floor(diff / (1000 * 60));
-                return minutes === 0 ? 'À l\'instant' : `Il y a ${minutes}min`;
+                return minutes === 0 ? I18n.t('À l\'instant') : `${I18n.t('Il y a')} ${minutes}min`;
             }
-            return `Il y a ${hours}h`;
+            return `${I18n.t('Il y a')} ${hours}h`;
         } else if (days === 1) {
-            return 'Hier';
+            return I18n.t('Hier');
         } else if (days < 7) {
-            return `Il y a ${days}j`;
+            return `${I18n.t('Il y a')} ${days}j`;
         } else {
-            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            return date.toLocaleDateString(document.documentElement.lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: '2-digit' });
         }
     }
 
     showNotification(message, type = 'info') {
         const event = new CustomEvent('app-notification', {
             detail: {
-                title: type === 'error' ? 'Erreur' : (type === 'success' ? 'Succès' : 'Info'),
+                title: type === 'error' ? I18n.t('Erreur') : (type === 'success' ? I18n.t('Succès') : 'Info'),
                 message: message,
                 type: type
             }
@@ -807,7 +781,7 @@ export class NotesModule {
         const textToProcess = selectedText.trim() || fullText.trim();
 
         if (!textToProcess) {
-            this.showNotification("Veuillez écrire ou sélectionner du texte d'abord", "info");
+            this.showNotification(I18n.t("Veuillez écrire ou sélectionner du texte d'abord"), "info");
             return;
         }
 
@@ -820,20 +794,20 @@ export class NotesModule {
 
         // Prompt Logic
         let prompt = "";
-        let systemPrompt = "Tu es un assistant d'écriture expert. Réponds uniquement avec le contenu demandé, sans bavardage.";
+        let systemPrompt = I18n.t("Tu es un assistant d'écriture expert. Réponds uniquement avec le contenu demandé, sans bavardage.");
 
         switch (action) {
             case 'summarize':
-                prompt = `Fais un résumé concis du texte suivant :\n\n"${textToProcess}"`;
+                prompt = `${I18n.t("Fais un résumé concis du texte suivant :")}\n\n"${textToProcess}"`;
                 break;
             case 'fix':
-                prompt = `Corrige les fautes d'orthographe et de grammaire du texte suivant. Conserve le formatage Markdown. Renvoie uniquement le texte corrigé :\n\n"${textToProcess}"`;
+                prompt = `${I18n.t("Corrige les fautes d'orthographe et de grammaire du texte suivant. Conserve le formatage Markdown. Renvoie uniquement le texte corrigé :")}\n\n"${textToProcess}"`;
                 break;
             case 'continue':
-                prompt = `Continue la rédaction du texte suivant de manière cohérente et créative :\n\n"${textToProcess}"`;
+                prompt = `${I18n.t("Continue la rédaction du texte suivant de manière cohérente et créative :")}\n\n"${textToProcess}"`;
                 break;
             case 'ideas':
-                prompt = `Donne-moi 5 idées ou points clés pertinents basés sur le texte suivant :\n\n"${textToProcess}"`;
+                prompt = `${I18n.t("Donne-moi 5 idées ou points clés pertinents basés sur le texte suivant :")}\n\n"${textToProcess}"`;
                 break;
         }
 
@@ -848,7 +822,7 @@ export class NotesModule {
                 })
             });
 
-            if (!response.ok) throw new Error("Erreur lors de la communication avec l'IA");
+            if (!response.ok) throw new Error(I18n.t("Erreur lors de la communication avec l'IA"));
 
             const data = await response.json();
             this.lastAIResult = data.reply;
@@ -863,7 +837,7 @@ export class NotesModule {
 
         } catch (error) {
             console.error(error);
-            this.showNotification("Erreur lors de la génération IA", "error");
+            this.showNotification(I18n.t("Erreur lors de la génération IA"), "error");
             this.closeAIModal();
         }
     }
@@ -891,6 +865,6 @@ export class NotesModule {
         if (this.isPreviewMode) this.updatePreview();
 
         this.closeAIModal();
-        this.showNotification("Contenu inséré avec succès", "success");
+        this.showNotification(I18n.t("Contenu inséré avec succès"), "success");
     }
 }

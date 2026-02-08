@@ -1,7 +1,8 @@
 <section class="tab-content" id="tab-notes">
     <header class="content-header">
-        <h1>📝 Bloc-Notes</h1>
-        <p class="subtitle">Créez et organisez vos notes avec un éditeur Markdown complet</p>
+        <h1 data-i18n="Bloc-Notes">📝 Bloc-Notes</h1>
+        <p class="subtitle" data-i18n="Créez et organisez vos notes avec un éditeur Markdown complet">Créez et organisez
+            vos notes avec un éditeur Markdown complet</p>
     </header>
 
     <div class="notes-container">
@@ -9,19 +10,20 @@
         <aside class="notes-sidebar">
             <div class="notes-sidebar-header">
                 <button class="btn-primary" id="newNoteBtn">
-                    <i data-lucide="plus"></i> Nouvelle note
+                    <i data-lucide="plus"></i> <span data-i18n="Nouvelle note">Nouvelle note</span>
                 </button>
                 <div class="notes-search">
                     <i data-lucide="search"></i>
-                    <input type="text" id="notesSearchInput" placeholder="Rechercher...">
+                    <input type="text" id="notesSearchInput" data-i18n-placeholder="Rechercher..."
+                        placeholder="Rechercher...">
                 </div>
             </div>
 
             <div class="notes-list" id="notesList">
                 <div class="notes-empty">
                     <i data-lucide="file-text" class="notes-empty-icon"></i>
-                    <p>Aucune note</p>
-                    <p class="notes-empty-hint">Créez votre première note</p>
+                    <p data-i18n="Aucune note">Aucune note</p>
+                    <p class="notes-empty-hint" data-i18n="Créez votre première note">Créez votre première note</p>
                 </div>
             </div>
         </aside>
@@ -31,10 +33,11 @@
             <div class="notes-welcome" id="notesWelcome">
                 <div class="notes-welcome-content">
                     <i data-lucide="book-open" class="notes-welcome-icon"></i>
-                    <h2>Bienvenue dans votre bloc-notes</h2>
-                    <p>Créez une nouvelle note ou sélectionnez-en une dans la liste</p>
+                    <h2 data-i18n="Bienvenue dans votre bloc-notes">Bienvenue dans votre bloc-notes</h2>
+                    <p data-i18n="Créez une nouvelle note ou sélectionnez-en une dans la liste">Créez une nouvelle note
+                        ou sélectionnez-en une dans la liste</p>
                     <button class="btn-primary" id="newNoteWelcomeBtn">
-                        <i data-lucide="plus"></i> Créer une note
+                        <i data-lucide="plus"></i> <span data-i18n="Créer une note">Créer une note</span>
                     </button>
                 </div>
             </div>
@@ -42,15 +45,18 @@
             <div class="notes-editor-container" id="notesEditorContainer" style="display: none;">
                 <!-- Header de la note -->
                 <div class="notes-editor-header">
-                    <input type="text" id="noteTitleInput" class="note-title-input" placeholder="Titre de la note...">
+                    <input type="text" id="noteTitleInput" class="note-title-input"
+                        data-i18n-placeholder="Titre de la note..." placeholder="Titre de la note...">
                     <div class="notes-editor-actions">
-                        <button class="btn-icon" id="togglePreviewBtn" title="Aperçu Markdown">
+                        <button class="btn-icon" id="togglePreviewBtn" data-i18n-title="Aperçu Markdown"
+                            title="Aperçu Markdown">
                             <i data-lucide="eye"></i>
                         </button>
-                        <button class="btn-icon" id="exportNoteBtn" title="Exporter vers Databank">
+                        <button class="btn-icon" id="exportNoteBtn" data-i18n-title="Exporter vers Databank"
+                            title="Exporter vers Databank">
                             <i data-lucide="download"></i>
                         </button>
-                        <button class="btn-icon" id="deleteNoteBtn" title="Supprimer">
+                        <button class="btn-icon" id="deleteNoteBtn" data-i18n-title="Supprimer" title="Supprimer">
                             <i data-lucide="trash-2"></i>
                         </button>
                     </div>
@@ -108,7 +114,8 @@
                     <div class="toolbar-divider"></div>
                     <!-- AI Group -->
                     <div class="toolbar-group">
-                        <button class="toolbar-btn ai-btn" id="notesAiBtn" title="Assistant IA">
+                        <button class="toolbar-btn ai-btn" id="notesAiBtn" data-i18n-title="Assistant IA"
+                            title="Assistant IA">
                             <i data-lucide="sparkles"></i>
                         </button>
                     </div>
@@ -118,36 +125,15 @@
                 <div class="notes-tags-container">
                     <i data-lucide="tag"></i>
                     <input type="text" id="noteTagsInput" class="note-tags-input"
+                        data-i18n-placeholder="Tags (séparés par des virgules)"
                         placeholder="Tags (séparés par des virgules)">
                 </div>
 
                 <!-- Éditeur / Preview -->
                 <div class="notes-editor-wrapper">
-                    <textarea id="noteContentEditor" class="note-content-editor" placeholder="Écrivez votre note en Markdown...
-
-# Titre 1
-## Titre 2
-
-**Gras** *Italique* ~~Barré~~
-
-- Liste à puces
-1. Liste numérotée
-
-> Citation
-
-`code inline`
-
-```
-Bloc de code
-```
-
-[Lien](https://example.com)
-![Image](url)
-
-| Colonne 1 | Colonne 2 |
-|-----------|-----------|
-| A         | B         |
-"></textarea>
+                    <textarea id="noteContentEditor" class="note-content-editor"
+                        data-i18n-placeholder="Écrivez votre note en Markdown..."
+                        placeholder="Écrivez votre note en Markdown..."></textarea>
                     <div id="noteContentPreview" class="note-content-preview" style="display: none;"></div>
                 </div>
 
@@ -158,11 +144,12 @@ Bloc de code
                         <span class="stat-divider">•</span>
                         <span id="noteCharCount">0 caractères</span>
                         <span class="stat-divider">•</span>
-                        <span id="noteLastSaved">Non sauvegardé</span>
+                        <span class="stat-divider">•</span>
+                        <span id="noteLastSaved" data-i18n="Non sauvegardé">Non sauvegardé</span>
                     </div>
                     <div class="note-save-status" id="noteSaveStatus">
                         <i data-lucide="check-circle"></i>
-                        <span>Sauvegardé</span>
+                        <span data-i18n="Sauvegardé">Sauvegardé</span>
                     </div>
                 </div>
             </div>
@@ -174,38 +161,39 @@ Bloc de code
 <div class="ai-modal-overlay" id="notesAiModal" style="display: none;">
     <div class="ai-modal">
         <div class="ai-modal-header">
-            <h3><i data-lucide="sparkles"></i> Assistant IA</h3>
+            <h3><i data-lucide="sparkles"></i> <span data-i18n="Assistant IA">Assistant IA</span></h3>
             <button class="btn-icon" id="closeAiModalBtn"><i data-lucide="x"></i></button>
         </div>
         <div class="ai-modal-body">
+            <!-- État initial : Liste des actions -->
             <!-- État initial : Liste des actions -->
             <div class="ai-actions" id="aiActionsList">
                 <button class="ai-action-btn" data-action="summarize">
                     <div class="ai-action-icon"><i data-lucide="file-text"></i></div>
                     <div class="ai-action-info">
-                        <strong>Résumer</strong>
-                        <span>Générer un résumé concis de la note</span>
+                        <strong data-i18n="Résumer">Résumer</strong>
+                        <span data-i18n="Générer un résumé concis de la note">Générer un résumé concis de la note</span>
                     </div>
                 </button>
                 <button class="ai-action-btn" data-action="fix">
                     <div class="ai-action-icon"><i data-lucide="check"></i></div>
                     <div class="ai-action-info">
-                        <strong>Corriger</strong>
-                        <span>Correction orthographe et grammaire</span>
+                        <strong data-i18n="Corriger">Corriger</strong>
+                        <span data-i18n="Correction orthographe et grammaire">Correction orthographe et grammaire</span>
                     </div>
                 </button>
                 <button class="ai-action-btn" data-action="continue">
                     <div class="ai-action-icon"><i data-lucide="pen-tool"></i></div>
                     <div class="ai-action-info">
-                        <strong>Continuer</strong>
-                        <span>Compléter la rédaction du texte</span>
+                        <strong data-i18n="Continuer">Continuer</strong>
+                        <span data-i18n="Compléter la rédaction du texte">Compléter la rédaction du texte</span>
                     </div>
                 </button>
                 <button class="ai-action-btn" data-action="ideas">
                     <div class="ai-action-icon"><i data-lucide="lightbulb"></i></div>
                     <div class="ai-action-info">
-                        <strong>Idées</strong>
-                        <span>Générer des idées liées au contenu</span>
+                        <strong data-i18n="Idées">Idées</strong>
+                        <span data-i18n="Générer des idées liées au contenu">Générer des idées liées au contenu</span>
                     </div>
                 </button>
             </div>
@@ -215,15 +203,15 @@ Bloc de code
                 <div class="ai-spinner">
                     <i data-lucide="loader" class="spin"></i>
                 </div>
-                <p>L'IA réfléchit...</p>
+                <p data-i18n="L'IA réfléchit...">L'IA réfléchit...</p>
             </div>
 
             <!-- État résultat -->
             <div class="ai-result" id="aiResult" style="display: none;">
                 <div class="ai-result-content" id="aiResultContent"></div>
                 <div class="ai-result-actions">
-                    <button class="btn-secondary" id="aiRetryBtn">Réessayer</button>
-                    <button class="btn-primary" id="aiApplyBtn">Insérer</button>
+                    <button class="btn-secondary" id="aiRetryBtn" data-i18n="Réessayer">Réessayer</button>
+                    <button class="btn-primary" id="aiApplyBtn" data-i18n="Insérer">Insérer</button>
                 </div>
             </div>
         </div>

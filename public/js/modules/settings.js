@@ -187,12 +187,12 @@ export class SettingsModule {
         const newPassword = this.secNewPassword.value;
 
         if (!username || !currentPassword || !newPassword) {
-            this.showPasswordMsg('Tous les champs sont requis', 'error');
+            this.showPasswordMsg(I18n.t('Tous les champs sont requis'), 'error');
             return;
         }
 
         this.updatePasswordBtn.disabled = true;
-        this.updatePasswordBtn.textContent = 'Mise à jour...';
+        this.updatePasswordBtn.textContent = I18n.t('Mise à jour...');
 
         try {
             const res = await fetch('/api/auth/change-password', {
@@ -209,10 +209,10 @@ export class SettingsModule {
                 this.secCurrentPassword.value = '';
                 this.secNewPassword.value = '';
             } else {
-                this.showPasswordMsg(data.error || 'Erreur lors de la mise à jour', 'error');
+                this.showPasswordMsg(data.error || I18n.t('Erreur lors de la mise à jour'), 'error');
             }
         } catch (error) {
-            this.showPasswordMsg('Erreur de connexion au serveur', 'error');
+            this.showPasswordMsg(I18n.t('Erreur de connexion au serveur'), 'error');
         } finally {
             this.updatePasswordBtn.disabled = false;
             this.updatePasswordBtn.textContent = 'Mettre à jour le mot de passe';
@@ -422,7 +422,7 @@ export class SettingsModule {
             this.downloadedModelsContainer.innerHTML = `
                 <div class="status-loading">
                     <i data-lucide="info" style="width: 24px; height: 24px; color: var(--text-muted);"></i>
-                    Aucun modèle téléchargé trouvé.
+                    ${I18n.t('Aucun modèle téléchargé trouvé.')}
                 </div>
             `;
             if (window.lucide) window.lucide.createIcons();
@@ -434,10 +434,10 @@ export class SettingsModule {
                 <table class="models-table">
                     <thead>
                         <tr>
-                            <th>Modèle</th>
-                            <th>Type</th>
-                            <th>Taille</th>
-                            <th>Date</th>
+                            <th>${I18n.t('Modèle')}</th>
+                            <th>${I18n.t('Type')}</th>
+                            <th>${I18n.t('Taille')}</th>
+                            <th>${I18n.t('Date')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -472,17 +472,17 @@ export class SettingsModule {
                 <div class="status-details">
                     ${s.status === 'online' ? `
                         <div class="detail-row">
-                            <span class="detail-label">Service</span>
+                            <span class="detail-label">${I18n.t('Service')}</span>
                             <span class="detail-value">${s.details?.service || 'N/A'}</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Status</span>
+                            <span class="detail-label">${I18n.t('Status')}</span>
                             <span class="detail-value">${s.details?.status || 'OK'}</span>
                         </div>
                     ` : `
                         <div class="detail-row">
-                            <span class="detail-label">Erreur</span>
-                            <span class="detail-value">${s.error || 'Inconnu'}</span>
+                            <span class="detail-label">${I18n.t('Erreur')}</span>
+                            <span class="detail-value">${s.error || I18n.t('Inconnu')}</span>
                         </div>
                     `}
                 </div>
@@ -491,7 +491,7 @@ export class SettingsModule {
 
         // Render System Metrics
         if (!data.system || !data.system.memory) {
-            this.systemMetricsContainer.innerHTML = '<div class="status-loading">Metrics non disponibles</div>';
+            this.systemMetricsContainer.innerHTML = `<div class="status-loading">${I18n.t('Metrics non disponibles')}</div>`;
             return;
         }
 
@@ -501,19 +501,19 @@ export class SettingsModule {
 
         this.systemMetricsContainer.innerHTML = `
             <div class="metric-box">
-                <span class="metric-label">Uptime</span>
+                <span class="metric-label">${I18n.t('Uptime')}</span>
                 <span class="metric-value">${uptimeH}h ${uptimeM}m</span>
             </div>
             <div class="metric-box">
-                <span class="metric-label">Mémoire (RSS)</span>
+                <span class="metric-label">${I18n.t('Mémoire (RSS)')}</span>
                 <span class="metric-value">${memMb} MB</span>
             </div>
             <div class="metric-box">
-                <span class="metric-label">Platform</span>
+                <span class="metric-label">${I18n.t('Platform')}</span>
                 <span class="metric-value">${data.system.platform || 'N/A'}</span>
             </div>
             <div class="metric-box">
-                <span class="metric-label">Node JS</span>
+                <span class="metric-label">${I18n.t('Node JS')}</span>
                 <span class="metric-value">${data.system.nodeVersion || 'N/A'}</span>
             </div>
         `;
@@ -535,7 +535,7 @@ export class SettingsModule {
         if (!this.settingsLogsContainer) return;
 
         if (!logs || logs.length === 0) {
-            this.settingsLogsContainer.innerHTML = '<div class="log-placeholder">Aucun log disponible.</div>';
+            this.settingsLogsContainer.innerHTML = `<div class="log-placeholder">${I18n.t('Aucun log disponible.')}</div>`;
             return;
         }
 
@@ -556,7 +556,7 @@ export class SettingsModule {
     }
 
     async clearServerLogs() {
-        if (!confirm('Voulez-vous vraiment effacer les logs du serveur ?')) return;
+        if (!confirm(I18n.t('Voulez-vous vraiment effacer les logs du serveur ?'))) return;
 
         try {
             const res = await fetch('/api/status/logs/clear', { method: 'POST' });
@@ -771,7 +771,7 @@ export class SettingsModule {
     }
 
     async clearCache() {
-        if (confirm('Voulez-vous vraiment vider le cache local ? Cela réinitialisera également vos réglages.')) {
+        if (confirm(I18n.t('Voulez-vous vraiment vider le cache local ? Cela réinitialisera également vos réglages.'))) {
             localStorage.clear();
             // We might want to clear the server side too, but usually clear cache means local.
             // For now let's just reload.
