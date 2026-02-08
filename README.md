@@ -1,6 +1,6 @@
 # 🚀 Ultra Dashboard
 
-Ultra Dashboard est une plateforme modulaire et élégante conçue pour centraliser vos outils numériques, la gestion de vos médias et des services d'Intelligence Artificielle de pointe, le tout dans une interface haut de gamme et réactive.
+Ultra Dashboard is a modular and elegant platform designed to centralize your digital tools, media management, and cutting-edge AI services, all in a premium and responsive interface.
 
 ![Dashboard Preview](https://i.imgur.com/zUNtJVL.png)
 
@@ -9,77 +9,77 @@ Ultra Dashboard est une plateforme modulaire et élégante conçue pour centrali
 
 ---
 
-## ✨ Fonctionnalités Clés
+## ✨ Key Features
 
-### 🤖 Suite AI Intégrée
-- **Plexus (Deep Research)** : Un moteur de recherche IA avancé (clone Perplexity) qui synthétise le web en temps réel avec des sources citées.
-- **AI Chat** : Assistant intelligent multi-modèles compatible **OpenRouter** et **Ollama** (IA locale).
-- **Remove BG** : Détourage automatique d'images via des modèles Python locaux (U2NET, ISNET, etc.).
-- **AI Upscaler** : Agrandissement et amélioration de la résolution d'image utilisant le modèle **PAN** (optimisé CPU) par défaut.
-- **Speech-to-Text (STT)** : Transcription audio précise via Whisper (modèle `base` pré-chargé).
+### 🤖 Integrated AI Suite
+- **Plexus (Deep Research)**: An advanced AI search engine (Perplexity clone) that synthesizes the web in real-time with cited sources.
+- **AI Chat**: Intelligent multi-model assistant compatible with **OpenRouter** and **Ollama** (local AI).
+- **Remove BG**: Automatic background removal via local Python models (U2NET, ISNET, etc.).
+- **AI Upscaler**: Image upscaling and enhancement using the **PAN** model (CPU optimized) by default.
+- **Speech-to-Text (STT)**: Accurate audio transcription via Whisper (`base` model pre-loaded).
 
-### 🎬 Outils Média & Téléchargement
-- **Downloader Global** : Téléchargement et conversion unifiés de vidéos/audio depuis **YouTube**, **Instagram**, **TikTok** et bien plus via `yt-dlp`.
-- **Convertisseur Universel** : Interface FFmpeg complète pour transformer tous vos fichiers audio et vidéo.
+### 🎬 Media Tools & Downloading
+- **Global Downloader**: Unified downloading and conversion of video/audio from **YouTube**, **Instagram**, **TikTok**, and more via `yt-dlp`.
+- **Universal Converter**: Complete FFmpeg interface to transform all your audio and video files.
 
-### ⚡ Réseau & Utilitaires
-- **Notes & Idées** : Prise de notes rapide avec support Markdown et assistants IA pour la rédaction.
-- **LocalDrop** : Partage de fichiers P2P ultra-rapide via WebRTC (le "AirDrop" de votre réseau local).
-- **Torrent Manager** : Gestionnaire de téléchargements intégré.
-- **Toolbox** : Miroir webcam, utilitaires système et widgets (Météo, Stats CPU/RAM).
-- **Databank** : Votre coffre-fort centralisé où tous les fichiers générés et téléchargés sont automatiquement indexés et triés.
-
----
-
-## 🛠️ Stack Technique
-- **Backend** : Node.js (Express), Socket.io, Better-SQLite3
-- **Frontend** : EJS, Vanilla JS, CSS Variables (Design System custom)
-- **AI Backend** : Microservices Python (Flask), PyTorch, ONNX
-- **Processing** : FFmpeg, yt-dlp, Sharp
+### ⚡ Network & Utilities
+- **Notes & Ideas**: Quick note-taking with Markdown support and AI assistants for writing.
+- **LocalDrop**: Ultra-fast P2P file sharing via WebRTC (the "AirDrop" of your local network).
+- **Torrent Manager**: Integrated download manager.
+- **Toolbox**: Webcam mirror, system utilities, and widgets (Weather, CPU/RAM Stats).
+- **Databank**: Your centralized vault where all generated and downloaded files are automatically indexed and sorted.
 
 ---
 
-## 📦 Installation Rapide
+## 🛠️ Tech Stack
+- **Backend**: Node.js (Express), Socket.io, Better-SQLite3
+- **Frontend**: EJS, Vanilla JS, CSS Variables (Custom Design System)
+- **AI Backend**: Python Microservices (Flask), PyTorch, ONNX
+- **Processing**: FFmpeg, yt-dlp, Sharp
 
-### 🐳 Via Docker (Totalement Plug & Play)
-Le moyen recommandé pour tout lancer (Dashboard, IA, SearXNG, FFmpeg, Nginx) sans rien installer sur votre machine :
+---
+
+## 📦 Quick Installation
+
+### 🐳 Via Docker (Totally Plug & Play)
+The recommended way to launch everything (Dashboard, AI, SearXNG, FFmpeg, Nginx) without installing anything on your machine:
 
 ```bash
-# 1. Cloner le projet
+# 1. Clone the project
 git clone https://github.com/niark2/Niark-Dashboard.git
 cd Niark-Dashboard
 
-# 2. Lancer la magie
+# 2. Launch using
 docker-compose up -d --build
 ```
 
-### 2. Accès & Avantages
-- **Dashboard** : `http://localhost` (via Nginx).
-- **SearXNG** : `http://localhost/searxng` (intégré et pré-configuré).
-- **Persistence** : Vos réglages, vos modèles IA et vos fichiers sont sauvegardés dans les dossiers `data/`, `models/` et `uploads/` de votre machine.
-- **Santé des services** : Le Dashboard attend que les services IA soient totalement opérationnels (modèles chargés) avant de s'ouvrir grâce aux *healthchecks* Docker.
-- **Aucun fichier .env à créer manuellement** : tout est pré-configuré pour un démarrage instantané.
-- **IA Locale** : Les modèles sont téléchargés automatiquement au premier lancement (PAN, Whisper, Rembg).
-- **Moteur de recherche** : Une instance **SearXNG** dédiée est automatiquement déployée et connectée.
+### 2. Access & Advantages
+- **Dashboard**: `http://localhost` (via Nginx).
+- **SearXNG**: `http://localhost/searxng` (integrated and pre-configured).
+- **Persistence**: Your settings, AI models, and files are saved in the `data/`, `models/`, and `uploads/` folders on your machine.
+- **Service Health**: The Dashboard waits for AI services to be fully operational (models loaded) before opening, thanks to Docker *healthchecks*.
+- **No .env file to create manually**: everything is pre-configured for instant startup.
+- **Local AI**: Models are downloaded automatically on first launch (PAN, Whisper, Rembg).
+- **Search Engine**: A dedicated **SearXNG** instance is automatically deployed and connected.
 
-### 💻 Installation Locale
-1. **Node.js** : `npm install`
-2. **Python** : `pip install -r server/python/requirements.txt`
-3. **Lancement** : `npm run dev`
-Accès sur `http://localhost:3000`.
+### 💻 Local Installation
+1. **Node.js**: `npm install`
+2. **Python**: `pip install -r server/python/requirements.txt`
+3. **Launch**: `npm run dev`
+Access at `http://localhost:3000`.
 
 > [!IMPORTANT]
-> Pour plus de détails sur les prérequis et la configuration avancée, consultez le **[Guide d'Installation Complet (INSTALL.md)](./INSTALL.md)**.
+> For more details on prerequisites and advanced configuration, consult the **[Complete Installation Guide (INSTALL.md)](./INSTALL.md)**.
 
 ---
 
 ## ⚙️ Configuration
-Pas besoin de manipuler des fichiers de configuration complexes. Une fois lancé, allez dans l'onglet **Réglages > Variables d'env** pour configurer :
-- Votre clé **OpenRouter** pour l'IA (optionnelle si vous utilisez Ollama).
-- L'URL de votre instance **Ollama** locale (ex: `http://localhost:11434`).
-- Les URLs de vos microservices personnalisés.
-- Vos préférences d'interface.
+No need to manipulate complex configuration files. Once launched, go to the **Settings > Env Variables** tab to configure:
+- Your **OpenRouter** key for AI (optional if using Ollama).
+- The URL of your local **Ollama** instance (e.g., `http://localhost:11434`).
+- The URLs of your custom microservices.
+- Your interface preferences.
 
 ---
 
-*Créé par [Niark2](https://github.com/niark2) - Conçu pour la vitesse, le style et la polyvalence.*
+*Created by [Niark2](https://github.com/niark2) - Designed for speed, style, and versatility.*
