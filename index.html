@@ -1,15 +1,343 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
+    <title>Ultra Dashboard - Le hub ultime pour votre productivité</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Colors */
+            --bg-primary: #020617;
+            --bg-secondary: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-glass: rgba(15, 23, 42, 0.7);
+
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.5);
+
+            --border: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.2);
+
+            /* Typography */
+            --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', system-ui, sans-serif;
+
+            /* Spacing */
+            --spacing-xl: 4rem;
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .bg-glow {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 20%, var(--primary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, var(--accent-glow) 0%, transparent 40%);
+            filter: blur(80px);
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 3rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-family: var(--font-display);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px -5px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px var(--primary-glow);
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-surface);
+            border-color: var(--border-hover);
+        }
+
+        /* Features Grid */
+        .features {
+            padding: var(--spacing-xl) 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: var(--spacing-xl);
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Hello World!</h1>
-    <p>Test de la page gh-page</p>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i data-lucide="layout-dashboard"></i>
+                ULTRA DASHBOARD
+            </div>
+            <nav>
+                <a href="#" class="btn btn-secondary">Documentation</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-badge animate">
+                    <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+                    Nouveau : Intelligence Artificielle Intégrée
+                </div>
+                <h1 class="animate delay-1">L'interface ultime pour vos outils préférés</h1>
+                <p class="animate delay-2">Un dashboard moderne, rapide et personnalisable pour gérer vos vidéos, vos
+                    fichiers et vos IA au même endroit.</p>
+
+                <div class="hero-actions animate delay-2">
+                    <a href="https://github.com/niark2/Ultra-Dashboard" class="btn btn-primary">
+                        <i data-lucide="github"></i>
+                        Voir sur GitHub
+                    </a>
+                    <a href="#features" class="btn btn-secondary">En savoir plus</a>
+                </div>
+            </section>
+
+            <section id="features" class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="video"></i>
+                    </div>
+                    <h3>Downloader HD</h3>
+                    <p>Téléchargez vos vidéos préférées depuis YouTube et les réseaux sociaux en haute qualité d'un
+                        simple clic.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="brain-circuit"></i>
+                    </div>
+                    <h3>IA Intégrée</h3>
+                    <p>Suppression d'arrière-plan, upscale d'images et transcription vocale directement dans votre
+                        navigateur.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="file-code"></i>
+                    </div>
+                    <h3>Multi-Outils</h3>
+                    <p>Convertisseur de fichiers, gestionnaire de torrents et partage de fichiers local ultra-rapide.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p class="copyright">&copy; 2024 Ultra Dashboard. Créé par Niark2.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>
