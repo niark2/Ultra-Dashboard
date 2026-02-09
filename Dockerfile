@@ -29,7 +29,10 @@ COPY . .
 RUN npm run build || echo "Build failed, but continuing..."
 
 # Install Python dependencies for AI services
-# We try standard install first, fallback to break-system-packages for newer Python versions
+# Optimization: Force CPU-only version of PyTorch to save space and avoid CUDA bloat
+RUN pip3 install --no-cache-dir --break-system-packages torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining requirements
 RUN pip3 install --no-cache-dir -r server/python/requirements.txt || \
     pip3 install --no-cache-dir --break-system-packages -r server/python/requirements.txt
 
