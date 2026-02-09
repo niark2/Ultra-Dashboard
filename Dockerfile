@@ -1,4 +1,4 @@
-FROM node:20-bullseye
+FROM node:20-bookworm
 
 # Install system dependencies
 # ffmpeg: For media conversion and processing
